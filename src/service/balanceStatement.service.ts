@@ -26,7 +26,8 @@ export const autoAddTotalBalance = async (todayDate: string) => {
   if (todayData.length > 0) return {};
 
   let prevDate = previous();
-  let prevData = await balanceStatementModel.find({ dateOfDay: prevDate });
+  // let prevData = await balanceStatementModel.find({ dateOfDay: prevDate });
+  let prevData = (await balanceStatementModel.find()).reverse().slice(0, 4);
   if (prevData.length < 1) return {};
 
   prevData.map(async (ea) => {
