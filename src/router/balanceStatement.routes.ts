@@ -4,15 +4,22 @@ import {
   addTodayBalanceHandler,
   addTotalBalanceHandler,
   getStatementBalanceHandler,
+  manualAddHandler,
 } from "../controller/balanceStatement.controller";
 import { validateAll, validateToken } from "../middleware/validator";
-import { fuelAdjustSchema, fuelReciveSchema, todayBalanceSchema } from "../schema/schema";
+import {
+  fuelAdjustSchema,
+  fuelReciveSchema,
+  todayBalanceSchema,
+} from "../schema/schema";
 
 const balanceStatementRoute = require("express").Router();
 
 balanceStatementRoute.get("/", validateToken, getStatementBalanceHandler);
 
 balanceStatementRoute.post("/", validateToken, addTotalBalanceHandler);
+
+balanceStatementRoute.post("/manual", manualAddHandler);
 
 balanceStatementRoute.post(
   "/recive-balance",
@@ -21,14 +28,12 @@ balanceStatementRoute.post(
   addReciveBalanceHandler
 );
 
-
 balanceStatementRoute.post(
   "/adjust-balance",
   validateToken,
   validateAll(fuelAdjustSchema),
   addAdjustBalanceHandler
 );
-
 
 balanceStatementRoute.post(
   "/today-balance",

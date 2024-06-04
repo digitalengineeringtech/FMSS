@@ -3,11 +3,13 @@ import fMsg from "../utils/helper";
 import {
   addTotalBalance,
   getTotalBalance,
+  manualAddTotalBalanceToday,
   updateTotalBalanceAdjust,
   updateTotalBalanceReceive,
   updateTotalBalanceToday,
 } from "../service/balanceStatement.service";
 import { addFuelIn } from "../service/fuelIn.service";
+import moment from "moment-timezone";
 
 export const addTotalBalanceHandler = async (
   req: Request,
@@ -47,7 +49,7 @@ export const addReciveBalanceHandler = async (
     const receiveAmount = Number(req.body.receiveAmount);
 
     if (!id || !receiveAmount) throw new Error("Bad request");
-    
+
     await updateTotalBalanceReceive(id, receiveAmount);
     await addFuelIn(req.body);
 
@@ -86,5 +88,23 @@ export const addTodayBalanceHandler = async (
     fMsg(res, "today tank  data was added");
   } catch (e) {
     next(e);
+  }
+};
+
+//update by hk
+//const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD")
+export const manualAddHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    console.log(req, "ggggggggggggggggggggggg");
+    const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
+    console.log(currentDate);
+    const result = await manualAddTotalBalanceToday("2024-06-08", req);
+    fMsg(res, "today balance statement data was added", result);
+  } catch (e) {
+    fMsg(res, "Balance statement is already exit !");
   }
 };

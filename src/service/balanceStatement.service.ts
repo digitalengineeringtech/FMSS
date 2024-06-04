@@ -3,7 +3,8 @@ import { UpdateQuery } from "mongoose";
 import balanceStatementModel, {
   balanceStatementDocument,
 } from "../model/balanceStatement.model";
-import { previous } from "../utils/helper";
+import fMsg, { previous } from "../utils/helper";
+import { response } from "express";
 
 export const getTotalBalance = async (
   query: FilterQuery<balanceStatementDocument>
@@ -126,7 +127,106 @@ export const updateTotalBalanceToday = async (
   return await balanceStatementModel.findById(id);
 };
 
-// opening + receive + adjust - issue = balance
-// yesterdayTank - todayTank = tankIssue
-// tankIssue - issue = todayGL
-// todayTank - balance = totalGL
+//update by hk
+
+export const manualAddTotalBalanceToday = async (todayDate: string, req) => {
+  let todayData = await balanceStatementModel.find({ dateOfDay: todayDate });
+  console.log(todayData);
+  if (todayData.length > 0) {
+    return fMsg(response, "Balance statement is already exit");
+  } else {
+    let prevDate = previous();
+    let prevData = await balanceStatementModel.find({ dateOfDay: prevDate });
+    let lastData = (await balanceStatementModel.find()).reverse().slice(0, 4);
+    if (prevData.length > 0) {
+      prevData.map(async (ea) => {
+        let newData = {
+          fuelType: ea.fuelType,
+          openingBalance: ea.balance,
+          yesterdayTank: ea.todayTank,
+          balance: ea.balance,
+          dateOfDay: todayDate,
+        };
+        await new balanceStatementModel(newData).save();
+      });
+    } else {
+      if (lastData.length > 0) {
+        lastData.map(async (ea) => {
+          let newData = {
+            fuelType: ea.fuelType,
+            openingBalance: ea.balance,
+            yesterdayTank: ea.todayTank,
+            balance: ea.balance,
+            dateOfDay: todayDate,
+          };
+          await new balanceStatementModel(newData).save();
+        });
+      } else {
+        console.log(req);
+        const initialData = [
+          {
+            fuelType: "001-Octane Ron(92)",
+            dateOfDay: todayDate,
+            openingBalance: req.body.OctaneTwo,
+            receive: 0,
+            issue: 0,
+            adjust: 0,
+            balance: 0,
+            todayTank: 0,
+            yesterdayTank: 0,
+            tankIssue: 0,
+            todayGL: 0,
+            totalGL: 0,
+          },
+          {
+            fuelType: "005-Premium Diesel",
+            dateOfDay: todayDate,
+            openingBalance: req.body.PreDiesel,
+            receive: 0,
+            issue: 0,
+            adjust: 0,
+            balance: 0,
+            todayTank: 0,
+            yesterdayTank: 0,
+            tankIssue: 0,
+            todayGL: 0,
+            totalGL: 0,
+          },
+          {
+            fuelType: "004-Diesel",
+            dateOfDay: todayDate,
+            openingBalance: req.body.Diesel,
+            receive: 0,
+            issue: 0,
+            adjust: 0,
+            balance: 0,
+            todayTank: 0,
+            yesterdayTank: 0,
+            tankIssue: 0,
+            todayGL: 0,
+            totalGL: 0,
+          },
+          {
+            fuelType: "002-Octane Ron(95)",
+            dateOfDay: todayDate,
+            openingBalance: req.body.OctaneFive,
+            receive: 0,
+            issue: 0,
+            adjust: 0,
+            balance: 0,
+            todayTank: 0,
+            yesterdayTank: 0,
+            tankIssue: 0,
+            todayGL: 0,
+            totalGL: 0,
+          },
+        ];
+        initialData.map(async (ea) => {
+          let newData = ea;
+          // console.log(ea);
+          await new balanceStatementModel(newData).save();
+        });
+      }
+    }
+  }
+};
