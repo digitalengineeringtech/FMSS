@@ -15,9 +15,9 @@ import {
 
 const balanceStatementRoute = require("express").Router();
 
-balanceStatementRoute.get("/", validateToken, getStatementBalanceHandler);
+balanceStatementRoute.get("/", getStatementBalanceHandler);
 
-balanceStatementRoute.post("/", validateToken, addTotalBalanceHandler);
+balanceStatementRoute.post("/", addTotalBalanceHandler);
 
 balanceStatementRoute.post("/manual", manualAddHandler);
 
