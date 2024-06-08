@@ -128,7 +128,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 const defaultData = async () => {
   //gpio led low
-
   // lowLed();
 
   await rp(); //user migration
