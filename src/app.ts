@@ -25,6 +25,8 @@ import customerRoute from "./router/customer.routes";
 import totalStatementRoute from "./router/totalStatement.routes";
 import balanceStatementRoute from "./router/balanceStatement.routes";
 import fuelInRoute from "./router/fuelIn.routes";
+import fuelBalanceRoute from "./router/fuelBalance.routes";
+import tankDataRoute from "./router/tankData.routes";
 
 const app = express();
 app.use(fileUpload());
@@ -116,6 +118,9 @@ app.use("/api/customer", customerRoute);
 app.use("/api/total-statement", totalStatementRoute);
 app.use("/api/balance-statement", balanceStatementRoute);
 app.use("/api/fuelIn", fuelInRoute);
+
+app.use("/api/fuel-balance", fuelBalanceRoute);
+app.use("/api/tank-data", tankDataRoute);
 
 // error handling and response
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
