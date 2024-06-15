@@ -262,7 +262,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       .sort({ _id: -1, createAt: -1 })
       .limit(2)
       .lean();
-
+    console.log(lastData, "this is last data");
     if (!lastData[0] || !lastData[1]) {
       return;
     }
@@ -314,7 +314,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
 
     let checkErrorData = await detailSaleModel.find({
       asyncAlready: 0,
-      dailyReportDate: prevDate,
+      // dailyReportDate: prevDate,
     });
     console.log(checkErrorData, "this is error");
     // cloud upload 0 condition
@@ -576,7 +576,7 @@ export const updateDetailSaleByAp = async (
 
   let checkErrorData = await detailSaleModel.find({
     asyncAlready: 0,
-    dailyReportDate: prevDate,
+    // dailyReportDate: prevDate,
   });
   // cloud upload 0 condition
   if (checkErrorData.length > 0) {
