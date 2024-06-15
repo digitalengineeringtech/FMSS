@@ -13,6 +13,8 @@ export const getTotalBalance = async (
 };
 
 export const addTotalBalance = async (body: balanceStatementDocument) => {
+  const date = new Date().toLocaleDateString("fr-CA");
+  console.log(date, "this is date");
   return await new balanceStatementModel(body).save();
 };
 

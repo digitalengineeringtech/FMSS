@@ -310,11 +310,13 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     mqttEmitter("detpos/local_server", `${result?.nozzleNo}/D1S1`);
 
     let prevDate = previous(new Date(result.dailyReportDate));
+    console.log(prevDate, "this is prev date");
 
     let checkErrorData = await detailSaleModel.find({
       asyncAlready: 0,
       dailyReportDate: prevDate,
     });
+    console.log(checkErrorData, "this is error");
     // cloud upload 0 condition
     if (checkErrorData.length > 0) {
       for (const ea of checkErrorData) {
