@@ -22,12 +22,12 @@ export const getTankDataCount = async () => {
 export const addTankData = async (body) => {
   try {
     let url = config.get<string>("tankDataUrl");
-    let tankRealTimeData = await axios.post(url);
+    // let tankRealTimeData = await axios.post(url);
 
     let saveData = {
       ...body,
       asyncAlready: "0",
-      data: tankRealTimeData.data,
+      // data: tankRealTimeData.data,
     };
 
     await new tankDataModel(saveData).save();

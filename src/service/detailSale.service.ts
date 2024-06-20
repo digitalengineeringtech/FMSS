@@ -5,6 +5,7 @@ import { UserDocument } from "../model/user.model";
 import moment from "moment-timezone";
 import { get, mqttEmitter, previous, set } from "../utils/helper";
 import axios from "axios";
+import { addTankData } from "./tankData.service";
 
 import { deviceLiveData } from "../connection/liveTimeData";
 
@@ -13,6 +14,13 @@ import {
   autoAddTotalBalance,
   updateTotalBalanceIssue,
 } from "./balanceStatement.service";
+import {
+  addFuelBalance,
+  calcFuelBalance,
+  getFuelBalance,
+} from "./fuelBalance.service";
+import { addDailyReport, getDailyReport } from "./dailyReport.service";
+import { fuelBalanceDocument } from "../model/fuelBalance.model";
 
 interface Data {
   nozzleNo: string;
@@ -296,18 +304,80 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       result.saleLiter
     );
 
-    // let checkRpDate = await getDailyReport({
-    //   stationId: result.stationDetailId,
-    //   dateOfDay: result.dailyReportDate,
-    // });
-    // if (checkRpDate.length == 0) {
-    //   await addDailyReport({
-    //     stationId: result.stationDetailId,
-    //     dateOfDay: result.dailyReportDate,
-    //   });
-    // }
+    try {
+      await addTankData({
+        stationDetailId: lastData[0].stationDetailId,
+        vocono: lastData[0].vocono,
+        nozzleNo: lastData[0].nozzleNo,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    let checkDate = await getFuelBalance({
+      stationId: result.stationDetailId,
+      createAt: result.dailyReportDate,
+    });
+    let checkRpDate = await getDailyReport({
+      stationId: result.stationDetailId,
+      dateOfDay: result.dailyReportDate,
+    });
+    if (checkRpDate.length == 0) {
+      await addDailyReport({
+        stationId: result.stationDetailId,
+        dateOfDay: result.dailyReportDate,
+      });
+    }
+
+    if (checkDate.length == 0) {
+      let prevDate = previous(new Date(result.dailyReportDate));
+
+      let prevResult = await getFuelBalance({
+        stationId: result.stationDetailId,
+        createAt: prevDate,
+      });
+      await Promise.all(
+        prevResult.map(async (ea) => {
+          let obj: fuelBalanceDocument;
+          if (ea.balance == 0) {
+            obj = {
+              stationId: ea.stationId,
+              fuelType: ea.fuelType,
+              capacity: ea.capacity,
+              opening: ea.opening + ea.fuelIn,
+              tankNo: ea.tankNo,
+              createAt: result?.dailyReportDate,
+              nozzles: ea.nozzles,
+              balance: ea.opening + ea.fuelIn,
+            } as fuelBalanceDocument;
+          } else {
+            obj = {
+              stationId: ea.stationId,
+              fuelType: ea.fuelType,
+              capacity: ea.capacity,
+              opening: ea.opening + ea.fuelIn - ea.cash,
+              tankNo: ea.tankNo,
+              createAt: result?.dailyReportDate,
+              nozzles: ea.nozzles,
+              balance: ea.opening + ea.fuelIn - ea.cash,
+            } as fuelBalanceDocument;
+          }
+
+          await addFuelBalance(obj);
+        })
+      );
+    }
 
     mqttEmitter("detpos/local_server", `${result?.nozzleNo}/D1S1`);
+
+    await calcFuelBalance(
+      {
+        stationId: result.stationDetailId,
+        fuelType: result.fuelType,
+        createAt: result.dailyReportDate,
+      },
+      { liter: result.saleLiter },
+      result.nozzleNo
+    );
 
     let prevDate = previous(new Date(result.dailyReportDate));
     console.log(prevDate, "this is prev date");
