@@ -92,14 +92,15 @@ export const preSetDetailSaleHandler = async (
 
       result = await preSetDetailSale(depNo, nozzleNo, newLiter, "L", req.body);
     }
+    
+    //hk
+    // let balanceStatementData = await getTotalBalance({
+    //   dateOfDay: result.dailyReportDate,
+    // });
 
-    let balanceStatementData = await getTotalBalance({
-      dateOfDay: result.dailyReportDate,
-    });
-
-    if (balanceStatementData.length < 1) {
-      await autoAddTotalBalance(result.dailyReportDate);
-    }
+    // if (balanceStatementData.length < 1) {
+    //   await autoAddTotalBalance(result.dailyReportDate);
+    // }
     // that is save in data base
 
     fMsg(res, "New DetailSale data was added", result);
