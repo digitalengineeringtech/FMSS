@@ -500,34 +500,37 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       console.log(prevResult, "this is result");
 
       await Promise.all(
-        prevResult.slice(0, 4).map(async (ea) => {
-          let obj: fuelBalanceDocument;
-          if (ea.balance == 0) {
-            obj = {
-              stationId: ea.stationId,
-              fuelType: ea.fuelType,
-              capacity: ea.capacity,
-              opening: ea.opening + ea.fuelIn,
-              tankNo: ea.tankNo,
-              createAt: result?.dailyReportDate,
-              nozzles: ea.nozzles,
-              balance: ea.opening + ea.fuelIn,
-            } as fuelBalanceDocument;
-          } else {
-            obj = {
-              stationId: ea.stationId,
-              fuelType: ea.fuelType,
-              capacity: ea.capacity,
-              opening: ea.opening + ea.fuelIn - ea.cash,
-              tankNo: ea.tankNo,
-              createAt: result?.dailyReportDate,
-              nozzles: ea.nozzles,
-              balance: ea.opening + ea.fuelIn - ea.cash,
-            } as fuelBalanceDocument;
-          }
+        prevResult
+          .reverse()
+          .slice(0, 4)
+          .map(async (ea) => {
+            let obj: fuelBalanceDocument;
+            if (ea.balance == 0) {
+              obj = {
+                stationId: ea.stationId,
+                fuelType: ea.fuelType,
+                capacity: ea.capacity,
+                opening: ea.opening + ea.fuelIn,
+                tankNo: ea.tankNo,
+                createAt: result?.dailyReportDate,
+                nozzles: ea.nozzles,
+                balance: ea.opening + ea.fuelIn,
+              } as fuelBalanceDocument;
+            } else {
+              obj = {
+                stationId: ea.stationId,
+                fuelType: ea.fuelType,
+                capacity: ea.capacity,
+                opening: ea.opening + ea.fuelIn - ea.cash,
+                tankNo: ea.tankNo,
+                createAt: result?.dailyReportDate,
+                nozzles: ea.nozzles,
+                balance: ea.opening + ea.fuelIn - ea.cash,
+              } as fuelBalanceDocument;
+            }
 
-          await addFuelBalance(obj);
-        })
+            await addFuelBalance(obj);
+          })
       );
     }
 
