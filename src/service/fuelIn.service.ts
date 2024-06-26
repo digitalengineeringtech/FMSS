@@ -1,6 +1,9 @@
-import { FilterQuery } from "mongoose";
+import { FilterQuery, UpdateQuery } from "mongoose";
 import fuelInModel, { fuelInDocument } from "../model/fuelIn.model";
+import { getFuelBalance, updateFuelBalance } from "./fuelBalance.service";
 import config from "config";
+
+const limitNo = config.get<number>("page_limit");
 
 export const getFuelIn = async (query: FilterQuery<fuelInDocument>) => {
   try {
@@ -30,13 +33,45 @@ export const fuelInPaginate = async (
   return { count, data };
 };
 
-export const addFuelIn = async (body: fuelInDocument) => {
-  let { driver, bowser, fuel_type, recive_balance } = body;
+export const addFuelIn = async (body: any) => {
+  try {
+    let no = await fuelInModel.count();
+    let tankCondition = await getFuelBalance({
+      stationId: body.user.stationId,
+      fuelType: body.fuel_type,
+      tankNo: body.tankNo,
+      createAt: body.receive_date,
+    });
+    console.log(tankCondition);
 
-  if (!driver || !bowser || !fuel_type)
-    throw new Error("you need one field");
-  let result = await new fuelInModel(body).save();
-  return result;
+    const updatedBody = {
+      ...body,
+      stationId: body.user.stationId,
+      fuel_in_code: no + 1,
+      tank_balance: tankCondition[0].balance,
+    };
+
+    let result = await new fuelInModel(updatedBody).save();
+    await updateFuelBalance(
+      { _id: tankCondition[0]._id },
+      { fuelIn: body.receive_balance }
+    );
+    return result;
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+export const updateFuelIn = async (
+  query: FilterQuery<fuelInDocument>,
+  body: UpdateQuery<fuelInDocument>
+) => {
+  try {
+    await fuelInModel.updateMany(query, body);
+    return await fuelInModel.find(query).lean();
+  } catch (e) {
+    throw new Error(e);
+  }
 };
 
 export const deleteFuelIn = async (query: FilterQuery<fuelInDocument>) => {
@@ -49,4 +84,32 @@ export const deleteFuelIn = async (query: FilterQuery<fuelInDocument>) => {
   } catch (e) {
     throw new Error(e);
   }
+};
+
+export const fuelInByDate = async (
+  query: FilterQuery<fuelInDocument>,
+  d1: Date,
+  d2: Date,
+  pageNo: number
+): Promise<{ count: number; data: fuelInDocument[] }> => {
+  const reqPage = pageNo == 1 ? 0 : pageNo - 1;
+  const skipCount = limitNo * reqPage;
+
+  const filter: FilterQuery<fuelInDocument> = {
+    ...query,
+    createAt: {
+      $gt: d1,
+      $lt: d2,
+    },
+  };
+
+  const data = await fuelInModel
+    .find(filter)
+    .sort({ createAt: -1 })
+    .skip(skipCount)
+    .limit(limitNo)
+    .select("-__v");
+
+  const count = await fuelInModel.countDocuments(filter);
+  return { data, count };
 };

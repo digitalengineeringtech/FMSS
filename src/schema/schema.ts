@@ -197,15 +197,15 @@ export const fuelInSchema = object({
     }),
 
     bowser: string({
-      required_error: "you need add driver",
+      required_error: "you need add browser",
     }),
 
     fuel_type: string({
-      required_error: "you need add driver",
+      required_error: "you need add fuelType",
     }),
 
-    recive_balance: string({
-      required_error: "you need add driver",
+    receive_balance: string({
+      required_error: "you need add balance",
     }),
   }),
 });
@@ -272,12 +272,12 @@ export const fuelAdjustSchema = object({
       required_error: "no data with that id",
     }).regex(/^[0-9a-fA-F]{24}$/, "invlid id"),
   }),
-  body : object({
+  body: object({
     adjustAmount: string({
       required_error: "you need add adjust Amount",
     }),
-  })
-})
+  }),
+});
 
 export const todayBalanceSchema = object({
   query: object({
@@ -285,9 +285,9 @@ export const todayBalanceSchema = object({
       required_error: "no data with that id",
     }).regex(/^[0-9a-fA-F]{24}$/, "invlid id"),
   }),
-  body : object({
+  body: object({
     todayTankAmount: string({
       required_error: "you need add adjust Amount",
     }),
-  })
-})
+  }),
+});

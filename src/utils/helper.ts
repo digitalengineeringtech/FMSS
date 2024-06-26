@@ -61,6 +61,7 @@ export const mqttEmitter = (topic: string, message: string) => {
   client.publish(topic, message);
 };
 
+
 export const set = async (id, value) =>
   await Redis.set(id.toString(), JSON.stringify(value));
 export const get = async (id) => JSON.parse(await Redis.get(id.toString()));
