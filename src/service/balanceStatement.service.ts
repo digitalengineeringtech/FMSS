@@ -14,7 +14,7 @@ export const getTotalBalance = async (
 
 export const addTotalBalance = async (body: balanceStatementDocument) => {
   const date = new Date().toLocaleDateString("fr-CA");
-  console.log(date, "this is date");
+  // console.log(date, "this is date");
   return await new balanceStatementModel(body).save();
 };
 
@@ -74,7 +74,7 @@ export const updateTotalBalanceReceive = async (
   if (!data) throw new Error("Not Work");
 
   let balance = data.balance + receiveAmount;
-  console.log(typeof receiveAmount);
+  // console.log(typeof receiveAmount);
   let updateData = {
     ...data.toObject(),
     receive: receiveAmount,
@@ -102,7 +102,7 @@ export const updateTotalBalanceAdjust = async (
     balance: balance,
     totalGL: data.todayTank - balance,
   };
-  console.log(updateData);
+  // console.log(updateData);
 
   await balanceStatementModel.findByIdAndUpdate(id, updateData);
   return await balanceStatementModel.findById(id);
@@ -124,7 +124,7 @@ export const updateTotalBalanceToday = async (
     todayGL: tankIssue - data.issue,
     totalGL: todayTankAmount - data.balance,
   };
-  console.log(updateData);
+  // console.log(updateData);
   await balanceStatementModel.findByIdAndUpdate(id, updateData);
   return await balanceStatementModel.findById(id);
 };
@@ -133,7 +133,7 @@ export const updateTotalBalanceToday = async (
 
 export const manualAddTotalBalanceToday = async (todayDate: string, req) => {
   let todayData = await balanceStatementModel.find({ dateOfDay: todayDate });
-  console.log(todayData);
+  // console.log(todayData);
   if (todayData.length > 0) {
     return fMsg(response, "Balance statement is already exit");
   } else {
@@ -164,7 +164,7 @@ export const manualAddTotalBalanceToday = async (todayDate: string, req) => {
           await new balanceStatementModel(newData).save();
         });
       } else {
-        console.log(req);
+        // console.log(req);
         const initialData = [
           {
             fuelType: "001-Octane Ron(92)",

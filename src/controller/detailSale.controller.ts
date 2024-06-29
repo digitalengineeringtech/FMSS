@@ -79,7 +79,7 @@ export const preSetDetailSaleHandler = async (
       if (preSetLiter.length > 7) throw new Error("You can enter only 6 digit");
 
       let arr = preSetLiter.split(".");
-      console.log(arr[1]);
+      // console.log(arr[1]);
       if (arr[0].length > 3 || arr[1]?.length > 3 || arr[1] == undefined) {
         throw new Error("the number format is 999.999");
       }

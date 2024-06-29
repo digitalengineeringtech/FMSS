@@ -96,7 +96,7 @@ export const calcFuelBalance = async (query, body, payload: string) => {
       ea.nozzles.includes(payload.toString())
     );
 
-    console.log(gg , "this is from calcuFuel gg")
+    // console.log(gg , "this is from calcuFuel gg")
 
     if (!gg) {
       throw new Error("No tank with the provided nozzle found.");

@@ -54,9 +54,9 @@ export const preSetDetailSale = async (
   type: string,
   body
 ) => {
-  console.log("====================================");
-  console.log(body);
-  console.log("====================================");
+  // console.log("====================================");
+  // console.log(body);
+  // console.log("====================================");
 
   const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
   const cuurentDateForVocono = moment().tz("Asia/Yangon").format("DDMMYYYY");
@@ -87,7 +87,7 @@ export const preSetDetailSale = async (
     dailyReportDate: currentDate,
   });
 
-  console.log(count, count + 1, "............");
+  // console.log(count, count + 1, "............");
 
   await set(currentDate, count + 1);
 
@@ -242,7 +242,7 @@ export const addDetailSale = async (
       dailyReportDate: currentDate,
     });
 
-    console.log(count, "this is count");
+    // console.log(count, "this is count");
 
     // await set(currentDate, newCount);
 
@@ -426,7 +426,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       .limit(2)
       .lean();
 
-    console.log(lastData, "this is last data");
+    // console.log(lastData, "this is last data");
     if (!lastData[0] || !lastData[1]) {
       return;
     }
@@ -452,9 +452,9 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     if (!result) {
       throw new Error("Final send in error");
     }
-    console.log("..................");
-    console.log(result);
-    console.log("..................");
+    // console.log("..................");
+    // console.log(result);
+    // console.log("..................");
     // console.log(result.fuelType  , result.dailyReportDate)
     //hk
     // await updateTotalBalanceIssue(
@@ -480,7 +480,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       dateOfDay: result.dailyReportDate,
     });
 
-    console.log(checkDate, "this is check data", checkDate.length);
+    // console.log(checkDate, "this is check data", checkDate.length);
 
     if (checkRpDate.length == 0) {
       await addDailyReport({
@@ -497,7 +497,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         // createAt: prevDate,
       });
 
-      console.log(prevResult, "this is result");
+      // console.log(prevResult, "this is result");
 
       await Promise.all(
         prevResult

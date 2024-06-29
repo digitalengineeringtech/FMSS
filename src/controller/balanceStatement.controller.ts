@@ -99,9 +99,9 @@ export const manualAddHandler = async (
   next: NextFunction
 ) => {
   try {
-    console.log(req, "ggggggggggggggggggggggg");
+    // console.log(req, "ggggggggggggggggggggggg");
     const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
-    console.log(currentDate);
+    // console.log(currentDate);
     const result = await manualAddTotalBalanceToday("2024-06-08", req);
     fMsg(res, "today balance statement data was added", result);
   } catch (e) {
