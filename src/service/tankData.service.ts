@@ -77,11 +77,15 @@ export const addTankData = async (body) => {
     //     id: 4,
     //   },
     // ];
+    console.log(
+      tankRealTimeData,
+      ".........this is tank realtime data................"
+    );
 
     let saveData = {
       ...body,
       asyncAlready: "0",
-      data: tankRealTimeData.data,
+      data: tankRealTimeData.data.data,
       // data: fakedata,
     };
 
