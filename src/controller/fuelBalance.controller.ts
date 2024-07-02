@@ -8,6 +8,7 @@ import {
   deleteFuelBalance,
   fuelBalancePaginate,
   fuelBalanceByDate,
+  fuelBalanceByOneDate,
 } from "../service/fuelBalance.service";
 import { fuelBalanceDocument } from "../model/fuelBalance.model";
 
@@ -123,6 +124,31 @@ export const getFuelBalanceByDateHandler = async (
     const startDate: Date = new Date(sDate);
     const endDate: Date = new Date(eDate);
     let result = await fuelBalanceByDate(query, startDate, endDate);
+    fMsg(res, "fuel balance between two date", result);
+  } catch (e) {
+    next(new Error(e));
+  }
+};
+export const getFuelBalanceByOneDateHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    console.log("====================================");
+    // console.log(sDate);
+    console.log("====================================");
+    let sDate: any = req.query.sDate;
+
+    delete req.query.sDate;
+
+    let query = req.query;
+
+    if (!sDate) {
+      throw new Error("you need date");
+    }
+    const startDate: Date = new Date(sDate);
+    let result = await fuelBalanceByOneDate(query, startDate);
     fMsg(res, "fuel balance between two date", result);
   } catch (e) {
     next(new Error(e));

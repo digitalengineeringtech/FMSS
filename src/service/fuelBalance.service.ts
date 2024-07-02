@@ -96,8 +96,6 @@ export const calcFuelBalance = async (query, body, payload: string) => {
       ea.nozzles.includes(payload.toString())
     );
 
-    // console.log(gg , "this is from calcuFuel gg")
-
     if (!gg) {
       throw new Error("No tank with the provided nozzle found.");
     }
@@ -153,6 +151,27 @@ export const fuelBalanceByDate = async (
       $gt: d1,
       $lt: d2,
     },
+  };
+
+  let result = await fuelBalanceModel
+    .find(filter)
+    .sort({ realTime: -1 })
+    // .populate("stationId")
+    .select("-__v");
+
+  return result;
+};
+
+export const fuelBalanceByOneDate = async (
+  query: FilterQuery<fuelBalanceDocument>,
+  d1: Date
+): Promise<fuelBalanceDocument[]> => {
+  console.log("====================================");
+  console.log(d1.toLocaleDateString("fr-CA"));
+  console.log("====================================");
+  const filter: FilterQuery<fuelBalanceDocument> = {
+    ...query,
+    createAt: d1.toLocaleDateString("fr-CA"),
   };
 
   let result = await fuelBalanceModel

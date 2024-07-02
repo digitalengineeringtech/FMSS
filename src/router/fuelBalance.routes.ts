@@ -3,6 +3,7 @@ import {
   deleteFuelBalanceHandler,
   getAllFuelBalanceHandler,
   getFuelBalanceByDateHandler,
+  getFuelBalanceByOneDateHandler,
   getFuelBalanceHandler,
   updateFuelBalanceHandler,
 } from "../controller/fuelBalance.controller";
@@ -35,6 +36,13 @@ fuelBalanceRoute.get(
   validateToken,
   hasAnyPermit(["view"]),
   getFuelBalanceByDateHandler
+);
+
+fuelBalanceRoute.get(
+  "/by-one-date",
+  validateToken,
+  hasAnyPermit(["view"]),
+  getFuelBalanceByOneDateHandler
 );
 
 fuelBalanceRoute.post(
