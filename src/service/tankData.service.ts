@@ -21,62 +21,66 @@ export const getTankDataCount = async () => {
 
 export const addTankData = async (body) => {
   try {
+    const fakedata = {
+      data: {
+        data: [
+          {
+            stateInfo: "No alarm",
+            oilType: "Petrol 92",
+            weight: 0,
+            level: 2222,
+            oilRatio: 0.3333,
+            waterRatio: 0,
+            canAddOilWeight: 0,
+            temperature: 32.33,
+            volume: 333,
+            connect: 3,
+            id: 1,
+          },
+          {
+            stateInfo: "No alarm",
+            oilType: "Diesel",
+            weight: 0,
+            level: 2222,
+            oilRatio: 0.3333,
+            waterRatio: 0,
+            canAddOilWeight: 0,
+            temperature: 32.33,
+            volume: 333,
+            connect: 3,
+            id: 2,
+          },
+          {
+            stateInfo: "No alarm",
+            oilType: "95 Octane",
+            weight: 0,
+            level: 2222,
+            oilRatio: 0.3333,
+            waterRatio: 0,
+            canAddOilWeight: 0,
+            temperature: 32.33,
+            volume: 333,
+            connect: 3,
+            id: 3,
+          },
+          {
+            stateInfo: "No alarm",
+            oilType: "Super Diesel",
+            weight: 0,
+            level: 2222,
+            oilRatio: 0.3333,
+            waterRatio: 0,
+            canAddOilWeight: 0,
+            temperature: 32.33,
+            volume: 333,
+            connect: 3,
+            id: 4,
+          },
+        ],
+      },
+    };
     let url = config.get<string>("tankDataUrl");
-    let tankRealTimeData = url && (await axios.post(url));
-    const fakedata = [
-      {
-        stateInfo: "No alarm",
-        oilType: "Petrol 92",
-        weight: 0,
-        level: 2222,
-        oilRatio: 0.3333,
-        waterRatio: 0,
-        canAddOilWeight: 0,
-        temperature: 32.33,
-        volume: 333,
-        connect: 3,
-        id: 1,
-      },
-      {
-        stateInfo: "No alarm",
-        oilType: "Diesel",
-        weight: 0,
-        level: 2222,
-        oilRatio: 0.3333,
-        waterRatio: 0,
-        canAddOilWeight: 0,
-        temperature: 32.33,
-        volume: 333,
-        connect: 3,
-        id: 2,
-      },
-      {
-        stateInfo: "No alarm",
-        oilType: "95 Octane",
-        weight: 0,
-        level: 2222,
-        oilRatio: 0.3333,
-        waterRatio: 0,
-        canAddOilWeight: 0,
-        temperature: 32.33,
-        volume: 333,
-        connect: 3,
-        id: 3,
-      },
-      {
-        stateInfo: "No alarm",
-        oilType: "Super Diesel",
-        weight: 0,
-        level: 2222,
-        oilRatio: 0.3333,
-        waterRatio: 0,
-        canAddOilWeight: 0,
-        temperature: 32.33,
-        volume: 333,
-        connect: 3,
-        id: 4,
-      },
-    ];
+    let tankRealTimeData = url ? await axios.post(url) : fakedata;
 
     console.log(
       tankRealTimeData,
@@ -86,7 +90,7 @@ export const addTankData = async (body) => {
     let saveData = {
       ...body,
       asyncAlready: "0",
-      data: url ? tankRealTimeData.data.data : fakedata,
+      data: tankRealTimeData.data.data,
       // data: fakedata,
     };
 
