@@ -28,12 +28,12 @@ import mongoose, { Schema } from "mongoose";
 export interface tankDataDocument extends mongoose.Document {
   vocono: string;
   nozzleNo: string;
-  asyncAlready : string;
+  asyncAlready: string;
   data: [];
 }
 
 const tankDataSchema = new Schema({
-  stationDetailId : {
+  stationDetailId: {
     type: Schema.Types.ObjectId,
     ref: "stationDetail",
     required: true,
