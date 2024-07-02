@@ -15,8 +15,6 @@ export const getTankDataHandler = async (
   try {
     let pageNo = Number(req.params.page);
     let dateOfDay = req.query.dateOfDay;
-
-
     let { count, data } = await tankDataPaginate(pageNo, {
       dateOfDay,
     });

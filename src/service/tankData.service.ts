@@ -155,6 +155,8 @@ export const tankDataPaginate = async (
   const reqPage = pageNo == 1 ? 0 : pageNo - 1;
   const skipCount = limitNo * reqPage;
 
+  console.log(query, ".................................................");
+
   const data = await tankDataModel
     .find(query)
     .sort({ createAt: -1 })

@@ -42,6 +42,10 @@ const tankDataSchema = new Schema({
   vocono: { type: String, required: true, unique: true },
   nozzleNo: { type: String, required: true },
   data: { type: Array, default: [] },
+  dailyReportDate: {
+    type: String,
+    default: new Date().toLocaleDateString(`fr-CA`),
+  },
 });
 
 const tankDataModel = mongoose.model<tankDataDocument>(

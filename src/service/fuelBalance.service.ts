@@ -166,9 +166,6 @@ export const fuelBalanceByOneDate = async (
   query: FilterQuery<fuelBalanceDocument>,
   d1: Date
 ): Promise<fuelBalanceDocument[]> => {
-  console.log("====================================");
-  console.log(d1.toLocaleDateString("fr-CA"));
-  console.log("====================================");
   const filter: FilterQuery<fuelBalanceDocument> = {
     ...query,
     createAt: d1.toLocaleDateString("fr-CA"),
