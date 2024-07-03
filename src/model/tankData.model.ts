@@ -42,7 +42,7 @@ const tankDataSchema = new Schema({
   vocono: { type: String, required: true, unique: true },
   nozzleNo: { type: String, required: true },
   data: { type: Array, default: [] },
-  dailyReportDate: {
+  dateOfDay: {
     type: String,
     default: new Date().toLocaleDateString(`fr-CA`),
   },
