@@ -5,7 +5,7 @@ import moment, { MomentTimezone } from "moment-timezone";
 const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
 
 export interface fuelInDocument extends mongoose.Document {
-  stationId: string;
+  stationDetailId: string;
   driver: string;
   tankNo: string;
   bowser: string;
@@ -17,7 +17,7 @@ export interface fuelInDocument extends mongoose.Document {
 }
 
 const fuelInSchema = new Schema({
-  stationId: {
+  stationDetailId: {
     type: Schema.Types.ObjectId,
     ref: "stationDetail",
     // default: "6464e9f1c45b82216ab1db6b",
