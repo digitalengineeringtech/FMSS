@@ -1,3 +1,4 @@
+import { response } from "express";
 import { FilterQuery, UpdateQuery } from "mongoose";
 import detailSaleModel, { detailSaleDocument } from "../model/detailSale.model";
 import config from "config";
@@ -21,6 +22,7 @@ import {
 } from "./fuelBalance.service";
 import { addDailyReport, getDailyReport } from "./dailyReport.service";
 import { fuelBalanceDocument } from "../model/fuelBalance.model";
+import fuelInModel from "../model/fuelIn.model";
 
 interface Data {
   nozzleNo: string;
@@ -553,9 +555,11 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       asyncAlready: 0,
       // dailyReportDate: prevDate,
     });
-    // console.log(checkErrorData, "this is error");
-    // cloud upload 0 condition
+
     if (checkErrorData.length > 0) {
+      // console.log(checkErrorData, "this is error");
+
+      // cloud upload 0 condition
       for (const ea of checkErrorData) {
         try {
           let url = config.get<string>("detailsaleCloudUrl");
@@ -592,6 +596,39 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         console.log(error);
         if (error.response && error.response.status === 409) {
         } else {
+        }
+      }
+    }
+
+    let checkErrorFuelInData = await fuelInModel.find({
+      asyncAlready: 1,
+      // dailyReportDate: prevDate,
+    });
+
+    console.log("======dfdffdf==============================");
+    console.log(checkErrorFuelInData);
+    console.log("======dfdfdfd==============================");
+
+    if (checkErrorFuelInData.length > 0) {
+      for (const ea of checkErrorFuelInData) {
+        try {
+          let response = await axios.post(
+            "http://192.168.1.146:9000/api/fuelIn",
+            ea
+          );
+
+          if (response.status == 200) {
+            await fuelInModel.findByIdAndUpdate(result._id, {
+              asyncAlready: "2",
+            });
+          } else {
+            console.log("error is here fuel in");
+          }
+        } catch (error) {
+          console.log("errr", error.response.data.msg);
+          if (error.response && error.response.status === 409) {
+          } else {
+          }
         }
       }
     }

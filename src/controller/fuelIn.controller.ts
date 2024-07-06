@@ -42,6 +42,7 @@ export const updateFuelInHandler = async (
   next: NextFunction
 ) => {
   try {
+    console.log(req.query, ".........................");
     let result = await updateFuelIn(req.query, req.body);
     fMsg(res, "updated FuelIn data", result);
   } catch (e) {

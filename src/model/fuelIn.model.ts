@@ -14,6 +14,7 @@ export interface fuelInDocument extends mongoose.Document {
   tank_balance: number;
   receive_balance: number;
   receive_date: string;
+  asyncAlready: number;
 }
 
 const fuelInSchema = new Schema({
@@ -31,6 +32,7 @@ const fuelInSchema = new Schema({
   receive_balance: { type: Number, required: true },
   receive_date: { type: String, default: new Date() },
   createAt: { type: Date, default: new Date() },
+  asyncAlready: { type: Number, required: true },
 });
 
 fuelInSchema.pre("save", function (next) {

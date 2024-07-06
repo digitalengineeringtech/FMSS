@@ -2,6 +2,7 @@ import { FilterQuery, UpdateQuery } from "mongoose";
 import fuelInModel, { fuelInDocument } from "../model/fuelIn.model";
 import { getFuelBalance, updateFuelBalance } from "./fuelBalance.service";
 import config from "config";
+import axios from "axios";
 
 const limitNo = config.get<number>("page_limit");
 
@@ -56,6 +57,27 @@ export const addFuelIn = async (body: any) => {
       { _id: tankCondition[0]._id },
       { fuelIn: body.receive_balance }
     );
+
+    try {
+      let response = await axios.post(
+        "http://192.168.1.146:9000/api/fuelIn",
+        updatedBody
+      );
+
+      if (response.status == 200) {
+        await fuelInModel.findByIdAndUpdate(result._id, {
+          asyncAlready: "2",
+        });
+      } else {
+        console.log("error is here fuel in");
+      }
+    } catch (error) {
+      console.log("errr", error);
+      if (error.response && error.response.status === 409) {
+      } else {
+      }
+    }
+
     return result;
   } catch (e) {
     throw new Error(e);

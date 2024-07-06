@@ -4,11 +4,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { client } from "./connect";
 const Redis = require("async-redis").createClient({
-  host: 'localhost',
+  host: "localhost",
   port: 6379,
-  db: 0, 
+  db: 0,
 });
-
 
 const saltWorkFactor = config.get<number>("saltWorkFactor");
 const secretKey = config.get<string>("secretKey");
@@ -61,12 +60,10 @@ export const mqttEmitter = (topic: string, message: string) => {
   client.publish(topic, message);
 };
 
-
 export const set = async (id, value) =>
   await Redis.set(id.toString(), JSON.stringify(value));
 export const get = async (id) => JSON.parse(await Redis.get(id.toString()));
 export const drop = async (id: any) => await Redis.del(id.toString());
-
 
 export const cleanAll = async () => await Redis.flushdb();
 
