@@ -58,11 +58,14 @@ export const addFuelIn = async (body: any) => {
       { fuelIn: body.receive_balance }
     );
 
+    const url = config.get<string>("fuelInCloud");
+
+    console.log("====================================");
+    console.log(url);
+    console.log("====================================");
+
     try {
-      let response = await axios.post(
-        "http://192.168.1.146:9000/api/fuelIn",
-        updatedBody
-      );
+      let response = await axios.post(url, updatedBody);
 
       if (response.status == 200) {
         await fuelInModel.findByIdAndUpdate(result._id, {

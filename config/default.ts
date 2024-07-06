@@ -17,6 +17,7 @@ export default {
   // tankDataUrl: "http://192.168.0.105:8080/baseOilcan",
   // tankDataCloudUrl: "https://detfsmm.com/api/tank-data",
   tankDataCloudUrl: "http://192.168.1.146:8000/api/tank-data",
+  fuelInCloud: "http://192.168.1.146:8000/api/fuelIn",
   // detailsaleCloudUrl: "https://detfsmm.com/api/detail-sale",
   detailsaleCloudUrl: "http://192.168.1.146:8000/api/detail-sale",
   //coustomerCloudUrl: "http://detfsmm.com:9000/api/customer",
