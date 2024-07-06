@@ -1,5 +1,5 @@
 export default {
-  port: 8000,
+  port: 9000,
   host: "localhost",
   dbUrl: "mongodb://detpos:asdffdsa@192.168.1.146:27017/test?authSource=admin",
   // dbUrl:
