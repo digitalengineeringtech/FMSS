@@ -609,13 +609,12 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     console.log(checkErrorFuelInData);
     console.log("======dfdfdfd==============================");
 
+    const url = config.get<string>("fuelInCloud");
+
     if (checkErrorFuelInData.length > 0) {
       for (const ea of checkErrorFuelInData) {
         try {
-          let response = await axios.post(
-            "http://192.168.1.146:9000/api/fuelIn",
-            ea
-          );
+          let response = await axios.post(url, ea);
 
           if (response.status == 200) {
             await fuelInModel.findByIdAndUpdate(result._id, {
