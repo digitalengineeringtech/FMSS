@@ -35,7 +35,7 @@ export const fuelInPaginate = async (
 };
 
 export const addFuelIn = async (body: any) => {
-  console.log(body , "this is body")
+  // console.log(body , "this is body")
   try {
     let no = await fuelInModel.count();
     let tankCondition = await getFuelBalance({
@@ -44,7 +44,7 @@ export const addFuelIn = async (body: any) => {
       tankNo: body.tankNo,
       createAt: body.receive_date,
     });
-    console.log(tankCondition);
+    // console.log(tankCondition);
 
     const updatedBody = {
       ...body,
@@ -61,9 +61,9 @@ export const addFuelIn = async (body: any) => {
 
     const url = config.get<string>("fuelInCloud");
 
-    console.log("===up=================================");
-    console.log(updatedBody);
-    console.log("===up=================================");
+    // console.log("===up=================================");
+    // console.log(updatedBody);
+    // console.log("===up=================================");
 
     try {
       let response = await axios.post(url, updatedBody);
