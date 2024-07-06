@@ -70,7 +70,7 @@ export const addFuelIn = async (body: any) => {
 
       if (response.status == 200) {
         await fuelInModel.findByIdAndUpdate(result._id, {
-          asyncAlready: 2,
+          asyncAlready: "2",
         });
       } else {
         console.log("error is here fuel in");
