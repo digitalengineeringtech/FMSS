@@ -60,16 +60,16 @@ export const addFuelIn = async (body: any) => {
 
     const url = config.get<string>("fuelInCloud");
 
-    console.log("====================================");
-    console.log(url);
-    console.log("====================================");
+    console.log("===up=================================");
+    console.log(updatedBody);
+    console.log("===up=================================");
 
     try {
       let response = await axios.post(url, updatedBody);
 
       if (response.status == 200) {
         await fuelInModel.findByIdAndUpdate(result._id, {
-          asyncAlready: "2",
+          asyncAlready: 2,
         });
       } else {
         console.log("error is here fuel in");
