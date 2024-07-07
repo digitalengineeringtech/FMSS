@@ -79,6 +79,7 @@ export const addTankData = async (body) => {
         ],
       },
     };
+
     let url = config.get<string>("tankDataUrl");
     let tankRealTimeData = url ? await axios.post(url) : fakedata;
 
@@ -99,6 +100,10 @@ export const addTankData = async (body) => {
     let uploadData = await getTankData({
       asyncAlready: "0",
     });
+
+    console.log("===this is=================================");
+    console.log(uploadData);
+    console.log("===upload data=================================");
 
     if (uploadData.length == 0) return;
 

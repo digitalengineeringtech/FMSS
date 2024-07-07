@@ -29,7 +29,6 @@ export const addFuelInHandler = async (
   next: NextFunction
 ) => {
   try {
-    console.log('.......................', req.body)
     let result = await addFuelIn(req.body);
     fMsg(res, "New FuelIn data was added", result);
   } catch (e) {

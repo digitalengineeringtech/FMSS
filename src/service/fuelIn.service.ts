@@ -35,7 +35,6 @@ export const fuelInPaginate = async (
 };
 
 export const addFuelIn = async (body: any) => {
-  // console.log(body , "this is body")
   try {
     let no = await fuelInModel.count();
     let tankCondition = await getFuelBalance({
@@ -44,7 +43,8 @@ export const addFuelIn = async (body: any) => {
       tankNo: body.tankNo,
       createAt: body.receive_date,
     });
-    // console.log(tankCondition);
+
+    console.log(tankCondition, "this is tank condition", body);
 
     const updatedBody = {
       ...body,

@@ -19,6 +19,7 @@ import {
   addFuelBalance,
   calcFuelBalance,
   getFuelBalance,
+  updateFuelBalance,
 } from "./fuelBalance.service";
 import { addDailyReport, getDailyReport } from "./dailyReport.service";
 import { fuelBalanceDocument } from "../model/fuelBalance.model";
@@ -464,11 +465,13 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     //   result.saleLiter
     // );
 
+    console.log(lastData, "this is last data");
+
     try {
       await addTankData({
-        stationDetailId: lastData[1].stationDetailId,
-        vocono: lastData[1].vocono,
-        nozzleNo: lastData[1].nozzleNo,
+        stationDetailId: lastData[0].stationDetailId,
+        vocono: lastData[0].vocono,
+        nozzleNo: lastData[0].nozzleNo,
       });
     } catch (e) {
       console.log(e);
@@ -613,22 +616,75 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
 
     if (checkErrorFuelInData.length > 0) {
       for (const ea of checkErrorFuelInData) {
-        try {
-          let response = await axios.post(url, ea);
+        console.log("====================================");
+        console.log(ea, {
+          stationId: ea.stationDetailId,
+          fuelType: ea.fuel_type,
+          tankNo: Number(ea.tankNo),
+          createAt: ea.receive_date,
+        });
+        console.log("====================================");
 
-          if (response.status == 200) {
-            await fuelInModel.findByIdAndUpdate(result._id, {
-              asyncAlready: "2",
-            });
-          } else {
-            console.log("error is here fuel in");
-          }
-        } catch (error) {
-          console.log("errr", error.response.data.msg);
-          if (error.response && error.response.status === 409) {
-          } else {
-          }
+        try {
+          let no = await fuelInModel.count();
+          let tankCondition = await getFuelBalance({
+            // stationId: ea.stationDetailId,
+            fuelType: ea.fuel_type,
+            // tankNo: Number(ea.tankNo),
+            createAt: ea.receive_date,
+          });
+
+          console.log(tankCondition, "this is tank condition", ea);
+
+          // const updatedBody = {
+          //   ...ea,
+          //   stationId: ea.stationDetailId,
+          //   fuel_in_code: no + 1,
+          //   tank_balance: tankCondition[0]?.balance || 0,
+          // };
+
+          // console.log(updatedBody, "this is updatebody");
+
+          // const url = config.get<string>("fuelInCloud");
+
+          // try {
+          //   let response = await axios.post(url, updatedBody);
+
+          //   if (response.status == 200) {
+          //     await fuelInModel.findByIdAndUpdate(result._id, {
+          //       asyncAlready: "2",
+          //     });
+          //   } else {
+          //     console.log("error is here fuel in");
+          //   }
+          // } catch (error) {
+          //   console.log("errr", error);
+          //   if (error.response && error.response.status === 409) {
+          //   } else {
+          //   }
+          // }
+
+          return result;
+        } catch (e) {
+          throw new Error(e);
         }
+
+        // try {
+        //   let response = await axios.post(url, ea);
+
+        //   if (response.status == 200) {
+        //     await fuelInModel.findByIdAndUpdate(result._id, {
+        //       asyncAlready: "2",
+        //     });
+        //   } else {
+        //     console.log("error is here fuel in");
+        //   }
+        // } catch (error) {
+        //   console.log("errr", error.response.data.msg);
+        //   if (error.response && error.response.status === 409) {
+        //   } else {
+        //   }
+        // }
       }
     }
   } catch (e) {
