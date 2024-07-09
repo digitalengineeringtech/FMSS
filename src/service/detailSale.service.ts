@@ -608,61 +608,55 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       // dailyReportDate: prevDate,
     });
 
-    console.log("======dfdffdf==============================");
-    console.log(checkErrorFuelInData);
-    console.log("======dfdfdfd==============================");
-
     const url = config.get<string>("fuelInCloud");
 
     if (checkErrorFuelInData.length > 0) {
       for (const ea of checkErrorFuelInData) {
-        console.log("====================================");
-        console.log(ea, {
-          stationId: ea.stationDetailId,
-          fuelType: ea.fuel_type,
-          tankNo: Number(ea.tankNo),
-          createAt: ea.receive_date,
-        });
-        console.log("====================================");
-
         try {
           let no = await fuelInModel.count();
           let tankCondition = await getFuelBalance({
-            // stationId: ea.stationDetailId,
+            stationId: ea.stationDetailId,
             fuelType: ea.fuel_type,
-            // tankNo: Number(ea.tankNo),
+            tankNo: Number(ea.tankNo),
             createAt: ea.receive_date,
           });
 
           console.log(tankCondition, "this is tank condition", ea);
 
-          // const updatedBody = {
-          //   ...ea,
-          //   stationId: ea.stationDetailId,
-          //   fuel_in_code: no + 1,
-          //   tank_balance: tankCondition[0]?.balance || 0,
-          // };
+          const updatedBody = {
+            driver: ea.driver,
+            bowser: ea.bowser,
+            tankNo: ea.tankNo,
+            fuel_type: ea.fuel_type,
+            receive_balance: ea.receive_balance.toString(),
+            receive_date: ea.receive_date,
+            asyncAlready: ea.asyncAlready,
+            stationId: ea.stationDetailId,
+            stationDetailId: ea.stationDetailId,
+            fuel_in_code: no + 1,
+            tank_balance: tankCondition[0]?.balance || 0,
+          };
 
-          // console.log(updatedBody, "this is updatebody");
+          console.log(updatedBody, "this is updatebody");
 
-          // const url = config.get<string>("fuelInCloud");
+          const url = config.get<string>("fuelInCloud");
 
-          // try {
-          //   let response = await axios.post(url, updatedBody);
+          try {
+            let response = await axios.post(url, updatedBody);
 
-          //   if (response.status == 200) {
-          //     await fuelInModel.findByIdAndUpdate(result._id, {
-          //       asyncAlready: "2",
-          //     });
-          //   } else {
-          //     console.log("error is here fuel in");
-          //   }
-          // } catch (error) {
-          //   console.log("errr", error);
-          //   if (error.response && error.response.status === 409) {
-          //   } else {
-          //   }
-          // }
+            if (response.status == 200) {
+              await fuelInModel.findByIdAndUpdate(ea._id, {
+                asyncAlready: "2",
+              });
+            } else {
+              console.log("error is here fuel in");
+            }
+          } catch (error) {
+            console.log("errr", error);
+            if (error.response && error.response.status === 409) {
+            } else {
+            }
+          }
 
           return result;
         } catch (e) {
