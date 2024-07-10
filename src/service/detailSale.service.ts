@@ -455,6 +455,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     if (!result) {
       throw new Error("Final send in error");
     }
+
     // console.log("..................");
     // console.log(result);
     // console.log("..................");
