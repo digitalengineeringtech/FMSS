@@ -445,6 +445,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       totalizer_amount:
         lastData[1].totalizer_amount + Number(totalPrice ? totalPrice : 0),
       devTotalizar_liter: data[4],
+      devTotalizar_amount: data[4] * data[1],
       isError: "A",
     };
 

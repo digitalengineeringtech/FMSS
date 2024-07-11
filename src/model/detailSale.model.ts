@@ -19,6 +19,7 @@ export interface detailSaleDocument extends mongoose.Document {
   totalizer_liter: number;
   totalizer_amount: number;
   devTotalizar_liter: number;
+  devTotalizar_amount: number;
   isError: string;
   preset: string;
   device: string;
@@ -56,6 +57,7 @@ const detailSaleSchema = new Schema({
   totalizer_liter: { type: Number, default: 0 },
   totalizer_amount: { type: Number, default: 0 },
   devTotalizar_liter: { type: Number, default: 0 },
+  devTotalizar_amount: { type: Number, default: 0 },
 
   dailyReportDate: {
     type: String,
