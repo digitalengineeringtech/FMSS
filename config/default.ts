@@ -1,26 +1,36 @@
 export default {
   port: 9000,
   host: "localhost",
-  dbUrl: "mongodb://detpos:asdffdsa@192.168.1.146:27017/test?authSource=admin",
-  // dbUrl:
-  //   "mongodb://detpos:asdffdsa@192.168.0.100:27017/local-pos?authSource=admin",
+  // dbUrl: "mongodb://detpos:asdffdsa@192.168.1.146:27017/test?authSource=admin",
+  dbUrl:
+    "mongodb://detpos:asdffdsa@192.168.0.100:27017/local-pos?authSource=admin",
   saltWorkFactor: 10,
   secretKey: "suuhh",
   page_limit: 50,
   // mqttUrl: "ws://127.0.0.1:9001",
-  // mqttUrl: "mqtt://127.0.0.1:1883",
-  mqttUrl: "mqtt://192.168.1.146:1883",
+  mqttUrl: "mqtt://127.0.0.1:1883",
+  // mqttUrl: "mqtt://192.168.1.146:1883",
   mqttUserName: "detpos",
   mqttPassword: "asdffdsa",
   wsServerUrl: "http://13.251.206.31:9000/api/change-mode",
-  //if atg => " atg link " : " "
-  tankDataUrl: "",
-  // tankDataUrl: "http://192.168.0.105:8080/baseOilcan",
-  // tankDataCloudUrl: "https://detfsmm.com/api/tank-data",
-  tankDataCloudUrl: "http://192.168.1.146:8000/api/tank-data",
-  fuelInCloud: "http://192.168.1.146:8000/api/fuelIn",
-  // detailsaleCloudUrl: "https://detfsmm.com/api/detail-sale",
-  detailsaleCloudUrl: "http://192.168.1.146:8000/api/detail-sale",
+
+  //--- tank data ( local atg ) -------------------------------------------------------
+  //if atg => " tankDataUrl actual link " : " "
+  // tankDataUrl: "",
+  tankDataUrl: "http://192.168.0.105:8080/baseOilcan",
+
+  //--- tank data ( tank data cloud ) -------------------------------------------------------
+  tankDataCloudUrl: "https://detfsmm.com/api/tank-data",
+  // tankDataCloudUrl: "http://192.168.1.146:8000/api/tank-data",
+
+  //--- tank data ( fuel in data cloud ) -------------------------------------------------------
+  fuelInCloud: "https://detfsmm.com/api/fuelIn",
+  // fuelInCloud: "http://192.168.1.146:8000/api/fuelIn",
+
+  //--- tank data ( voucher data cloud ) -------------------------------------------------------
+  detailsaleCloudUrl: "https://detfsmm.com/api/detail-sale",
+  // detailsaleCloudUrl: "http://192.168.1.146:8000/api/detail-sale",
+
   //coustomerCloudUrl: "http://detfsmm.com:9000/api/customer",
   // coustomerCloudUrl: "https://detfsmm.com/api/customer/local-create",
   // debtCloudUrl: "https://detfsmm.com/api/debt/local-create",
