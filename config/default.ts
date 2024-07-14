@@ -13,6 +13,7 @@ export default {
   mqttUserName: "detpos",
   mqttPassword: "asdffdsa",
   wsServerUrl: "http://13.251.206.31:9000/api/change-mode",
+  //if atg => " atg link " : " "
   tankDataUrl: "",
   // tankDataUrl: "http://192.168.0.105:8080/baseOilcan",
   // tankDataCloudUrl: "https://detfsmm.com/api/tank-data",
