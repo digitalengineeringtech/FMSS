@@ -3,6 +3,7 @@ import config from "config";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { client } from "./connect";
+
 const Redis = require("async-redis").createClient({
   host: "localhost",
   port: 6379,

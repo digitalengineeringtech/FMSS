@@ -478,6 +478,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     } catch (e) {
       console.log(e);
     }
+    
     let checkDate = await getFuelBalance({
       stationId: result.stationDetailId,
       createAt: result.dailyReportDate,
@@ -497,6 +498,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     }
 
     if (checkDate.length == 0) {
+      
       let prevDate = previous(new Date(result.dailyReportDate));
 
       let prevResult = await getFuelBalance({

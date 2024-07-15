@@ -1,7 +1,8 @@
 export default {
   port: 9000,
   host: "localhost",
-  // dbUrl: "mongodb://detpos:asdffdsa@192.168.1.146:27017/test?authSource=admin",
+  // dbUrl:
+  //   "mongodb://detpos:asdffdsa@192.168.1.146:27017/local-pos?authSource=admin",
   dbUrl:
     "mongodb://detpos:asdffdsa@192.168.0.100:27017/local-pos?authSource=admin",
   saltWorkFactor: 10,
@@ -20,8 +21,8 @@ export default {
   tankDataUrl: "http://192.168.0.105:8080/baseOilcan",
 
   //--- tank data ( tank data cloud ) -------------------------------------------------------
-  tankDataCloudUrl: "https://detfsmm.com/api/tank-data",
-  // tankDataCloudUrl: "http://192.168.1.146:8000/api/tank-data",
+  // tankDataCloudUrl: "https://detfsmm.com/api/tank-data",
+  tankDataCloudUrl: "http://192.168.1.146:8000/api/tank-data",
 
   //--- tank data ( fuel in data cloud ) -------------------------------------------------------
   fuelInCloud: "https://detfsmm.com/api/fuelIn",
