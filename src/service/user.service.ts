@@ -37,6 +37,7 @@ export const loginUser = async ({
   set(user._id, userObj);
   set("stationNo", userObj.stationNo);
   set("stationId", userObj.stationId);
+  set('tankCount', userObj.tankCount);
   return userObj;
 };
 
