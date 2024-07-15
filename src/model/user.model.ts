@@ -13,6 +13,7 @@ export interface UserInput {
   stationId: string;
   stationNo: number;
   cardId: string;
+  tankCount: number;
 }
 
 export interface UserDocument extends UserInput, mongoose.Document {
@@ -37,6 +38,7 @@ const userSchema = new Schema(
     address: { type: String, default: null }, // address of the address
     nrcNo: { type: String, required: true },
     status: { type: String, default: "enable", enum: ["enable", "disable"] },
+    tankCount: { type: Number, required: true },
   },
   {
     timestamps: true,
