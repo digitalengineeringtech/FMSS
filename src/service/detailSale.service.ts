@@ -504,12 +504,15 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         // createAt: prevDate,
       });
 
+      let tankCount = await get("tankCount");
+
+      console.log(tankCount, "this is tank count");
       // console.log(prevResult, "this is result");
 
       await Promise.all(
         prevResult
           .reverse()
-          .slice(0, 4)
+          .slice(0, tankCount)  
           .map(async (ea) => {
             let obj: fuelBalanceDocument;
             if (ea.balance == 0) {
