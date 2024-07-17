@@ -907,7 +907,7 @@ export const updateDetailSaleByAp = async (
 
   let checkErrorData = await detailSaleModel.find({
     asyncAlready: 0,
-    // dailyReportDate: prevDate,
+    dailyReportDate: prevDate,
   });
   // cloud upload 0 condition
   if (checkErrorData.length > 0) {
