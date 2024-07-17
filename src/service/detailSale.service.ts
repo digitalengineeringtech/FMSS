@@ -573,6 +573,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         try {
           let url = config.get<string>("detailsaleCloudUrl");
           let response = await axios.post(url, ea);
+          console.log(response, "up to cloud");
           if (response.status == 200) {
             await detailSaleModel.findByIdAndUpdate(ea._id, {
               asyncAlready: "2",
@@ -594,6 +595,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       try {
         let url = config.get<string>("detailsaleCloudUrl");
         let response = await axios.post(url, ea);
+        console.log(response, "up to cloud");
         if (response.status == 200) {
           await detailSaleModel.findByIdAndUpdate(ea._id, {
             asyncAlready: "2",
