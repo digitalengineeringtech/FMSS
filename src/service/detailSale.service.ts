@@ -469,16 +469,6 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
 
     console.log(lastData, "this is last data");
 
-    try {
-      await addTankData({
-        stationDetailId: lastData[0].stationDetailId,
-        vocono: lastData[0].vocono,
-        nozzleNo: lastData[0].nozzleNo,
-      });
-    } catch (e) {
-      console.log(e);
-    }
-    
     let checkDate = await getFuelBalance({
       stationId: result.stationDetailId,
       createAt: result.dailyReportDate,
@@ -498,7 +488,6 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     }
 
     if (checkDate.length == 0) {
-      
       let prevDate = previous(new Date(result.dailyReportDate));
 
       let prevResult = await getFuelBalance({
@@ -514,7 +503,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       await Promise.all(
         prevResult
           .reverse()
-          .slice(0, tankCount)  
+          .slice(0, tankCount)
           .map(async (ea) => {
             let obj: fuelBalanceDocument;
             if (ea.balance == 0) {
@@ -547,6 +536,16 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     }
 
     mqttEmitter("detpos/local_server", `${result?.nozzleNo}/D1S1`);
+
+    try {
+      await addTankData({
+        stationDetailId: lastData[0].stationDetailId,
+        vocono: lastData[0].vocono,
+        nozzleNo: lastData[0].nozzleNo,
+      });
+    } catch (e) {
+      console.log(e);
+    }
 
     await calcFuelBalance(
       {
