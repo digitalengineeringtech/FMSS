@@ -562,7 +562,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
 
     let checkErrorData = await detailSaleModel.find({
       asyncAlready: 0,
-      // dailyReportDate: prevDate,
+      dailyReportDate: prevDate,
     });
 
     if (checkErrorData.length > 0) {
