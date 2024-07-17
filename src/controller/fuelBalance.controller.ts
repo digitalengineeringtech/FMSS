@@ -138,9 +138,6 @@ export const getFuelBalanceByOneDateHandler = async (
 ) => {
   try {
     let sDate: any = req.query.sDate;
-    console.log("====================================");
-    console.log(sDate);
-    console.log("====================================");
 
     delete req.query.sDate;
 
@@ -149,7 +146,11 @@ export const getFuelBalanceByOneDateHandler = async (
     if (!sDate) {
       throw new Error("you need date");
     }
-    const startDate: Date = new Date(sDate);
+    let startDate: Date = new Date(sDate);
+    startDate.setDate(startDate.getDate() - 1);
+    console.log("====sfdsf================================");
+    console.log(startDate.toLocaleDateString("fr-CA"), query);
+    console.log("=====sff===============================");
     let result = await fuelBalanceByOneDate(query, startDate);
     fMsg(res, "fuel balance between two date", result);
   } catch (e) {
