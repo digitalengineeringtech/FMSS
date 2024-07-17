@@ -153,10 +153,14 @@ export const fuelBalanceByDate = async (
     },
   };
 
+  console.log("====================================");
+  console.log(filter);
+  console.log("====================================");
+
   let result = await fuelBalanceModel
     .find(filter)
     .sort({ realTime: -1 })
-    // .populate("stationId")
+    .populate("stationId")
     .select("-__v");
 
   return result;

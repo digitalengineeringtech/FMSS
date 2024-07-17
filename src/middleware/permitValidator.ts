@@ -3,20 +3,23 @@ import { permitDocument } from "../model/permit.model";
 
 export const hasAnyPermit =
   (permits: string[]) => (req: Request, res: Response, next: NextFunction) => {
-    try{
+    try {
       let bol: boolean = false;
-    for (let i = 0; i < permits.length; i++) {
-      let hasPermit = req.body.user.permits.find(
-        (ea: permitDocument) => ea.name == permits[i]
-      );
-      if (hasPermit) {
-        bol = true;
-        break;
+      for (let i = 0; i < permits.length; i++) {
+        let hasPermit = req.body.user.permits.find(
+          (ea: permitDocument) => ea.name == permits[i]
+        );
+        if (hasPermit) {
+          bol = true;
+          break;
+        }
       }
-    }
-    if (!bol) return next(new Error("You have not that permit"));
-    next();
-    }catch(e){
-    next(new Error(e));
+      if (!bol) return next(new Error("You have not that permit"));
+      console.log("====================================");
+      console.log("gggggggggggggggggggg");
+      console.log("====================================");
+      next();
+    } catch (e) {
+      next(new Error(e));
     }
   };
