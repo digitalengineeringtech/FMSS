@@ -25,7 +25,7 @@ import { addDailyReport, getDailyReport } from "./dailyReport.service";
 import { fuelBalanceDocument } from "../model/fuelBalance.model";
 import fuelInModel from "../model/fuelIn.model";
 import { escape } from "querystring";
-import { string } from 'zod';
+import { string } from "zod";
 
 interface Data {
   nozzleNo: string;
@@ -422,7 +422,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     let totalPrice = deviceLiveData.get(data[0])?.[1];
 
     console.log(data);
-    
+
     let query = {
       nozzleNo: data[0],
     };
@@ -439,8 +439,8 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     }
 
     let tankCount = await get("tankCount");
-  
-    console.log('tankCount', tankCount);
+
+    console.log("tankCount", tankCount);
 
     let fuelBalances = await getFuelBalance({
       stationId: lastData[0].stationDetailId,
@@ -454,16 +454,16 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         .reverse()
         .slice(0, tankCount)
         .map(async (ea) => {
-          console.log('nozzles', ea.nozzles);
-          if(ea.nozzles.includes(data[0] as never)) {
-              tankNo = ea.tankNo
+          console.log("nozzles", ea.nozzles);
+          if (ea.nozzles.includes(data[0] as never)) {
+            tankNo = ea.tankNo;
           } else {
-              return;
+            return;
           }
         })
-    )
+    );
 
-    console.log('tankNo', tankNo);
+    console.log("tankNo", tankNo);
 
     const fakedata = {
       data: {
@@ -524,11 +524,19 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       },
     };
 
-    let tankUrl = config.get<string>("tankDataUrl");
-    let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;
+    let volume;
 
-    const volume = tankRealTimeData.data.data.find((ea) => ea.id === tankNo)?.volume;
-    console.log(volume);
+    try {
+      let tankUrl = config.get<string>("tankDataUrl");
+      let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;
+
+      volume = tankRealTimeData.data.data.find(
+        (ea) => ea.id === tankNo
+      )?.volume;
+      console.log(volume);
+    } catch (e) {
+      console.log(e);
+    }
 
     let updateBody: UpdateQuery<detailSaleDocument> = {
       nozzleNo: data[0],
@@ -543,7 +551,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[4] * data[1],
       tankNo: tankNo,
-      tankBalance: volume,
+      tankBalance: volume || "0",
       isError: "A",
     };
 
@@ -592,8 +600,6 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         stationId: result.stationDetailId,
         // createAt: prevDate,
       });
-
-      
 
       // console.log(tankCount, "this is tank count");
       // console.log(prevResult, "this is result");
