@@ -24,6 +24,8 @@ import {
 import { addDailyReport, getDailyReport } from "./dailyReport.service";
 import { fuelBalanceDocument } from "../model/fuelBalance.model";
 import fuelInModel from "../model/fuelIn.model";
+import { escape } from "querystring";
+import { string } from 'zod';
 
 interface Data {
   nozzleNo: string;
@@ -419,6 +421,8 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     let saleLiter = deviceLiveData.get(data[0])?.[0];
     let totalPrice = deviceLiveData.get(data[0])?.[1];
 
+    console.log(data);
+    
     let query = {
       nozzleNo: data[0],
     };
@@ -434,6 +438,98 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       return;
     }
 
+    let tankCount = await get("tankCount");
+  
+    console.log('tankCount', tankCount);
+
+    let fuelBalances = await getFuelBalance({
+      stationId: lastData[0].stationDetailId,
+      // createAt: prevDate,
+    });
+
+    let tankNo;
+
+    await Promise.all(
+      fuelBalances
+        .reverse()
+        .slice(0, tankCount)
+        .map(async (ea) => {
+          console.log('nozzles', ea.nozzles);
+          if(ea.nozzles.includes(data[0] as never)) {
+              tankNo = ea.tankNo
+          } else {
+              return;
+          }
+        })
+    )
+
+    console.log('tankNo', tankNo);
+
+    const fakedata = {
+      data: {
+        data: [
+          {
+            stateInfo: "No alarm",
+            oilType: "Petrol 92",
+            weight: 0,
+            level: 2222,
+            oilRatio: 0.3333,
+            waterRatio: 0,
+            canAddOilWeight: 0,
+            temperature: 32.33,
+            volume: 333,
+            connect: 3,
+            id: 1,
+          },
+          {
+            stateInfo: "No alarm",
+            oilType: "Diesel",
+            weight: 0,
+            level: 2222,
+            oilRatio: 0.3333,
+            waterRatio: 0,
+            canAddOilWeight: 0,
+            temperature: 32.33,
+            volume: 444,
+            connect: 3,
+            id: 2,
+          },
+          {
+            stateInfo: "No alarm",
+            oilType: "95 Octane",
+            weight: 0,
+            level: 2222,
+            oilRatio: 0.3333,
+            waterRatio: 0,
+            canAddOilWeight: 0,
+            temperature: 32.33,
+            volume: 555,
+            connect: 3,
+            id: 3,
+          },
+          {
+            stateInfo: "No alarm",
+            oilType: "Super Diesel",
+            weight: 0,
+            level: 2222,
+            oilRatio: 0.3333,
+            waterRatio: 0,
+            canAddOilWeight: 0,
+            temperature: 32.33,
+            volume: 666,
+            connect: 3,
+            id: 4,
+          },
+        ],
+      },
+    };
+
+    let tankUrl = config.get<string>("tankDataUrl");
+    let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;
+
+    const volume = tankRealTimeData.data.data.find((ea) => ea.id === tankNo)?.volume;
+    console.log(volume);
+
     let updateBody: UpdateQuery<detailSaleDocument> = {
       nozzleNo: data[0],
       salePrice: data[1],
@@ -446,6 +542,8 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         lastData[1].totalizer_amount + Number(totalPrice ? totalPrice : 0),
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[4] * data[1],
+      tankNo: tankNo,
+      tankBalance: volume,
       isError: "A",
     };
 
@@ -495,9 +593,9 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         // createAt: prevDate,
       });
 
-      let tankCount = await get("tankCount");
+      
 
-      console.log(tankCount, "this is tank count");
+      // console.log(tankCount, "this is tank count");
       // console.log(prevResult, "this is result");
 
       await Promise.all(
