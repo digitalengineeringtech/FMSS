@@ -524,19 +524,19 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       },
     };
 
-    // let volume;
+    let volume;
 
-    // try {
-    //   let tankUrl = config.get<string>("tankDataUrl");
-    //   let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;
-
-    //   volume = tankRealTimeData.data.data.find(
-    //     (ea) => ea.id === tankNo
-    //   )?.volume;
-    //   console.log(volume);
-    // } catch (e) {
-    //   console.log(e);
-    // }
+    try {
+      let tankUrl = config.get<string>("tankDataUrl");
+      let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;  
+        volume = tankRealTimeData.data.data.find(
+          (ea) => ea.id === tankNo
+        )?.volume;
+       console.log(volume);
+    } catch (e) {
+      console.log(e);
+      volume = lastData[0].tankBalance
+    }
 
     let updateBody: UpdateQuery<detailSaleDocument> = {
       nozzleNo: data[0],
@@ -551,7 +551,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[4] * data[1],
       tankNo: tankNo,
-      // tankBalance: volume || "0",
+      tankBalance: volume,
       isError: "A",
     };
 
