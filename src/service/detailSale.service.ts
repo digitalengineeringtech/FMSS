@@ -6,7 +6,7 @@ import { UserDocument } from "../model/user.model";
 import moment from "moment-timezone";
 import { get, mqttEmitter, previous, set } from "../utils/helper";
 import axios from "axios";
-import { addTankData } from "./tankData.service";
+import { addTankData, getTankData, updateExistingTankData } from "./tankData.service";
 
 import { deviceLiveData } from "../connection/liveTimeData";
 
@@ -421,7 +421,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     let saleLiter = deviceLiveData.get(data[0])?.[0];
     let totalPrice = deviceLiveData.get(data[0])?.[1];
 
-    console.log(data);
+    // console.log(data);
 
     let query = {
       nozzleNo: data[0],
@@ -440,7 +440,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
 
     let tankCount = await get("tankCount");
 
-    console.log("tankCount", tankCount);
+    // console.log("tankCount", tankCount);
 
     let fuelBalances = await getFuelBalance({
       stationId: lastData[0].stationDetailId,
@@ -463,7 +463,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         })
     );
 
-    console.log("tankNo", tankNo);
+    // console.log("tankNo", tankNo);
 
     const fakedata = {
       data: {
@@ -532,9 +532,9 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         volume = tankRealTimeData.data.data.find(
           (ea) => ea.id === tankNo
         )?.volume;
-       console.log(volume);
+      //  console.log(volume);
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       volume = lastData[0].tankBalance
     }
 
@@ -573,7 +573,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     //   result.saleLiter
     // );
 
-    console.log(lastData, "this is last data");
+    // console.log(lastData, "this is last data");
 
     let checkDate = await getFuelBalance({
       stationId: result.stationDetailId,
@@ -641,16 +641,30 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
 
     mqttEmitter("detpos/local_server", `${result?.nozzleNo}/D1S1`);
 
-    try {
-      await addTankData({
-        stationDetailId: lastData[0].stationDetailId,
-        vocono: lastData[0].vocono,
-        nozzleNo: lastData[0].nozzleNo,
-      });
-    } catch (e) {
-      console.log(e);
-    }
+    // get tank data by today date
+    const tankData = await getTankData({
+      stationDetailId: result.stationDetailId,
+      dateOfDay: moment().format("YYYY-MM-DD"),
+    });
 
+    // check if tank data exists
+    try {
+      if (tankData.length === 0) {
+        await addTankData({
+          stationDetailId: result.stationDetailId,
+          vocono: lastData[0].vocono,
+          nozzleNo: lastData[0].nozzleNo,
+        });
+      } else {
+        await updateExistingTankData({
+          id: tankData[0]._id,
+          stationDetailId: result.stationDetailId,
+        });
+      }
+    } catch (error) {
+      console.error("Error handling tank data:", error);
+    }
+   
     await calcFuelBalance(
       {
         stationId: result.stationDetailId,
