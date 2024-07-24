@@ -209,11 +209,7 @@ export const updateExistingTankData = async (body) => {
   try {
       let url = config.get<string>("tankDataCloudUrl");
   
-      await axios.post(url, {
-        body: {
-          data: uploadData,
-        },
-      });
+      await axios.post(url, uploadData[0]);
     } catch (e) {
       console.log(e.response, "from add tank data");
     }
