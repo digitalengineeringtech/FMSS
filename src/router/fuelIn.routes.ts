@@ -1,8 +1,10 @@
 import {
+  addAtgFuelInHandler,
   addFuelInHandler,
   deleteFuelInHandler,
   getFuelInByDateHandler,
   getFuelInHandler,
+  updateAtgFuelInHandler,
   updateFuelInHandler,
 } from "../controller/fuelIn.controller";
 import { hasAnyPermit } from "../middleware/permitValidator";
@@ -49,5 +51,20 @@ fuelInRoute.delete(
   validateAll(allSchemaId),
   deleteFuelInHandler
 );
+
+fuelInRoute.post('/atg', 
+  validateToken,
+  roleValidator(["admin", "manager"]), //In that one role is manager
+  hasAnyPermit(["add"]),
+  validateAll(fuelInSchema),
+  addAtgFuelInHandler
+)
+
+fuelInRoute.patch('/atg/update', 
+  validateToken,
+  roleValidator(["admin", "manager"]),
+  hasAnyPermit(["edit"]),
+  updateAtgFuelInHandler
+)
 
 export default fuelInRoute;

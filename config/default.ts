@@ -28,6 +28,9 @@ export default {
   fuelInCloud: "https://detfsmm.com/api/fuelIn",
   // fuelInCloud: "http://192.168.1.146:8000/api/fuelIn",
 
+  atgFuelInCloud: 'https://detfsmm.com/api/fuelIn/cloud/atg',
+  //   atgFuelInCloud: 'http://192.168.1.146:8000/api/fuelIn/cloud/atg',
+
   //--- tank data ( voucher data cloud ) -------------------------------------------------------
   detailsaleCloudUrl: "https://detfsmm.com/api/detail-sale",
   // detailsaleCloudUrl: "http://192.168.1.146:8000/api/detail-sale",

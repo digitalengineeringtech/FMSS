@@ -7,6 +7,8 @@ import {
   deleteFuelIn,
   fuelInPaginate,
   fuelInByDate,
+  addAtgFuelIn,
+  updateAtgFuelIn,
 } from "../service/fuelIn.service";
 
 export const getFuelInHandler = async (
@@ -95,3 +97,31 @@ export const getFuelInByDateHandler = async (
     next(new Error(e));
   }
 };
+
+export const addAtgFuelInHandler = async(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let result = await addAtgFuelIn(req.body);
+    fMsg(res, "New FuelIn data was added", result);
+  } catch (e) {
+    next(new Error(e));
+  }
+}
+
+export const updateAtgFuelInHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+
+    let result = await updateAtgFuelIn(req.body);
+
+    fMsg(res, "FuelIn data was updated", result);
+  } catch(e) {
+    next(new Error(e));
+  }
+}

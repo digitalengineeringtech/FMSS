@@ -11,6 +11,7 @@ export interface fuelInDocument extends mongoose.Document {
   bowser: string;
   fuel_type: string;
   fuel_in_code: number;
+  opening: number,
   tank_balance: number;
   receive_balance: number;
   receive_date: string;
@@ -29,7 +30,8 @@ const fuelInSchema = new Schema({
   fuel_type: { type: String, required: true },
   fuel_in_code: { type: Number, required: true },
   tank_balance: { type: Number, required: true },
-  receive_balance: { type: Number, required: true },
+  opening: { type: Number },
+  receive_balance: { type: Number },
   receive_date: { type: String, default: new Date() },
   createAt: { type: Date, default: new Date() },
   asyncAlready: { type: String, required: true },
