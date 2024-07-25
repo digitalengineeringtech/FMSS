@@ -6,7 +6,11 @@ import { UserDocument } from "../model/user.model";
 import moment from "moment-timezone";
 import { get, mqttEmitter, previous, set } from "../utils/helper";
 import axios from "axios";
-import { addTankData, getTankData, updateExistingTankData } from "./tankData.service";
+import {
+  addTankData,
+  getTankData,
+  updateExistingTankData,
+} from "./tankData.service";
 
 import { deviceLiveData } from "../connection/liveTimeData";
 
@@ -452,7 +456,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     await Promise.all(
       fuelBalances
         .reverse()
-        .slice(0, tankCount)
+        // .slice(0, tankCount)
         .map(async (ea) => {
           console.log("nozzles", ea.nozzles);
           if (ea.nozzles.includes(data[0] as never)) {
@@ -526,17 +530,60 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
 
     let volume;
 
+    //old version
+    // try {
+    //   let tankUrl = config.get<string>("tankDataUrl");
+    //   let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;
+    //     volume = tankRealTimeData.data.data.find(
+    //       (ea) => ea.id === tankNo
+    //     )?.volume;
+    //   //  console.log(volume);
+    // } catch (e) {
+    //   // console.log(e);
+    //   volume = lastData[0].tankBalance
+    // }
+
+    //new version
+
+    console.log(lastData);
+
     try {
       let tankUrl = config.get<string>("tankDataUrl");
-      let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;  
-        volume = tankRealTimeData.data.data.find(
-          (ea) => ea.id === tankNo
-        )?.volume;
-      //  console.log(volume);
+      let tankRealTimeData;
+
+      if (tankUrl) {
+        try {
+          tankRealTimeData = await axios.post(tankUrl);
+          if (tankRealTimeData.status !== 200) {
+            throw new Error(
+              `Unexpected response status: ${tankRealTimeData.status}`
+            );
+          }
+        } catch (postError) {
+          console.error(
+            `Failed to fetch tank data from ${tankUrl}:`,
+            postError.message
+          );
+          throw postError; // Re-throw to handle fallback
+        }
+      } else {
+        tankRealTimeData = fakedata;
+      }
+
+      volume = tankRealTimeData.data.data.find(
+        (ea) => ea.id === tankNo
+      )?.volume;
+
+      if (volume === undefined) {
+        console.warn(`Tank number ${tankNo} not found in the fetched data.`);
+        volume = lastData[1].tankBalance; // Fallback to lastData
+      }
     } catch (e) {
-      // console.log(e);
-      volume = lastData[0].tankBalance
+      console.error("An error occurred while fetching tank data:", e.message);
+      volume = lastData[1].tankBalance; // Fallback to lastData
     }
+
+    //end update
 
     let updateBody: UpdateQuery<detailSaleDocument> = {
       nozzleNo: data[0],
@@ -551,7 +598,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[4] * data[1],
       tankNo: tankNo,
-      tankBalance: volume,
+      tankBalance: Number(volume) + Number(saleLiter),
       isError: "A",
     };
 
@@ -596,10 +643,13 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     if (checkDate.length == 0) {
       let prevDate = previous(new Date(result.dailyReportDate));
 
-      let prevResult = await getFuelBalance({
-        stationId: result.stationDetailId,
-        // createAt: prevDate,
-      });
+      let prevResult = await getFuelBalance(
+        {
+          stationId: result.stationDetailId,
+          // createAt: prevDate,
+        },
+        tankCount
+      );
 
       // console.log(tankCount, "this is tank count");
       // console.log(prevResult, "this is result");
@@ -664,7 +714,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     } catch (error) {
       console.error("Error handling tank data:", error);
     }
-   
+
     await calcFuelBalance(
       {
         stationId: result.stationDetailId,

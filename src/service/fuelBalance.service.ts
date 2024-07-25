@@ -5,10 +5,17 @@ import fuelBalanceModel, {
 import config from "config";
 
 export const getFuelBalance = async (
-  query: FilterQuery<fuelBalanceDocument>
+  query: FilterQuery<fuelBalanceDocument>,
+  tankCount?: number
 ) => {
   try {
-    return await fuelBalanceModel.find(query).lean().select("-__v");
+    // return await fuelBalanceModel.find(query).lean().select("-__v");
+    return await fuelBalanceModel
+      .find(query)
+      .sort({ $natural: -1 })
+      .limit(Number(tankCount))
+      .lean()
+      .select("-__v");
   } catch (e) {
     throw new Error(e);
   }
