@@ -10,7 +10,7 @@ import localToDeviceRoute from "./router/localToDevice.routes";
 import deviceRoute from "./router/device.routes";
 import dailyReportRoute from "./router/dailyReport.routes";
 import { liveDataChangeHandler } from "./connection/liveTimeData";
-import { detailSaleUpdateByDevice } from "./service/detailSale.service";
+import { detailSaleUpdateByDevice, zeroDetailSaleUpdateByDevice } from "./service/detailSale.service";
 import dailyPriceRoute from "./router/dailyPrice.routes";
 import dbConnect, { client, connect } from "./utils/connect";
 import blinkLed, { lowLed } from "./connection/ledBlink";
@@ -46,9 +46,15 @@ client.on("message", async (topic, message) => {
     // blinkLed(Number(data[3]));                                      // for blink led
   }
 
+  if(data[2] == "Reload") {
+    // console.log(topic, message);
+    liveDataChangeHandler(message.toString());
+    zeroDetailSaleUpdateByDevice(data[3], message.toString());
+  }
+
   if (data[2] == "Final") {
     // when final topic come
-    console.log(topic, message);
+    // liveDataChangeHandler(message.toString());
     detailSaleUpdateByDevice(data[3], message.toString()); // add final data to detail sale vocono
   }
 
@@ -140,7 +146,7 @@ const defaultData = async () => {
   systemStatusAdd();
 };
 
-defaultData();
+// defaultData();
 
 server.listen(port, () =>
   console.log(`server is running in  http://${host}:${port}`)
