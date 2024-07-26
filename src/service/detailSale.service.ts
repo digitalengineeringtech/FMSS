@@ -865,6 +865,400 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
   }
 };
 
+export const zeroDetailSaleUpdateByDevice = async(topic: string, message) => {
+  try {
+    const regex = /[A-Z]/g;
+    let data: any[] = message.split(regex);
+    let saleLiter = deviceLiveData.get(data[0])?.[0];
+    let totalPrice = deviceLiveData.get(data[0])?.[1];
+    let depNo = topic;
+
+    let query = {
+      nozzleNo: data[0],
+      saleLiter: 0,
+      totalPrice: 0,
+      devTotalizar_liter: 0
+    };
+
+    const lastData = await detailSaleModel
+      .findOne(query)
+      .sort({ _id: -1 })
+      .lean();
+
+      if(!lastData) {
+        return;
+      }
+
+      let tankCount = await get("tankCount");
+
+      // console.log("tankCount", tankCount);
+  
+      let fuelBalances = await getFuelBalance({
+        stationId: lastData.stationDetailId,
+        // createAt: prevDate,
+      });
+  
+      let tankNo;
+  
+      await Promise.all(
+        fuelBalances
+          .reverse()
+          // .slice(0, tankCount)
+          .map(async (ea) => {
+            console.log("nozzles", ea.nozzles);
+            if (ea.nozzles.includes(data[0] as never)) {
+              tankNo = ea.tankNo;
+            } else {
+              return;
+            }
+          })
+      );
+  
+      // console.log("tankNo", tankNo);
+  
+      const fakedata = {
+        data: {
+          data: [
+            {
+              stateInfo: "No alarm",
+              oilType: "Petrol 92",
+              weight: 0,
+              level: 2222,
+              oilRatio: 0.3333,
+              waterRatio: 0,
+              canAddOilWeight: 0,
+              temperature: 32.33,
+              volume: 333,
+              connect: 3,
+              id: 1,
+            },
+            {
+              stateInfo: "No alarm",
+              oilType: "Diesel",
+              weight: 0,
+              level: 2222,
+              oilRatio: 0.3333,
+              waterRatio: 0,
+              canAddOilWeight: 0,
+              temperature: 32.33,
+              volume: 444,
+              connect: 3,
+              id: 2,
+            },
+            {
+              stateInfo: "No alarm",
+              oilType: "95 Octane",
+              weight: 0,
+              level: 2222,
+              oilRatio: 0.3333,
+              waterRatio: 0,
+              canAddOilWeight: 0,
+              temperature: 32.33,
+              volume: 555,
+              connect: 3,
+              id: 3,
+            },
+            {
+              stateInfo: "No alarm",
+              oilType: "Super Diesel",
+              weight: 0,
+              level: 2222,
+              oilRatio: 0.3333,
+              waterRatio: 0,
+              canAddOilWeight: 0,
+              temperature: 32.33,
+              volume: 666,
+              connect: 3,
+              id: 4,
+            },
+          ],
+        },
+      };
+  
+      let volume;
+  
+      try {
+        let tankUrl = config.get<string>("tankDataUrl");
+        let tankRealTimeData;
+  
+        if (tankUrl) {
+          try {
+            tankRealTimeData = await axios.post(tankUrl);
+            if (tankRealTimeData.status !== 200) {
+              throw new Error(
+                `Unexpected response status: ${tankRealTimeData.status}`
+              );
+            }
+          } catch (postError) {
+            console.error(
+              `Failed to fetch tank data from ${tankUrl}:`,
+              postError.message
+            );
+            throw postError; // Re-throw to handle fallback
+          }
+        } else {
+          tankRealTimeData = fakedata;
+        }
+  
+        volume = tankRealTimeData.data.data.find(
+          (ea) => ea.id === tankNo
+        )?.volume;
+  
+        if (volume === undefined) {
+          console.warn(`Tank number ${tankNo} not found in the fetched data.`);
+          volume = lastData.tankBalance; // Fallback to lastData
+        }
+      } catch (e) {
+        console.error("An error occurred while fetching tank data:", e.message);
+        volume = lastData.tankBalance; // Fallback to lastData
+      }
+  
+      //end update
+      let updateBody: UpdateQuery<detailSaleDocument> = {
+        nozzleNo: data[0],
+        salePrice: data[1],
+        saleLiter: saleLiter,
+        totalPrice: totalPrice ? totalPrice : 0,
+        asyncAlready: lastData.asyncAlready == "a0" ? "a" : "1",
+        totalizer_liter: lastData.totalizer_liter ?? + Number(saleLiter ? saleLiter : 0),
+        totalizer_amount: lastData.totalizer_amount ?? + Number(totalPrice ? totalPrice : 0),
+        devTotalizar_liter: data[4],
+        devTotalizar_amount: data[4] * data[1],
+        tankNo: tankNo,
+        tankBalance: Number(volume) + Number(saleLiter),
+        isError: "A",
+      };
+
+      await detailSaleModel.findByIdAndUpdate(lastData._id, updateBody);
+
+      let result = await detailSaleModel.findById(lastData._id);
+
+      if (!result) {
+        throw new Error("Final send in error");
+      }
+
+      let checkDate = await getFuelBalance({
+        stationId: result.stationDetailId,
+        createAt: result.dailyReportDate,
+      });
+      let checkRpDate = await getDailyReport({
+        stationId: result.stationDetailId,
+        dateOfDay: result.dailyReportDate,
+      });
+
+      // console.log(checkDate, "this is check data", checkDate.length);
+
+      if (checkRpDate.length == 0) {
+        await addDailyReport({
+          stationId: result.stationDetailId,
+          dateOfDay: result.dailyReportDate,
+        });
+      }
+
+    if (checkDate.length == 0) {
+      let prevDate = previous(new Date(result.dailyReportDate));
+
+      let prevResult = await getFuelBalance(
+        {
+          stationId: result.stationDetailId,
+          // createAt: prevDate,
+        },
+        tankCount
+      );
+
+      // console.log(tankCount, "this is tank count");
+      // console.log(prevResult, "this is result");
+
+      await Promise.all(
+        prevResult
+          .reverse()
+          .slice(0, tankCount)
+          .map(async (ea) => {
+            let obj: fuelBalanceDocument;
+            if (ea.balance == 0) {
+              obj = {
+                stationId: ea.stationId,
+                fuelType: ea.fuelType,
+                capacity: ea.capacity,
+                opening: ea.opening + ea.fuelIn,
+                tankNo: ea.tankNo,
+                createAt: result?.dailyReportDate,
+                nozzles: ea.nozzles,
+                balance: ea.opening + ea.fuelIn,
+              } as fuelBalanceDocument;
+            } else {
+              obj = {
+                stationId: ea.stationId,
+                fuelType: ea.fuelType,
+                capacity: ea.capacity,
+                opening: ea.opening + ea.fuelIn - ea.cash,
+                tankNo: ea.tankNo,
+                createAt: result?.dailyReportDate,
+                nozzles: ea.nozzles,
+                balance: ea.opening + ea.fuelIn - ea.cash,
+              } as fuelBalanceDocument;
+            }
+
+            await addFuelBalance(obj);
+          })
+      );
+    }
+
+    mqttEmitter("detpos/local_server", `${result?.nozzleNo}/D1S1`);
+    mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
+
+    // get tank data by today date
+    const tankData = await getTankData({
+      stationDetailId: result.stationDetailId,
+      dateOfDay: moment().format("YYYY-MM-DD"),
+    });
+
+    // check if tank data exists
+    try {
+      if (tankData.length === 0) {
+        await addTankData({
+          stationDetailId: result.stationDetailId,
+          vocono: lastData[0].vocono,
+          nozzleNo: lastData[0].nozzleNo,
+        });
+      } else {
+        await updateExistingTankData({
+          id: tankData[0]._id,
+          stationDetailId: result.stationDetailId,
+        });
+      }
+    } catch (error) {
+      console.error("Error handling tank data:", error);
+    }
+
+    await calcFuelBalance(
+      {
+        stationId: result.stationDetailId,
+        fuelType: result.fuelType,
+        createAt: result.dailyReportDate,
+      },
+      { liter: result.saleLiter },
+      result.nozzleNo
+    );
+
+    let prevDate = previous(new Date(result.dailyReportDate));
+    // console.log(prevDate, "this is prev date");
+
+    let checkErrorData = await detailSaleModel.find({
+      asyncAlready: 0,
+      dailyReportDate: prevDate,
+    });
+
+    if (checkErrorData.length > 0) {
+      // console.log(checkErrorData, "this is error");
+
+      // cloud upload 0 condition
+      for (const ea of checkErrorData) {
+        try {
+          let url = config.get<string>("detailsaleCloudUrl");
+          let response = await axios.post(url, ea);
+          console.log(response, "up to cloud");
+          if (response.status == 200) {
+            await detailSaleModel.findByIdAndUpdate(ea._id, {
+              asyncAlready: "2",
+            });
+          } else {
+            break;
+          }
+        } catch (error) {
+          if (error.response && error.response.status === 409) {
+          } else {
+          }
+        }
+      }
+    }
+
+    //cloud upload 1 conditon
+    let finalData = await detailSaleModel.find({ asyncAlready: 1 });
+    for (const ea of finalData) {
+      try {
+        let url = config.get<string>("detailsaleCloudUrl");
+        let response = await axios.post(url, ea);
+        console.log(response, "up to cloud");
+        if (response.status == 200) {
+          await detailSaleModel.findByIdAndUpdate(ea._id, {
+            asyncAlready: "2",
+          });
+        } else {
+          break;
+        }
+      } catch (error) {
+        console.log(error);
+        if (error.response && error.response.status === 409) {
+        } else {
+        }
+      }
+    }
+
+    let checkErrorFuelInData = await fuelInModel.find({
+      asyncAlready: 1,
+      // dailyReportDate: prevDate,
+    });
+
+    const url = config.get<string>("fuelInCloud");
+
+    if (checkErrorFuelInData.length > 0) {
+      for (const ea of checkErrorFuelInData) {
+        try {
+          let no = await fuelInModel.count();
+          let tankCondition = await getFuelBalance({
+            stationId: ea.stationDetailId,
+            fuelType: ea.fuel_type,
+            tankNo: Number(ea.tankNo),
+            createAt: ea.receive_date,
+          });
+
+          console.log(tankCondition, "this is tank condition", ea);
+
+          const updatedBody = {
+            driver: ea.driver,
+            bowser: ea.bowser,
+            tankNo: ea.tankNo,
+            fuel_type: ea.fuel_type,
+            receive_balance: ea.receive_balance.toString(),
+            receive_date: ea.receive_date,
+            asyncAlready: ea.asyncAlready,
+            stationId: ea.stationDetailId,
+            stationDetailId: ea.stationDetailId,
+            fuel_in_code: no + 1,
+            tank_balance: tankCondition[0]?.balance || 0,
+          };
+
+          const url = config.get<string>("fuelInCloud");
+
+          try {
+            let response = await axios.post(url, updatedBody);
+
+            if (response.status == 200) {
+              await fuelInModel.findByIdAndUpdate(ea._id, {
+                asyncAlready: "2",
+              });
+            } else {
+              console.log("error is here fuel in");
+            }
+          } catch (error) {
+            console.log("errr", error);
+            if (error.response && error.response.status === 409) {
+            } else {
+            }
+          }
+
+          return result;
+        } catch (e) {
+          throw new Error(e);
+        }
+      }
+    }
+  } catch(error) {
+    console.log(error.message)
+  }
+}
+
 export const deleteDetailSale = async (
   query: FilterQuery<detailSaleDocument>
 ) => {
