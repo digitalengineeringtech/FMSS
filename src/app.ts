@@ -51,8 +51,9 @@ client.on("message", async (topic, message) => {
 
   if (data[2] == "Reload") {
     // console.log(topic, message);
-    liveDataChangeHandler(message.toString());
+    // liveDataChangeHandler(message.toString());
     zeroDetailSaleUpdateByDevice(data[3], message.toString());
+    // detailSaleUpdateByDevice(data[3], message.toString());
   }
 
   if (data[2] == "Final") {
@@ -149,7 +150,7 @@ const defaultData = async () => {
   systemStatusAdd();
 };
 
-defaultData();
+// defaultData();
 
 server.listen(port, () =>
   console.log(`server is running in  http://${host}:${port}`)

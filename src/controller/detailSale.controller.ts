@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, query } from "express";
-import fMsg, { previous } from "../utils/helper";
+import fMsg, { mqttEmitter, previous } from "../utils/helper";
 import {
   getDetailSale,
   addDetailSale,
@@ -19,6 +19,7 @@ import {
 
 import { deviceLiveData } from "../connection/liveTimeData";
 import { getCustomerByCardId } from "../service/customer.service";
+import detailSaleModel, { detailSaleDocument } from "../model/detailSale.model";
 import {
   autoAddTotalBalance,
   getTotalBalance,
@@ -92,7 +93,7 @@ export const preSetDetailSaleHandler = async (
 
       result = await preSetDetailSale(depNo, nozzleNo, newLiter, "L", req.body);
     }
-    
+
     //hk
     // let balanceStatementData = await getTotalBalance({
     //   dateOfDay: result.dailyReportDate,
@@ -121,6 +122,15 @@ export const addDetailSaleHandler = async (
     if (!depNo || !nozzleNo) {
       throw new Error("you need pumpNo or message");
     }
+
+    // const lastDocument = await detailSaleModel
+    //   .findOne({ nozzleNo: req.body.nozzleNo })
+    //   .sort({ _id: -1, createAt: -1 });
+
+    // if (lastDocument?.devTotalizar_liter === 0) {
+    //   mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
+    //   return;
+    // }
 
     let result = await addDetailSale(depNo, nozzleNo, req.body);
 
