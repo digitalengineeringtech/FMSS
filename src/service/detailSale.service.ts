@@ -234,6 +234,7 @@ export const addDetailSale = async (
     }
 
     let iso: Date = new Date(`${currentDate}T${currentDateTime}.000Z`);
+
     //hk
     // console.log(iso, "this is iso date");
     // get today count
@@ -267,6 +268,7 @@ export const addDetailSale = async (
     const lastDocument = await detailSaleModel
       .findOne({ nozzleNo: body.nozzleNo })
       .sort({ _id: -1, createAt: -1 });
+
     //hk
     // body = {
     //   ...body,
@@ -321,6 +323,7 @@ export const addDetailSale = async (
         dateOfDay: result.dailyReportDate,
       });
     }
+
     if (checkDate.length == 0) {
       let prevDate = previous(new Date(result.dailyReportDate));
 

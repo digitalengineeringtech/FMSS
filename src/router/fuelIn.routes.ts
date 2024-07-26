@@ -52,19 +52,21 @@ fuelInRoute.delete(
   deleteFuelInHandler
 );
 
-fuelInRoute.post('/atg', 
+fuelInRoute.post(
+  "/atg",
   validateToken,
   roleValidator(["admin", "manager"]), //In that one role is manager
   hasAnyPermit(["add"]),
   validateAll(fuelInSchema),
   addAtgFuelInHandler
-)
+);
 
-fuelInRoute.patch('/atg/update', 
+fuelInRoute.post(
+  "/atg/update",
   validateToken,
   roleValidator(["admin", "manager"]),
   hasAnyPermit(["edit"]),
   updateAtgFuelInHandler
-)
+);
 
 export default fuelInRoute;

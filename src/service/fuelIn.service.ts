@@ -142,228 +142,225 @@ export const fuelInByDate = async (
 };
 
 export const addAtgFuelIn = async (body: any) => {
-    const fakedata = {
-      data: {
-        data: [
-          {
-            stateInfo: "No alarm",
-            oilType: "Petrol 92",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 333,
-            connect: 3,
-            id: 1,
-          },
-          {
-            stateInfo: "No alarm",
-            oilType: "Diesel",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 444,
-            connect: 3,
-            id: 2,
-          },
-          {
-            stateInfo: "No alarm",
-            oilType: "95 Octane",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 555,
-            connect: 3,
-            id: 3,
-          },
-          {
-            stateInfo: "No alarm",
-            oilType: "Super Diesel",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 666,
-            connect: 3,
-            id: 4,
-          },
-        ],
-      },
+  const fakedata = {
+    data: {
+      data: [
+        {
+          stateInfo: "No alarm",
+          oilType: "Petrol 92",
+          weight: 0,
+          level: 2222,
+          oilRatio: 0.3333,
+          waterRatio: 0,
+          canAddOilWeight: 0,
+          temperature: 32.33,
+          volume: 333,
+          connect: 3,
+          id: 1,
+        },
+        {
+          stateInfo: "No alarm",
+          oilType: "Diesel",
+          weight: 0,
+          level: 2222,
+          oilRatio: 0.3333,
+          waterRatio: 0,
+          canAddOilWeight: 0,
+          temperature: 32.33,
+          volume: 444,
+          connect: 3,
+          id: 2,
+        },
+        {
+          stateInfo: "No alarm",
+          oilType: "95 Octane",
+          weight: 0,
+          level: 2222,
+          oilRatio: 0.3333,
+          waterRatio: 0,
+          canAddOilWeight: 0,
+          temperature: 32.33,
+          volume: 555,
+          connect: 3,
+          id: 3,
+        },
+        {
+          stateInfo: "No alarm",
+          oilType: "Super Diesel",
+          weight: 0,
+          level: 2222,
+          oilRatio: 0.3333,
+          waterRatio: 0,
+          canAddOilWeight: 0,
+          temperature: 32.33,
+          volume: 666,
+          connect: 3,
+          id: 4,
+        },
+      ],
+    },
+  };
+
+  try {
+    let no = await fuelInModel.count();
+
+    let tankUrl = config.get<string>("tankDataUrl");
+
+    let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;
+
+    const tank = tankRealTimeData.data.data.find((ea) => ea.id == body.tankNo);
+
+    const oilType = tank?.oilType;
+
+    const opening = tank?.volume;
+
+    let fuel_type;
+
+    if (oilType === "Petrol 92") {
+      fuel_type = "001-Octane Ron(92)";
+    } else if (oilType === "95 Octane") {
+      fuel_type = "002-Octane Ron(95)";
+    } else if (oilType === "HSD") {
+      fuel_type = "004-Diesel";
+    } else if (oilType === "PHSD") {
+      fuel_type = "005-Premium Diesel";
+    }
+
+    const fuelInObject = {
+      stationDetailId: body.stationDetailId,
+      driver: body.driver,
+      bowser: body.bowser,
+      tankNo: body.tankNo,
+      fuel_type: fuel_type,
+      fuel_in_code: no + 1,
+      opening: opening,
+      tank_balance: 0,
+      receive_balance: 0,
+      receive_date: new Date("YYYY-MM-DD"),
+      asyncAlready: 0,
     };
 
-    try {
-      let no = await fuelInModel.count();
+    let result = await new fuelInModel(fuelInObject).save();
 
-      let tankUrl = config.get<string>("tankDataUrl");
-
-      let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;
-
-      const tank = tankRealTimeData.data.data.find((ea) => ea.id == body.tankNo);
-
-      const oilType = tank?.oilType;
-
-      const opening = tank?.volume;
-
-      let fuel_type;
-
-      if(oilType === 'Petrol 92'){
-          fuel_type = '001-Octane Ron(92)';
-      } else if(oilType === '95 Octane'){
-          fuel_type = '002-Octane Ron(95)';
-      } else if(oilType === 'HSD'){
-          fuel_type = '004-Diesel';
-      } else if(oilType === 'PHSD'){
-          fuel_type = '005-Premium Diesel';
-      }
-
-      const fuelInObject = {
-         stationDetailId: body.stationDetailId,
-         driver: body.driver,
-         bowser: body.bowser,
-         tankNo: body.tankNo,
-         fuel_type: fuel_type,
-         fuel_in_code: no + 1,
-         opening: opening, 
-         tank_balance: 0,
-         receive_balance: 0, 
-         receive_date: new Date('YYYY-MM-DD'),
-         asyncAlready: 0,
-      };
-
-      let result = await new fuelInModel(fuelInObject).save();
-
-      return result;
-
-    } catch (e) {
-      console.log(e);
-    }
+    return result;
+  } catch (e) {
+    console.log(e);
+  }
 };
 
-export const updateAtgFuelIn = async (
-  body: any
-) => {
-    const fakedata = {
-      data: {
-        data: [
-          {
-            stateInfo: "No alarm",
-            oilType: "Petrol 92",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 666,
-            connect: 3,
-            id: 1,
-          },
-          {
-            stateInfo: "No alarm",
-            oilType: "Diesel",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 444,
-            connect: 3,
-            id: 2,
-          },
-          {
-            stateInfo: "No alarm",
-            oilType: "95 Octane",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 555,
-            connect: 3,
-            id: 3,
-          },
-          {
-            stateInfo: "No alarm",
-            oilType: "Super Diesel",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 666,
-            connect: 3,
-            id: 4,
-          },
-        ],
-      },
+export const updateAtgFuelIn = async (body: any) => {
+  const fakedata = {
+    data: {
+      data: [
+        {
+          stateInfo: "No alarm",
+          oilType: "Petrol 92",
+          weight: 0,
+          level: 2222,
+          oilRatio: 0.3333,
+          waterRatio: 0,
+          canAddOilWeight: 0,
+          temperature: 32.33,
+          volume: 666,
+          connect: 3,
+          id: 1,
+        },
+        {
+          stateInfo: "No alarm",
+          oilType: "Diesel",
+          weight: 0,
+          level: 2222,
+          oilRatio: 0.3333,
+          waterRatio: 0,
+          canAddOilWeight: 0,
+          temperature: 32.33,
+          volume: 444,
+          connect: 3,
+          id: 2,
+        },
+        {
+          stateInfo: "No alarm",
+          oilType: "95 Octane",
+          weight: 0,
+          level: 2222,
+          oilRatio: 0.3333,
+          waterRatio: 0,
+          canAddOilWeight: 0,
+          temperature: 32.33,
+          volume: 777,
+          connect: 3,
+          id: 3,
+        },
+        {
+          stateInfo: "No alarm",
+          oilType: "Super Diesel",
+          weight: 0,
+          level: 2222,
+          oilRatio: 0.3333,
+          waterRatio: 0,
+          canAddOilWeight: 0,
+          temperature: 32.33,
+          volume: 666,
+          connect: 3,
+          id: 4,
+        },
+      ],
+    },
+  };
+
+  try {
+    let tankUrl = config.get<string>("tankDataUrl");
+
+    let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;
+
+    const tank = tankRealTimeData.data.data.find((ea) => ea.id == body.tankNo);
+
+    const fuelIn = await fuelInModel.findOne({ _id: body.id });
+
+    if (!fuelIn) {
+      throw new Error("fuelIn document not found for the given ID");
+    }
+
+    const closing = tank?.volume;
+
+    const opening = fuelIn?.opening;
+
+    const updateFuelIn = {
+      tank_balance: closing,
+      receive_balance: closing - opening,
+    };
+
+    let result = await fuelInModel.findByIdAndUpdate(body.id, updateFuelIn);
+
+    const atgurl = config.get<string>("atgFuelInCloud");
+
+    const cloudFuelIn = {
+      stationId: result?.stationDetailId,
+      driver: result?.driver,
+      bowser: result?.bowser,
+      tankNo: result?.tankNo,
+      fuel_type: result?.fuel_type,
+      fuel_in_code: result?.fuel_in_code,
+      tank_balance: result?.tank_balance,
+      opening: result?.opening,
+      receive_balance: result?.receive_balance,
+      receive_date: result?.receive_date,
     };
 
     try {
-      let tankUrl = config.get<string>("tankDataUrl");
+      let response = await axios.post(atgurl, cloudFuelIn);
 
-      let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;
-
-      const tank = tankRealTimeData.data.data.find((ea) => ea.id == body.tankNo);
-
-      const fuelIn = await fuelInModel.findOne({ _id: body.id });
-
-      if (!fuelIn) {
-        throw new Error('fuelIn document not found for the given ID');
+      if (response) {
+        await fuelInModel.findByIdAndUpdate(result?._id, {
+          asyncAlready: "2",
+        });
       }
-
-      const closing = tank?.volume;
-
-      const opening = fuelIn?.opening;
-
-      const updateFuelIn = {
-        tank_balance: closing,
-        receive_balance: closing - opening,
-     };
-
-      let result = await fuelInModel.findByIdAndUpdate(body.id, updateFuelIn);
-
-      const atgurl = config.get<string>('atgFuelInCloud');
-
-      const cloudFuelIn = {
-        stationId: result?.stationDetailId,
-        driver: result?.driver,
-        bowser: result?.bowser,
-        tankNo: result?.tankNo,
-        fuel_type: result?.fuel_type,  
-        fuel_in_code: result?.fuel_in_code,
-        tank_balance: result?.tank_balance,
-        opening: result?.opening,
-        receive_balance: result?.receive_balance,
-        receive_date: result?.receive_date,
-      }
-
-      try {
-        let response = await axios.post(atgurl, cloudFuelIn);
-
-        if(response){
-          await fuelInModel.findByIdAndUpdate(result?._id, {
-            asyncAlready: "2",
-          });
-        }
-        } catch (error) {
-          console.log("errr", error.message)
-        }
-
-        return result;
     } catch (error) {
-      console.log(error)
+      console.log("errr", error.message);
     }
-}
+
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
