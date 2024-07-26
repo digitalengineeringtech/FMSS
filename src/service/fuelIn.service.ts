@@ -3,6 +3,7 @@ import fuelInModel, { fuelInDocument } from "../model/fuelIn.model";
 import { getFuelBalance, updateFuelBalance } from "./fuelBalance.service";
 import config from "config";
 import axios from "axios";
+import { log } from "console";
 
 const limitNo = config.get<number>("page_limit");
 
@@ -325,14 +326,18 @@ export const updateAtgFuelIn = async (body: any) => {
 
     const opening = fuelIn?.opening;
 
-    let result = await fuelInModel.findOneAndUpdate(body.id,  {
+    await fuelInModel.findByIdAndUpdate(body.id, {
       tank_balance: closing,
       receive_balance: closing - opening,
     });
 
+    const result = await fuelInModel.findById(body.id);
+
+    console.log(result, "this is result");
+
     try {
       const url = config.get<string>("atgFuelInCloud");
-  
+
       let cloudObject = {
         stationDetailId: result?.stationDetailId,
         stationId: result?.stationDetailId,
@@ -350,14 +355,15 @@ export const updateAtgFuelIn = async (body: any) => {
       const response = await axios.post(url, cloudObject);
 
       if (response.status === 200) {
-        await fuelInModel.findOneAndUpdate(body.id,  {
+        await fuelInModel.findOneAndUpdate(body.id, {
           asyncAlready: 2,
-        })
+        });
       } else {
         throw new Error("Cloud not connected");
       }
     } catch (error) {
-        throw new Error(error.message);
+      console.log(error);
+      throw new Error(error);
     }
 
     return result;

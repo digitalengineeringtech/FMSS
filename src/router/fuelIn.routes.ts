@@ -64,7 +64,7 @@ fuelInRoute.post(
 fuelInRoute.post(
   "/atg/update",
   validateToken,
-  roleValidator(["admin", "manager"]),
+  roleValidator(["manager"]),
   hasAnyPermit(["edit"]),
   updateAtgFuelInHandler
 );

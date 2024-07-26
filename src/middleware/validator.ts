@@ -29,11 +29,9 @@ export const validateToken = async (
       return next(new Error("invalid token"));
     }
     let decoded = checkToken(token);
-    console.log(decoded, "*************************");
 
     // let user = await getUser({ _id: decoded._id });
     let user = await get(decoded?._id);
-    console.log(user, "*user********************");
     if (!user) {
       return next(new Error("invalid token 2"));
     }

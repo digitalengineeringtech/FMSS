@@ -98,7 +98,7 @@ export const getFuelInByDateHandler = async (
   }
 };
 
-export const addAtgFuelInHandler = async(
+export const addAtgFuelInHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -109,7 +109,7 @@ export const addAtgFuelInHandler = async(
   } catch (e) {
     next(new Error(e));
   }
-}
+};
 
 export const updateAtgFuelInHandler = async (
   req: Request,
@@ -117,11 +117,11 @@ export const updateAtgFuelInHandler = async (
   next: NextFunction
 ) => {
   try {
-
+    console.log("wekkekkkekeekeke");
     let result = await updateAtgFuelIn(req.body);
 
     fMsg(res, "FuelIn data was updated", result);
-  } catch(e) {
-    next(new Error(e));
+  } catch (e) {
+    console.log(e, "this is err");
   }
-}
+};
