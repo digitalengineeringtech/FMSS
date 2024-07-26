@@ -325,38 +325,39 @@ export const updateAtgFuelIn = async (body: any) => {
 
     const opening = fuelIn?.opening;
 
-    const updateFuelIn = {
+    let result = await fuelInModel.findOneAndUpdate(body.id,  {
       tank_balance: closing,
       receive_balance: closing - opening,
-    };
-
-    let result = await fuelInModel.findByIdAndUpdate(body.id, updateFuelIn);
-
-    const atgurl = config.get<string>("atgFuelInCloud");
-
-    const cloudFuelIn = {
-      stationId: result?.stationDetailId,
-      driver: result?.driver,
-      bowser: result?.bowser,
-      tankNo: result?.tankNo,
-      fuel_type: result?.fuel_type,
-      fuel_in_code: result?.fuel_in_code,
-      tank_balance: result?.tank_balance,
-      opening: result?.opening,
-      receive_balance: result?.receive_balance,
-      receive_date: result?.receive_date,
-    };
+    });
 
     try {
-      let response = await axios.post(atgurl, cloudFuelIn);
+      const url = config.get<string>("atgFuelInCloud");
+  
+      let cloudObject = {
+        stationDetailId: result?.stationDetailId,
+        stationId: result?.stationDetailId,
+        driver: result?.driver,
+        bowser: result?.bowser,
+        tankNo: result?.tankNo,
+        fuel_type: result?.fuel_type,
+        fuel_in_code: result?.fuel_in_code,
+        opening: result?.opening,
+        tank_balance: result?.tank_balance,
+        receive_balance: result?.receive_balance.toString(),
+        receive_date: result?.receive_date,
+      };
 
-      if (response) {
-        await fuelInModel.findByIdAndUpdate(result?._id, {
-          asyncAlready: "2",
-        });
+      const response = await axios.post(url, cloudObject);
+
+      if (response.status === 200) {
+        await fuelInModel.findOneAndUpdate(body.id,  {
+          asyncAlready: 2,
+        })
+      } else {
+        throw new Error("Cloud not connected");
       }
     } catch (error) {
-      console.log("errr", error.message);
+        throw new Error(error.message);
     }
 
     return result;
