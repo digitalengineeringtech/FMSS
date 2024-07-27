@@ -34,6 +34,7 @@ import { log } from "console";
 import { create } from "domain";
 
 interface Data {
+  depNo: string;
   nozzleNo: string;
   fuelType: string;
   vocono: string;
@@ -295,6 +296,7 @@ export const addDetailSale = async (
       stationDetailId: body.user.stationId,
       casherCode: body.user.name,
       asyncAlready: "0",
+      depNo: depNo,
       totalizer_liter: lastDocument?.totalizer_liter,
       totalizer_amount: lastDocument?.totalizer_amount,
       createAt: iso,
