@@ -31,6 +31,7 @@ import fuelInModel from "../model/fuelIn.model";
 import { escape } from "querystring";
 import { string } from "zod";
 import { log } from "console";
+import { create } from "domain";
 
 interface Data {
   nozzleNo: string;
@@ -270,10 +271,7 @@ export const addDetailSale = async (
       .findOne({ nozzleNo: body.nozzleNo })
       .sort({ _id: -1, createAt: -1 });
 
-    if (lastDocument?.devTotalizar_liter === 0) {
-      mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
-      return;
-    }
+    
     
     console.log(lastDocument, "this is last document");
 
@@ -303,6 +301,11 @@ export const addDetailSale = async (
     };
 
     let result = await new detailSaleModel(body).save();
+
+    if (lastDocument?.devTotalizar_liter === 0) {
+      mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
+      return;
+    }
 
     // let checkRpDate = await getDailyReport({
     //   stationId: result.stationDetailId,
@@ -722,6 +725,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       } else {
         await updateExistingTankData({
           id: tankData[0]._id,
+          vocono: lastData[0].vocono,
           stationDetailId: result.stationDetailId,
         });
       }
@@ -893,16 +897,17 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       devTotalizar_liter: 0,
     };
 
-    const lastData = await detailSaleModel
-      .findOne(query)
-      .sort({ _id: -1 })
+    const lastData: any[] = await detailSaleModel
+      .find(query)
+      .limit(2)
+      .sort({ _id: -1, createdAt: -1 })
       .lean();
 
     console.log("====================================");
     console.log(lastData);
     console.log("====================================");
 
-    if (!lastData) {
+    if (!lastData[0] || !lastData[1]) {
       return;
     }
 
@@ -911,7 +916,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     // console.log("tankCount", tankCount);
 
     let fuelBalances = await getFuelBalance({
-      stationId: lastData.stationDetailId,
+      stationId: lastData[0].stationDetailId,
       // createAt: prevDate,
     });
 
@@ -945,7 +950,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
             waterRatio: 0,
             canAddOilWeight: 0,
             temperature: 32.33,
-            volume: 333,
+            volume: 444,
             connect: 3,
             id: 1,
           },
@@ -958,7 +963,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
             waterRatio: 0,
             canAddOilWeight: 0,
             temperature: 32.33,
-            volume: 444,
+            volume: 555,
             connect: 3,
             id: 2,
           },
@@ -971,7 +976,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
             waterRatio: 0,
             canAddOilWeight: 0,
             temperature: 32.33,
-            volume: 555,
+            volume: 666,
             connect: 3,
             id: 3,
           },
@@ -984,7 +989,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
             waterRatio: 0,
             canAddOilWeight: 0,
             temperature: 32.33,
-            volume: 666,
+            volume: 777,
             connect: 3,
             id: 4,
           },
@@ -1023,11 +1028,11 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
 
       if (volume === undefined) {
         console.warn(`Tank number ${tankNo} not found in the fetched data.`);
-        volume = lastData.tankBalance; // Fallback to lastData
+        volume = lastData[1].tankBalance; // Fallback to lastData
       }
     } catch (e) {
       console.error("An error occurred while fetching tank data:", e.message);
-      volume = lastData.tankBalance; // Fallback to lastData
+      volume = lastData[1].tankBalance; // Fallback to lastData
     }
 
     //end update
@@ -1036,11 +1041,11 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       salePrice: data[1],
       saleLiter: data[2],
       totalPrice: data[2] * data[3],
-      asyncAlready: lastData.asyncAlready == "a0" ? "a" : "1",
+      asyncAlready: lastData[0].asyncAlready == "a0" ? "a" : "1",
       totalizer_liter:
-        lastData.totalizer_liter ?? +Number(saleLiter ? saleLiter : 0),
+        lastData[1].totalizer_liter ?? +Number(saleLiter ? saleLiter : 0),
       totalizer_amount:
-        lastData.totalizer_amount ?? +Number(totalPrice ? totalPrice : 0),
+        lastData[1].totalizer_amount ?? +Number(totalPrice ? totalPrice : 0),
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[4] * data[1],
       tankNo: tankNo,
@@ -1048,9 +1053,9 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       isError: "A",
     };
 
-    await detailSaleModel.findByIdAndUpdate(lastData._id, updateBody);
+    await detailSaleModel.findByIdAndUpdate(lastData[1]._id, updateBody);
 
-    let result = await detailSaleModel.findById(lastData._id);
+    let result = await detailSaleModel.findById(lastData[1]._id);
 
     if (!result) {
       throw new Error("Final send in error");
@@ -1138,8 +1143,8 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       if (tankData.length === 0) {
         await addTankData({
           stationDetailId: result.stationDetailId,
-          vocono: lastData.vocono,
-          nozzleNo: lastData.nozzleNo,
+          vocono: lastData[0].vocono,
+          nozzleNo: lastData[0].nozzleNo,
         });
       } else {
         await updateExistingTankData({
