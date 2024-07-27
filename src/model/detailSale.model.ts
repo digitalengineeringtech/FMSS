@@ -38,7 +38,7 @@ const detailSaleSchema = new Schema({
   vocono: { type: String, required: true, unique: true },
   carNo: { type: String, required: true },
   vehicleType: { type: String, required: true },
-  depNo: { type: String, required: true },
+  depNo: { type: String, default: '0' },
   nozzleNo: { type: String, required: true },
   fuelType: { type: String, required: true },
 
