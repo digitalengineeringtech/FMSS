@@ -150,7 +150,7 @@ const defaultData = async () => {
   systemStatusAdd();
 };
 
-// defaultData();
+defaultData();
 
 server.listen(port, () =>
   console.log(`server is running in  http://${host}:${port}`)
