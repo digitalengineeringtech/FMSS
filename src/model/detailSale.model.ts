@@ -7,6 +7,7 @@ export interface detailSaleDocument extends mongoose.Document {
   vocono: string;
   carNo: string;
   vehicleType: string;
+  depNo: string;
   nozzleNo: string;
   fuelType: string;
   cashType: string;
@@ -37,6 +38,7 @@ const detailSaleSchema = new Schema({
   vocono: { type: String, required: true, unique: true },
   carNo: { type: String, required: true },
   vehicleType: { type: String, required: true },
+  depNo: { type: String, required: true },
   nozzleNo: { type: String, required: true },
   fuelType: { type: String, required: true },
 
