@@ -545,7 +545,8 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       },
     };
 
-    let volume;
+    let volume: number;
+
 
     //old version
     // try {
@@ -562,7 +563,9 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
 
     //new version
 
-    console.log(lastData);
+    // console.log(lastData);
+
+    
 
     try {
       let tankUrl = config.get<string>("tankDataUrl");
@@ -592,11 +595,11 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       )?.volume;
 
       if (volume === undefined) {
-        console.warn(`Tank number ${tankNo} not found in the fetched data.`);
+        // console.warn(`Tank number ${tankNo} not found in the fetched data.`);
         volume = lastData[1].tankBalance; // Fallback to lastData
       }
     } catch (e) {
-      console.error("An error occurred while fetching tank data:", e.message);
+      // console.error("An error occurred while fetching tank data:", e.message);
       volume = lastData[1].tankBalance; // Fallback to lastData
     }
 
@@ -608,7 +611,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       // saleLiter: saleLiter,
       saleLiter: data[2],
       // totalPrice: totalPrice ? totalPrice : 0,
-      totalPrice: data[2] * data[3],
+      totalPrice: data[2] * data[1],
       asyncAlready: lastData[0].asyncAlready == "a0" ? "a" : "1",
       totalizer_liter:
         lastData[1].totalizer_liter + Number(saleLiter ? saleLiter : 0),
@@ -792,7 +795,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
           break;
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         if (error.response && error.response.status === 409) {
         } else {
         }
@@ -817,7 +820,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
             createAt: ea.receive_date,
           });
 
-          console.log(tankCondition, "this is tank condition", ea);
+          // console.log(tankCondition, "this is tank condition", ea);
 
           const updatedBody = {
             driver: ea.driver,
@@ -833,7 +836,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
             tank_balance: tankCondition[0]?.balance || 0,
           };
 
-          console.log(updatedBody, "this is updatebody");
+          // console.log(updatedBody, "this is updatebody");
 
           const url = config.get<string>("fuelInCloud");
 
@@ -848,7 +851,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
               console.log("error is here fuel in");
             }
           } catch (error) {
-            console.log("errr", error);
+            // console.log("errr", error);
             if (error.response && error.response.status === 409) {
             } else {
             }
@@ -890,7 +893,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     let totalPrice = deviceLiveData.get(data[0])?.[1];
     let depNo = topic;
 
-    console.log("wllllllllllllllllllllll");
+    // console.log("wllllllllllllllllllllll");
 
     let query = {
       nozzleNo: data[0],
@@ -905,9 +908,9 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       .sort({ _id: -1, createdAt: -1 })
       .lean();
 
-    console.log("====================================");
-    console.log(lastData);
-    console.log("====================================");
+    // console.log("====================================");
+    // console.log(lastData);
+    // console.log("====================================");
 
     if (!lastData[0] || !lastData[1]) {
       return;
@@ -999,7 +1002,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       },
     };
 
-    let volume;
+    let volume: number;
 
     try {
       let tankUrl = config.get<string>("tankDataUrl");
@@ -1028,21 +1031,32 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         (ea) => ea.id === tankNo
       )?.volume;
 
+      // console.log('------------------ volume ----------------------')
+      // console.log(volume);
+      // console.log('------------------ volume ----------------------')
+
+
       if (volume === undefined) {
-        console.warn(`Tank number ${tankNo} not found in the fetched data.`);
+        // console.warn(`Tank number ${tankNo} not found in the fetched data.`);
         volume = lastData[1].tankBalance; // Fallback to lastData
       }
     } catch (e) {
-      console.error("An error occurred while fetching tank data:", e.message);
+      // console.error("An error occurred while fetching tank data:", e.message);
       volume = lastData[1].tankBalance; // Fallback to lastData
     }
+    
+
+    // console.log('----------------tankBalance----------------')
+    // console.log('tankBalance', volume + Number(data[2]))
+    // console.log('----------------tankBalance----------------')
+
 
     //end update
     let updateBody: UpdateQuery<detailSaleDocument> = {
       nozzleNo: data[0],
       salePrice: data[1],
       saleLiter: data[2],
-      totalPrice: data[2] * data[3],
+      totalPrice: data[2] * data[1],
       asyncAlready: lastData[0].asyncAlready == "a0" ? "a" : "1",
       totalizer_liter:
         lastData[1].totalizer_liter ?? +Number(saleLiter ? saleLiter : 0),
@@ -1051,7 +1065,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[4] * data[1],
       tankNo: tankNo,
-      tankBalance: Number(volume) + Number(data[2]),
+      tankBalance: volume + Number(data[2]),
       isError: "A",
     };
 
@@ -1155,7 +1169,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         });
       }
     } catch (error) {
-      console.error("Error handling tank data:", error);
+      console.error("Error handling tank data:", error.message);
     }
 
     await calcFuelBalance(
