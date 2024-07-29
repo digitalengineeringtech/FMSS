@@ -620,7 +620,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[4] * data[1],
       tankNo: tankNo,
-      tankBalance: Number(volume) + Number(saleLiter),
+      tankBalance: volume + Number(data[2]),
       isError: "A",
     };
 
@@ -1042,7 +1042,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       }
     } catch (e) {
       // console.error("An error occurred while fetching tank data:", e.message);
-      volume = lastData[1].tankBalance; // Fallback to lastData
+      volume = lastData[1].tankBalance ; // Fallback to lastData
     }
     
 
