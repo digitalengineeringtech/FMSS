@@ -5,7 +5,7 @@ import config from "config";
 import { UserDocument } from "../model/user.model";
 import moment from "moment-timezone";
 import { get, mqttEmitter, previous, set } from "../utils/helper";
-import axios from "axios";
+import axios, { isCancel } from "axios";
 import {
   addTankData,
   getTankData,
@@ -138,6 +138,7 @@ export const preSetDetailSale = async (
     totalizer_liter: lastDocument?.totalizer_liter,
     totalizer_amount: lastDocument?.totalizer_amount,
     preset: `${preset} ${type}`,
+    isCancel: 0,
     createAt: iso,
   };
 
@@ -216,6 +217,27 @@ export const preSetDetailSale = async (
   return result;
 };
 
+export const cancelDetailSale = async (message) => {
+  let data: any[] = [message.slice(0, 2), message.slice(2).trim()];
+
+  const query = {
+    nozzleNo: data[0],
+    preset: { $ne: null },
+    dailyReportDate: moment().tz("Asia/Yangon").format("YYYY-MM-DD"),
+  }
+
+  if(data[1] == "cancel"){
+    const lastDetailSale = await detailSaleModel
+    .findOne(query)
+    .sort({ _id: -1, createAt: -1 });
+
+    if (lastDetailSale) {
+      lastDetailSale.isCancel = 1;
+      await lastDetailSale.save();
+    }
+  }
+}
+
 export const addDetailSale = async (
   depNo: string,
   nozzleNo: string,
@@ -269,12 +291,9 @@ export const addDetailSale = async (
     }
 
     const lastDocument = await detailSaleModel
-      .findOne({ nozzleNo: body.nozzleNo })
+      .findOne({ nozzleNo: body.nozzleNo, isCancel: 0 })
       .sort({ _id: -1, createAt: -1 });
-
     
-    
-    console.log(lastDocument, "this is last document");
 
     //hk
     // body = {
@@ -442,10 +461,9 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     let saleLiter = deviceLiveData.get(data[0])?.[0];
     let totalPrice = deviceLiveData.get(data[0])?.[1];
 
-    // console.log(data);
-
     let query = {
       nozzleNo: data[0],
+      isCancel: 0
     };
 
     const lastData: any[] = await detailSaleModel
@@ -900,6 +918,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       // saleLiter: 0,
       // totalPrice: 0,
       devTotalizar_liter: 0,
+      isCancel: 0
     };
 
     const lastData: any[] = await detailSaleModel
