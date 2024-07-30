@@ -626,10 +626,10 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     let updateBody: UpdateQuery<detailSaleDocument> = {
       nozzleNo: data[0],
       salePrice: data[1],
-      // saleLiter: saleLiter,
-      saleLiter: data[2],
-      // totalPrice: totalPrice ? totalPrice : 0,
-      totalPrice: data[2] * data[1],
+      saleLiter: saleLiter,
+      // saleLiter: data[2],
+      totalPrice: totalPrice ? totalPrice : 0,
+      // totalPrice: data[2] * data[1],
       asyncAlready: lastData[0].asyncAlready == "a0" ? "a" : "1",
       totalizer_liter:
         lastData[1].totalizer_liter + Number(saleLiter ? saleLiter : 0),
@@ -638,7 +638,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[4] * data[1],
       tankNo: tankNo,
-      tankBalance: volume + Number(data[2]),
+      tankBalance: volume + saleLiter,
       isError: "A",
     };
 
@@ -1075,7 +1075,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       nozzleNo: data[0],
       salePrice: data[1],
       saleLiter: data[2],
-      totalPrice: data[2] * data[1],
+      totalPrice: data[3],
       asyncAlready: lastData[0].asyncAlready == "a0" ? "a" : "1",
       totalizer_liter:
         lastData[1].totalizer_liter ?? +Number(saleLiter ? saleLiter : 0),
