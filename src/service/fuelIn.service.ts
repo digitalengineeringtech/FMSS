@@ -143,71 +143,12 @@ export const fuelInByDate = async (
 };
 
 export const addAtgFuelIn = async (body: any) => {
-  const fakedata = {
-    data: {
-      data: [
-        {
-          stateInfo: "No alarm",
-          oilType: "Petrol 92",
-          weight: 0,
-          level: 2222,
-          oilRatio: 0.3333,
-          waterRatio: 0,
-          canAddOilWeight: 0,
-          temperature: 32.33,
-          volume: 333,
-          connect: 3,
-          id: 1,
-        },
-        {
-          stateInfo: "No alarm",
-          oilType: "Diesel",
-          weight: 0,
-          level: 2222,
-          oilRatio: 0.3333,
-          waterRatio: 0,
-          canAddOilWeight: 0,
-          temperature: 32.33,
-          volume: 444,
-          connect: 3,
-          id: 2,
-        },
-        {
-          stateInfo: "No alarm",
-          oilType: "95 Octane",
-          weight: 0,
-          level: 2222,
-          oilRatio: 0.3333,
-          waterRatio: 0,
-          canAddOilWeight: 0,
-          temperature: 32.33,
-          volume: 555,
-          connect: 3,
-          id: 3,
-        },
-        {
-          stateInfo: "No alarm",
-          oilType: "Super Diesel",
-          weight: 0,
-          level: 2222,
-          oilRatio: 0.3333,
-          waterRatio: 0,
-          canAddOilWeight: 0,
-          temperature: 32.33,
-          volume: 666,
-          connect: 3,
-          id: 4,
-        },
-      ],
-    },
-  };
-
   try {
     let no = await fuelInModel.count();
 
     let tankUrl = config.get<string>("tankDataUrl");
 
-    let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;
+    let tankRealTimeData = await axios.post(tankUrl);
 
     const tank = tankRealTimeData.data.data.find((ea) => ea.id == body.tankNo);
 
@@ -250,69 +191,10 @@ export const addAtgFuelIn = async (body: any) => {
 };
 
 export const updateAtgFuelIn = async (body: any) => {
-  const fakedata = {
-    data: {
-      data: [
-        {
-          stateInfo: "No alarm",
-          oilType: "Petrol 92",
-          weight: 0,
-          level: 2222,
-          oilRatio: 0.3333,
-          waterRatio: 0,
-          canAddOilWeight: 0,
-          temperature: 32.33,
-          volume: 666,
-          connect: 3,
-          id: 1,
-        },
-        {
-          stateInfo: "No alarm",
-          oilType: "Diesel",
-          weight: 0,
-          level: 2222,
-          oilRatio: 0.3333,
-          waterRatio: 0,
-          canAddOilWeight: 0,
-          temperature: 32.33,
-          volume: 444,
-          connect: 3,
-          id: 2,
-        },
-        {
-          stateInfo: "No alarm",
-          oilType: "95 Octane",
-          weight: 0,
-          level: 2222,
-          oilRatio: 0.3333,
-          waterRatio: 0,
-          canAddOilWeight: 0,
-          temperature: 32.33,
-          volume: 777,
-          connect: 3,
-          id: 3,
-        },
-        {
-          stateInfo: "No alarm",
-          oilType: "Super Diesel",
-          weight: 0,
-          level: 2222,
-          oilRatio: 0.3333,
-          waterRatio: 0,
-          canAddOilWeight: 0,
-          temperature: 32.33,
-          volume: 666,
-          connect: 3,
-          id: 4,
-        },
-      ],
-    },
-  };
-
   try {
     let tankUrl = config.get<string>("tankDataUrl");
 
-    let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;
+    let tankRealTimeData = await axios.post(tankUrl);
 
     const tank = tankRealTimeData.data.data.find((ea) => ea.id == body.tankNo);
 
