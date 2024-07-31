@@ -648,10 +648,10 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         stationDetailId: result.stationDetailId,
         dateOfDay: moment().format("YYYY-MM-DD"),
       });
-  
+
       // check if tank data exists
       try {
-        if (tankData.length === 0) {
+        if (tankData.length == 0) {
           await addTankData({
             stationDetailId: result.stationDetailId,
             vocono: lastData[0].vocono,
@@ -695,7 +695,6 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         try {
           let url = config.get<string>("detailsaleCloudUrl");
           let response = await axios.post(url, ea);
-          console.log(response, "up to cloud");
           if (response.status == 200) {
             await detailSaleModel.findByIdAndUpdate(ea._id, {
               asyncAlready: "2",
@@ -717,7 +716,6 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       try {
         let url = config.get<string>("detailsaleCloudUrl");
         let response = await axios.post(url, ea);
-        console.log(response, "up to cloud");
         if (response.status == 200) {
           await detailSaleModel.findByIdAndUpdate(ea._id, {
             asyncAlready: "2",
@@ -792,23 +790,6 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         } catch (e) {
           throw new Error(e);
         }
-
-        // try {
-        //   let response = await axios.post(url, ea);
-
-        //   if (response.status == 200) {
-        //     await fuelInModel.findByIdAndUpdate(result._id, {
-        //       asyncAlready: "2",
-        //     });
-        //   } else {
-        //     console.log("error is here fuel in");
-        //   }
-        // } catch (error) {
-        //   console.log("errr", error.response.data.msg);
-        //   if (error.response && error.response.status === 409) {
-        //   } else {
-        //   }
-        // }
       }
     }
   } catch (e) {

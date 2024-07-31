@@ -2,6 +2,7 @@ import { FilterQuery, UpdateQuery } from "mongoose";
 import tankDataModel, { tankDataDocument } from "../model/tankData.model";
 import config from "config";
 import axios from "axios";
+import moment from "moment-timezone";
 
 export const getTankData = async (query: FilterQuery<tankDataDocument>) => {
   try {
@@ -41,35 +42,29 @@ export const addTankData = async (body) => {
     await new tankDataModel(saveData).save();
 
     let uploadData = await getTankData({
-      asyncAlready: "0",
+      stationDetailId: body.stationDetailId,
+      dailyReportDate: moment().format("YYYY-MM-DD"),
     });
-
-    // console.log("===this is=================================");
-    // console.log(uploadData);
-    // console.log("===upload data=================================");
 
     if (uploadData.length == 0) return;
 
-    for (const ea of uploadData) {
       try {
         let url = config.get<string>("tankDataCloudUrl");
-        let response = await axios.post(url, ea);
-        // let get = await axios.get(url);
-        // console.log(get, "this is get");
+
+        let response = await axios.post(url, uploadData[0]);
+
         if (response.status == 200) {
-          await tankDataModel.findByIdAndUpdate(ea._id, {
+          await tankDataModel.findByIdAndUpdate(uploadData[0]._id, {
             asyncAlready: "2",
           });
         }
       } catch (e) {
-        
+        console.log(e.message, "error from add tank data");       
       }
-    }
   } catch (e) {
     throw new Error(e);
   }
-};
-
+}
 export const updateExistingTankData = async (body) => {
  try {
  
