@@ -502,123 +502,34 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         })
     );
 
-    // console.log("tankNo", tankNo);
-
-    const fakedata = {
-      data: {
-        data: [
-          {
-            stateInfo: "No alarm",
-            oilType: "Petrol 92",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 333,
-            connect: 3,
-            id: 1,
-          },
-          {
-            stateInfo: "No alarm",
-            oilType: "Diesel",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 444,
-            connect: 3,
-            id: 2,
-          },
-          {
-            stateInfo: "No alarm",
-            oilType: "95 Octane",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 555,
-            connect: 3,
-            id: 3,
-          },
-          {
-            stateInfo: "No alarm",
-            oilType: "Super Diesel",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 666,
-            connect: 3,
-            id: 4,
-          },
-        ],
-      },
-    };
-
     let volume: number;
 
+    let tankUrl = config.get<string>("tankDataUrl");
 
-    //old version
-    // try {
-    //   let tankUrl = config.get<string>("tankDataUrl");
-    //   let tankRealTimeData = tankUrl ? await axios.post(tankUrl) : fakedata;
-    //     volume = tankRealTimeData.data.data.find(
-    //       (ea) => ea.id === tankNo
-    //     )?.volume;
-    //   //  console.log(volume);
-    // } catch (e) {
-    //   // console.log(e);
-    //   volume = lastData[0].tankBalance
-    // }
+    if(tankUrl) {
+      try {
+        let tankRealTimeData;
+        tankRealTimeData = await axios.post(tankUrl);
 
-    //new version
-
-    // console.log(lastData);
-
-    
-
-    try {
-      let tankUrl = config.get<string>("tankDataUrl");
-      let tankRealTimeData;
-
-      if (tankUrl) {
-        try {
-          tankRealTimeData = await axios.post(tankUrl);
-          if (tankRealTimeData.status !== 200) {
-            throw new Error(
-              `Unexpected response status: ${tankRealTimeData.status}`
-            );
-          }
-        } catch (postError) {
-          console.error(
-            `Failed to fetch tank data from ${tankUrl}:`,
-            postError.message
+        if (tankRealTimeData.status !== 200) {
+          throw new Error(
+            `Unexpected response status: ${tankRealTimeData.status}`
           );
-          throw postError; // Re-throw to handle fallback
         }
-      } else {
-        tankRealTimeData = fakedata;
-      }
 
-      volume = tankRealTimeData.data.data.find(
-        (ea) => ea.id === tankNo
-      )?.volume;
+        volume = tankRealTimeData.data.data.find(
+          (ea) => ea.id === tankNo
+        )?.volume;
 
-      if (volume === undefined) {
-        // console.warn(`Tank number ${tankNo} not found in the fetched data.`);
-        volume = lastData[1].tankBalance; // Fallback to lastData
+        if (volume === undefined) {
+          volume = lastData[1].tankBalance;
+        }
+      } catch (e: any) {
+          console.log(`Failed to fetch tank data: ${e.message}`);
+          volume = lastData[1].tankBalance;
       }
-    } catch (e) {
-      // console.error("An error occurred while fetching tank data:", e.message);
-      volume = lastData[1].tankBalance; // Fallback to lastData
+    } else {
+        volume = 0;
     }
 
     //end update
@@ -732,28 +643,30 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     mqttEmitter("detpos/local_server", `${result?.nozzleNo}/D1S1`);
 
     // get tank data by today date
-    const tankData = await getTankData({
-      stationDetailId: result.stationDetailId,
-      dateOfDay: moment().format("YYYY-MM-DD"),
-    });
-
-    // check if tank data exists
-    try {
-      if (tankData.length === 0) {
-        await addTankData({
-          stationDetailId: result.stationDetailId,
-          vocono: lastData[0].vocono,
-          nozzleNo: lastData[0].nozzleNo,
-        });
-      } else {
-        await updateExistingTankData({
-          id: tankData[0]._id,
-          vocono: lastData[0].vocono,
-          stationDetailId: result.stationDetailId,
-        });
+    if(tankUrl) {
+      const tankData = await getTankData({
+        stationDetailId: result.stationDetailId,
+        dateOfDay: moment().format("YYYY-MM-DD"),
+      });
+  
+      // check if tank data exists
+      try {
+        if (tankData.length === 0) {
+          await addTankData({
+            stationDetailId: result.stationDetailId,
+            vocono: lastData[0].vocono,
+            nozzleNo: lastData[0].nozzleNo,
+          });
+        } else {
+          await updateExistingTankData({
+            id: tankData[0]._id,
+            vocono: lastData[0].vocono,
+            stationDetailId: result.stationDetailId,
+          });
+        }
+      } catch (error) {
+        console.error("Error handling tank data:", error);
       }
-    } catch (error) {
-      console.error("Error handling tank data:", error);
     }
 
     await calcFuelBalance(
@@ -960,116 +873,34 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         })
     );
 
-    // console.log("tankNo", tankNo);
-
-    const fakedata = {
-      data: {
-        data: [
-          {
-            stateInfo: "No alarm",
-            oilType: "Petrol 92",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 444,
-            connect: 3,
-            id: 1,
-          },
-          {
-            stateInfo: "No alarm",
-            oilType: "Diesel",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 555,
-            connect: 3,
-            id: 2,
-          },
-          {
-            stateInfo: "No alarm",
-            oilType: "95 Octane",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 666,
-            connect: 3,
-            id: 3,
-          },
-          {
-            stateInfo: "No alarm",
-            oilType: "Super Diesel",
-            weight: 0,
-            level: 2222,
-            oilRatio: 0.3333,
-            waterRatio: 0,
-            canAddOilWeight: 0,
-            temperature: 32.33,
-            volume: 777,
-            connect: 3,
-            id: 4,
-          },
-        ],
-      },
-    };
-
     let volume: number;
 
-    try {
-      let tankUrl = config.get<string>("tankDataUrl");
-      let tankRealTimeData;
+    let tankUrl = config.get<string>("tankDataUrl");
 
-      if (tankUrl) {
-        try {
-          tankRealTimeData = await axios.post(tankUrl);
-          if (tankRealTimeData.status !== 200) {
-            throw new Error(
-              `Unexpected response status: ${tankRealTimeData.status}`
-            );
-          }
-        } catch (postError) {
-          console.error(
-            `Failed to fetch tank data from ${tankUrl}:`,
-            postError.message
+    if(tankUrl){
+      try {
+        let tankRealTimeData;
+        tankRealTimeData = await axios.post(tankUrl);
+
+        if (tankRealTimeData.status !== 200) {
+          throw new Error(
+            `Unexpected response status: ${tankRealTimeData.status}`
           );
-          throw postError; // Re-throw to handle fallback
         }
-      } else {
-        tankRealTimeData = fakedata;
+
+        volume = tankRealTimeData.data.data.find(
+          (ea) => ea.id === tankNo
+        )?.volume;
+  
+        if (volume === undefined) {
+          volume = lastData[1].tankBalance; // Fallback to lastData
+        }
+      } catch (e: any) {
+         volume = lastData[1].tankBalance;
       }
-
-      volume = tankRealTimeData.data.data.find(
-        (ea) => ea.id === tankNo
-      )?.volume;
-
-      // console.log('------------------ volume ----------------------')
-      // console.log(volume);
-      // console.log('------------------ volume ----------------------')
-
-
-      if (volume === undefined) {
-        // console.warn(`Tank number ${tankNo} not found in the fetched data.`);
-        volume = lastData[1].tankBalance; // Fallback to lastData
-      }
-    } catch (e) {
-      // console.error("An error occurred while fetching tank data:", e.message);
-      volume = lastData[1].tankBalance ; // Fallback to lastData
+    } else {
+      volume = 0;
     }
-    
-
-    // console.log('----------------tankBalance----------------')
-    // console.log('tankBalance', volume + Number(data[2]))
-    // console.log('----------------tankBalance----------------')
-
-
     //end update
     let updateBody: UpdateQuery<detailSaleDocument> = {
       nozzleNo: data[0],
@@ -1168,27 +999,30 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
 
     // get tank data by today date
-    const tankData = await getTankData({
-      stationDetailId: result.stationDetailId,
-      dateOfDay: moment().format("YYYY-MM-DD"),
-    });
-
-    // check if tank data exists
-    try {
-      if (tankData.length === 0) {
-        await addTankData({
-          stationDetailId: result.stationDetailId,
-          vocono: lastData[0].vocono,
-          nozzleNo: lastData[0].nozzleNo,
-        });
-      } else {
-        await updateExistingTankData({
-          id: tankData[0]._id,
-          stationDetailId: result.stationDetailId,
-        });
+    
+    if(tankUrl) {
+      const tankData = await getTankData({
+        stationDetailId: result.stationDetailId,
+        dateOfDay: moment().format("YYYY-MM-DD"),
+      });
+  
+      // check if tank data exists
+      try {
+        if (tankData.length === 0) {
+          await addTankData({
+            stationDetailId: result.stationDetailId,
+            vocono: lastData[0].vocono,
+            nozzleNo: lastData[0].nozzleNo,
+          });
+        } else {
+          await updateExistingTankData({
+            id: tankData[0]._id,
+            stationDetailId: result.stationDetailId,
+          });
+        }
+      } catch (error) {
+        console.error("Error handling tank data:", error.message);
       }
-    } catch (error) {
-      console.error("Error handling tank data:", error.message);
     }
 
     await calcFuelBalance(
