@@ -2,6 +2,7 @@ import { FilterQuery, UpdateQuery } from "mongoose";
 import userModel, { UserInput, UserDocument } from "../model/user.model";
 import { compass, createToken, set } from "../utils/helper";
 import { permitDocument } from "../model/permit.model";
+import config from "config";
 
 export const registerUser = async (payload: UserInput) => {
   try {
@@ -30,9 +31,20 @@ export const loginUser = async ({
     throw new Error("Creditial Error");
   }
 
+  const tankDataUrl = config.get<string>("tankDataUrl");
+
+  let hasAtg: boolean;
+
+  if (tankDataUrl != '') {
+    hasAtg = true;
+  } else {
+    hasAtg = false;
+  }
+
   let userObj: Partial<UserDocument> = user.toObject();
   userObj["token"] = createToken(userObj);
-
+  userObj["hasAtg"] = hasAtg;
+  
   delete userObj.password;
   set(user._id, userObj);
   set("stationNo", userObj.stationNo);
