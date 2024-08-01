@@ -874,10 +874,10 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         )?.volume;
   
         if (volume === undefined) {
-          volume = lastData[1].tankBalance; // Fallback to lastData
+          volume = lastData[1]?.tankBalance; // Fallback to lastData
         }
       } catch (e: any) {
-         volume = lastData[1].tankBalance;
+         volume = lastData[1]?.tankBalance;
       }
     } else {
       volume = 0;
