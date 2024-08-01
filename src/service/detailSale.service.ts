@@ -522,11 +522,11 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         )?.volume;
 
         if (volume === undefined) {
-          volume = lastData[1].tankBalance;
+          volume = lastData[1]?.tankBalance;
         }
       } catch (e: any) {
           console.log(`Failed to fetch tank data: ${e.message}`);
-          volume = lastData[1].tankBalance;
+          volume = lastData[1]?.tankBalance;
       }
     } else {
         volume = 0;
