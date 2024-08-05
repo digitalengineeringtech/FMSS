@@ -6,6 +6,7 @@ import {
   getFuelBalanceByOneDateHandler,
   getFuelBalanceHandler,
   updateFuelBalanceHandler,
+  updateTodayTankHandler,
 } from "../controller/fuelBalance.controller";
 import { hasAnyPermit } from "../middleware/permitValidator";
 import { roleValidator } from "../middleware/roleValidator";
@@ -53,6 +54,13 @@ fuelBalanceRoute.post(
   hasAnyPermit(["add"]),
   addFuelBalanceHandler
 );
+
+fuelBalanceRoute.post('/add-today-tank',
+  // validateToken2,
+  // roleValidator['manager'],
+  // hasAnyPermit['add'],
+  updateTodayTankHandler
+)
 
 fuelBalanceRoute.patch(
   "/",
