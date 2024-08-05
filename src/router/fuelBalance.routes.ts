@@ -56,9 +56,9 @@ fuelBalanceRoute.post(
 );
 
 fuelBalanceRoute.post('/add-today-tank',
-  // validateToken2,
-  // roleValidator['manager'],
-  // hasAnyPermit['add'],
+  validateToken2,
+  roleValidator['manager'],
+  hasAnyPermit['add'],
   updateTodayTankHandler
 )
 
