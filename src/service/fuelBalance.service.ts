@@ -3,6 +3,7 @@ import fuelBalanceModel, {
   fuelBalanceDocument,
 } from "../model/fuelBalance.model";
 import config from "config";
+import moment from "moment-timezone";
 
 export const getFuelBalance = async (
   query: FilterQuery<fuelBalanceDocument>,
@@ -36,6 +37,20 @@ export const addFuelBalance = async (body: fuelBalanceDocument) => {
     throw new Error(e);
   }
 };
+
+export const updateTodayTankBalance = async(body: fuelBalanceDocument) => {
+  try {
+    const query = {
+      tankNo: body.tankNo,
+      createAt: moment().format("YYYY-MM-DD")
+    }
+
+    return await fuelBalanceModel.findOneAndUpdate(query, body, {new: true});
+
+  } catch (e) {
+    throw new Error(e);
+  }
+}
 
 export const updateFuelBalance = async (
   query: FilterQuery<fuelBalanceDocument>,

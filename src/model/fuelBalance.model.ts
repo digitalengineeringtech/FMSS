@@ -11,6 +11,7 @@ export interface fuelBalanceDocument extends mongoose.Document {
   cash: number;
   credit: number;
   balance: number;
+  todayTank: number;
   realTime: Date;
   nozzles: [];
   createAt: string;
@@ -28,6 +29,7 @@ const fuelBalanceSchema = new Schema({
   fuelIn: { type: Number, default: 0 },
   cash: { type: Number, default: 0 },
   balance: { type: Number, default: 0 },
+  todayTank: { type: Number, default: 0},
   nozzles: { type: Array, default: [] },
   realTime: { type: Date, default: new Date() },
   createAt: { type: String, default: new Date().toLocaleDateString(`fr-CA`) },

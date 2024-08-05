@@ -9,6 +9,7 @@ import {
   fuelBalancePaginate,
   fuelBalanceByDate,
   fuelBalanceByOneDate,
+  updateTodayTankBalance,
 } from "../service/fuelBalance.service";
 import { fuelBalanceDocument } from "../model/fuelBalance.model";
 
@@ -74,6 +75,21 @@ export const addFuelBalanceHandler = async (
     next(new Error(e));
   }
 };
+
+export const updateTodayTankHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try{
+    let result = await updateTodayTankBalance(req.body);
+    fMsg(res, "Today tank updated", result);
+  } catch(e) {
+    next(new Error(e));
+  }
+}
+ 
+
 
 export const updateFuelBalanceHandler = async (
   req: Request,
