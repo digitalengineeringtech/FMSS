@@ -81,15 +81,13 @@ export const updateTodayTankHandler = async (
   res: Response,
   next: NextFunction
 ) => {
-  try{
+  try {
     let result = await updateTodayTankBalance(req.body);
     fMsg(res, "Today tank updated", result);
-  } catch(e) {
+  } catch (e) {
     next(new Error(e));
   }
-}
- 
-
+};
 
 export const updateFuelBalanceHandler = async (
   req: Request,
@@ -162,8 +160,22 @@ export const getFuelBalanceByOneDateHandler = async (
     if (!sDate) {
       throw new Error("you need date");
     }
+    const format = (date) => {
+      const dateObj = new Date(date);
+
+      const day = String(dateObj.getUTCDate()).padStart(2, "0");
+      const month = String(dateObj.getUTCMonth() + 1).padStart(2, "0"); // Months are 0-based
+      const year = dateObj.getUTCFullYear();
+
+      // const time = dateObj?.toISOString().slice(11, 19);
+
+      return `${year}-${month}-${day}`;
+    };
+
+    console.log(sDate, "1");
     let startDate: Date = new Date(sDate);
     // startDate.setDate(startDate.getDate() - 1);
+    console.log(startDate, "2");
     let result = await fuelBalanceByOneDate(query, startDate);
     fMsg(res, "fuel balance between two date", result);
   } catch (e) {

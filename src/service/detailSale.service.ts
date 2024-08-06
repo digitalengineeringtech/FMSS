@@ -224,19 +224,19 @@ export const cancelDetailSale = async (message) => {
     nozzleNo: data[0],
     preset: { $ne: null },
     dailyReportDate: moment().tz("Asia/Yangon").format("YYYY-MM-DD"),
-  }
+  };
 
-  if(data[1] == "cancel"){
+  if (data[1] == "cancel") {
     const lastDetailSale = await detailSaleModel
-    .findOne(query)
-    .sort({ _id: -1, createAt: -1 });
+      .findOne(query)
+      .sort({ _id: -1, createAt: -1 });
 
     if (lastDetailSale) {
       lastDetailSale.isCancel = 1;
       await lastDetailSale.save();
     }
   }
-}
+};
 
 export const addDetailSale = async (
   depNo: string,
@@ -280,7 +280,7 @@ export const addDetailSale = async (
     const lastDocument = await detailSaleModel
       .findOne({ nozzleNo: body.nozzleNo, isCancel: 0 })
       .sort({ _id: -1, createAt: -1 });
-  
+
     body = {
       ...body,
       vocono: `${body.user.stationNo}/${
@@ -318,21 +318,20 @@ export const addDetailSale = async (
 
     let tankUrl = config.get<string>("tankDataUrl");
 
-    if(tankUrl == '') {
+    if (tankUrl == "") {
       let checkDate = await getFuelBalance({
         stationId: result.stationDetailId,
         createAt: result.dailyReportDate,
       });
-  
+
       if (checkDate.length == 0) {
-  
         let prevResult = await getFuelBalance(
           {
             stationId: result.stationDetailId,
           },
           tankCount
         );
-  
+
         await Promise.all(
           prevResult.map(async (ea) => {
             let obj: fuelBalanceDocument;
@@ -341,25 +340,25 @@ export const addDetailSale = async (
                 stationId: ea.stationId,
                 fuelType: ea.fuelType,
                 capacity: ea.capacity,
-                opening: ea.todayTank != 0 ? (ea.todayTank) : (ea.opening + ea.fuelIn),
+                opening: ea.todayTank != 0 ? ea.todayTank : ea.balance,
                 tankNo: ea.tankNo,
                 createAt: result?.dailyReportDate,
                 nozzles: ea.nozzles,
-                balance: ea.todayTank != 0 ? (ea.todayTank) : (ea.opening + ea.fuelIn),
+                balance: ea.todayTank != 0 ? ea.todayTank : ea.balance,
               } as fuelBalanceDocument;
             } else {
               obj = {
                 stationId: ea.stationId,
                 fuelType: ea.fuelType,
                 capacity: ea.capacity,
-                opening: ea.todayTank != 0 ? (ea.todayTank) : (ea.opening + ea.fuelIn),
+                opening: ea.todayTank != 0 ? ea.todayTank : ea.balance,
                 tankNo: ea.tankNo,
                 createAt: result?.dailyReportDate,
                 nozzles: ea.nozzles,
-                balance: ea.todayTank != 0 ? (ea.todayTank) : (ea.opening + ea.fuelIn),
+                balance: ea.todayTank != 0 ? ea.todayTank : ea.balance,
               } as fuelBalanceDocument;
             }
-  
+
             await addFuelBalance(obj);
           })
         );
@@ -432,7 +431,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
 
     let query = {
       nozzleNo: data[0],
-      isCancel: 0
+      isCancel: 0,
     };
 
     const lastData: any[] = await detailSaleModel
@@ -475,7 +474,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
 
     let tankUrl = config.get<string>("tankDataUrl");
 
-    if(tankUrl != '') {
+    if (tankUrl != "") {
       try {
         let tankRealTimeData;
         tankRealTimeData = await axios.post(tankUrl);
@@ -494,11 +493,11 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
           volume = lastData[1]?.tankBalance;
         }
       } catch (e: any) {
-          console.log(`Failed to fetch tank data: ${e.message}`);
-          volume = lastData[1]?.tankBalance;
+        console.log(`Failed to fetch tank data: ${e.message}`);
+        volume = lastData[1]?.tankBalance;
       }
     } else {
-        volume = 0;
+      volume = 0;
     }
 
     //end update
@@ -544,7 +543,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       });
     }
 
-    if(tankUrl == "") {
+    if (tankUrl == "") {
       let checkDate = await getFuelBalance({
         stationId: result.stationDetailId,
         createAt: result.dailyReportDate,
@@ -570,30 +569,30 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
                   stationId: ea.stationId,
                   fuelType: ea.fuelType,
                   capacity: ea.capacity,
-                  opening: ea.opening + ea.fuelIn,
+                  opening: ea.todayTank != 0 ? ea.todayTank : ea.balance,
                   tankNo: ea.tankNo,
                   createAt: result?.dailyReportDate,
                   nozzles: ea.nozzles,
-                  balance: ea.opening + ea.fuelIn,
+                  balance: ea.todayTank != 0 ? ea.todayTank : ea.balance,
                 } as fuelBalanceDocument;
               } else {
                 obj = {
                   stationId: ea.stationId,
                   fuelType: ea.fuelType,
                   capacity: ea.capacity,
-                  opening: ea.opening + ea.fuelIn - ea.cash,
+                  opening: ea.todayTank != 0 ? ea.todayTank : ea.balance,
                   tankNo: ea.tankNo,
                   createAt: result?.dailyReportDate,
                   nozzles: ea.nozzles,
-                  balance: ea.opening + ea.fuelIn - ea.cash,
+                  balance: ea.todayTank != 0 ? ea.todayTank : ea.balance,
                 } as fuelBalanceDocument;
               }
-  
+
               await addFuelBalance(obj);
             })
         );
       }
-  
+
       await calcFuelBalance(
         {
           stationId: result.stationDetailId,
@@ -608,7 +607,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     mqttEmitter("detpos/local_server", `${result?.nozzleNo}/D1S1`);
 
     // get tank data by today date
-    if(tankUrl != "") {
+    if (tankUrl != "") {
       const tankData = await getTankData({
         stationDetailId: result.stationDetailId,
         dateOfDay: moment().format("YYYY-MM-DD"),
@@ -759,7 +758,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     let query = {
       nozzleNo: data[0],
       devTotalizar_liter: 0,
-      isCancel: 0
+      isCancel: 0,
     };
 
     const lastData: any[] = await detailSaleModel
@@ -798,7 +797,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
 
     let tankUrl = config.get<string>("tankDataUrl");
 
-    if(tankUrl != ''){
+    if (tankUrl != "") {
       try {
         let tankRealTimeData;
         tankRealTimeData = await axios.post(tankUrl);
@@ -812,12 +811,12 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         volume = tankRealTimeData.data.data.find(
           (ea) => ea.id === tankNo
         )?.volume;
-  
+
         if (volume === undefined) {
           volume = lastData[1]?.tankBalance; // Fallback to lastData
         }
       } catch (e: any) {
-         volume = lastData[1]?.tankBalance;
+        volume = lastData[1]?.tankBalance;
       }
     } else {
       volume = 0;
@@ -860,22 +859,20 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       });
     }
 
-  
-    if(tankUrl == '') {
+    if (tankUrl == "") {
       let checkDate = await getFuelBalance({
         stationId: result.stationDetailId,
         createAt: result.dailyReportDate,
       });
-  
+
       if (checkDate.length == 0) {
-  
         let prevResult = await getFuelBalance(
           {
             stationId: result.stationDetailId,
           },
           tankCount
         );
-  
+
         await Promise.all(
           prevResult
             .reverse()
@@ -905,7 +902,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
                   balance: ea.opening + ea.fuelIn - ea.cash,
                 } as fuelBalanceDocument;
               }
-  
+
               await addFuelBalance(obj);
             })
         );
@@ -925,13 +922,13 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
 
     // get tank data by today date
-    
-    if(tankUrl != '') {
+
+    if (tankUrl != "") {
       const tankData = await getTankData({
         stationDetailId: result.stationDetailId,
         dateOfDay: moment().format("YYYY-MM-DD"),
       });
-  
+
       // check if tank data exists
       try {
         if (tankData.length === 0) {

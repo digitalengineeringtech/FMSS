@@ -50,8 +50,8 @@ client.on("message", async (topic, message) => {
     // blinkLed(Number(data[3]));                                      // for blink led
   }
 
-  if(data[2] == 'req'){ 
-     cancelDetailSale(message.toString());
+  if (data[2] == "req") {
+    cancelDetailSale(message.toString());
   }
 
   if (data[2] == "Reload") {

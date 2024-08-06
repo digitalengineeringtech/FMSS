@@ -38,19 +38,26 @@ export const addFuelBalance = async (body: fuelBalanceDocument) => {
   }
 };
 
-export const updateTodayTankBalance = async(body: fuelBalanceDocument) => {
+export const updateTodayTankBalance = async (body: fuelBalanceDocument) => {
+  console.log({
+    tankNo: body.tankNo,
+    createAt: moment().format("YYYY-MM-DD"),
+  });
   try {
     const query = {
       tankNo: body.tankNo,
-      createAt: moment().format("YYYY-MM-DD")
-    }
+      createAt: moment().format("YYYY-MM-DD"),
+    };
 
-    return await fuelBalanceModel.findOneAndUpdate(query, body, {new: true});
-
+    const result = await fuelBalanceModel.findOneAndUpdate(query, body, {
+      new: true,
+    });
+    console.log(result);
+    return result;
   } catch (e) {
     throw new Error(e);
   }
-}
+};
 
 export const updateFuelBalance = async (
   query: FilterQuery<fuelBalanceDocument>,
