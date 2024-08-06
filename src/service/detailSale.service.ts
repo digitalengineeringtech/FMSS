@@ -426,13 +426,15 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
   try {
     const regex = /[A-Z]/g;
     let data: any[] = message.split(regex);
-    let saleLiter = deviceLiveData.get(data[0])?.[0];
+    let saleLiter = deviceLiveData.get(data[0])?.[0] || 0;
     let totalPrice = deviceLiveData.get(data[0])?.[1];
 
     let query = {
       nozzleNo: data[0],
-      isCancel: 0,
+      // isCancel: 0,
     };
+
+    // console.log(message);
 
     const lastData: any[] = await detailSaleModel
       .find(query)
@@ -440,35 +442,37 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       .limit(2)
       .lean();
 
-    // console.log(lastData, "this is last data");
+    // console.log(lastData, "this is last data", data[0]);
     if (!lastData[0] || !lastData[1]) {
       return;
     }
 
     let tankCount = await get("tankCount");
 
-    // console.log("tankCount", tankCount);
+    // console.log("tankCount", lastData);
 
-    let fuelBalances = await getFuelBalance({
-      stationId: lastData[0].stationDetailId,
-      // createAt: prevDate,
-    });
+    let fuelBalances = await getFuelBalance(
+      {
+        stationId: lastData[0].stationDetailId,
+        // createAt: prevDate,
+      },
+      tankCount
+    );
+
+    // console.log(fuelBalances, "this is fb");
 
     let tankNo;
 
-    await Promise.all(
-      fuelBalances
-        .reverse()
-        // .slice(0, tankCount)
-        .map(async (ea) => {
-          // console.log("nozzles", ea.nozzles);
-          if (ea.nozzles.includes(data[0] as never)) {
-            tankNo = ea.tankNo;
-          } else {
-            return;
-          }
-        })
-    );
+    // await Promise.all(
+    fuelBalances.map(async (ea) => {
+      // console.log("nozzles", ea.nozzles);
+      if (ea.nozzles.includes(data[0] as never)) {
+        tankNo = ea.tankNo;
+      }
+    });
+    // );
+
+    // console.log(tankNo, "tank number");
 
     let volume: number;
 
@@ -490,15 +494,22 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         )?.volume;
 
         if (volume === undefined) {
-          volume = lastData[1]?.tankBalance;
+          volume = Number(lastData[1]?.tankBalance) + Number(saleLiter);
         }
       } catch (e: any) {
         console.log(`Failed to fetch tank data: ${e.message}`);
-        volume = lastData[1]?.tankBalance;
+        volume = Number(lastData[1]?.tankBalance) + Number(saleLiter);
       }
     } else {
-      volume = 0;
+      volume =
+        Number(fuelBalances?.find((e) => e.tankNo == tankNo)?.balance) +
+        Number(saleLiter);
     }
+
+    // console.log(
+    //   fuelBalances?.find((e) => e.tankNo == tankNo),
+    //   "sale volume"
+    // );
 
     //end update
 
@@ -517,7 +528,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[4] * data[1],
       tankNo: tankNo,
-      tankBalance: volume + saleLiter,
+      tankBalance: volume,
       isError: "A",
     };
 
@@ -543,7 +554,10 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       });
     }
 
+    // console.log(tankUrl, "this is tank url");
+
     if (tankUrl == "") {
+      // console.log("00000000");
       let checkDate = await getFuelBalance({
         stationId: result.stationDetailId,
         createAt: result.dailyReportDate,
@@ -592,6 +606,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
             })
         );
       }
+      // console.log("1111111");
 
       await calcFuelBalance(
         {
@@ -602,6 +617,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         { liter: result.saleLiter },
         result.nozzleNo
       );
+      // console.log("22222222222222222");
     }
 
     mqttEmitter("detpos/local_server", `${result?.nozzleNo}/D1S1`);
@@ -767,31 +783,43 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       .sort({ _id: -1, createdAt: -1 })
       .lean();
 
+    // console.log(lastData);
+
     if (!lastData[0] || !lastData[1]) {
       return;
     }
 
     let tankCount = await get("tankCount");
 
-    let fuelBalances = await getFuelBalance({
-      stationId: lastData[0].stationDetailId,
-      // createAt: prevDate,
-    });
+    let fuelBalances = await getFuelBalance(
+      {
+        stationId: lastData[0].stationDetailId,
+        // createAt: prevDate,
+      },
+      tankCount
+    );
 
     let tankNo;
 
-    await Promise.all(
-      fuelBalances
-        .reverse()
-        .slice(0, tankCount)
-        .map(async (ea) => {
-          if (ea.nozzles.includes(data[0] as never)) {
-            tankNo = ea.tankNo;
-          } else {
-            return;
-          }
-        })
-    );
+    // await Promise.all(
+    //   fuelBalances
+    //     .reverse()
+    //     .slice(0, tankCount)
+    //     .map(async (ea) => {
+    //       if (ea.nozzles.includes(data[0] as never)) {
+    //         tankNo = ea.tankNo;
+    //       } else {
+    //         return;
+    //       }
+    //     })
+    // );
+
+    fuelBalances.map(async (ea) => {
+      // console.log("nozzles", ea.nozzles);
+      if (ea.nozzles.includes(data[0] as never)) {
+        tankNo = ea.tankNo;
+      }
+    });
 
     let volume: number;
 
@@ -813,13 +841,16 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         )?.volume;
 
         if (volume === undefined) {
-          volume = lastData[1]?.tankBalance; // Fallback to lastData
+          volume = Number(lastData[1]?.tankBalance) + Number(data[2] || 0);
         }
       } catch (e: any) {
-        volume = lastData[1]?.tankBalance;
+        console.log(`Failed to fetch tank data: ${e.message}`);
+        volume = Number(lastData[1]?.tankBalance) + Number(data[2] || 0);
       }
     } else {
-      volume = 0;
+      volume =
+        Number(fuelBalances?.find((e) => e.tankNo == tankNo)?.balance) +
+        Number(data[2] || 0);
     }
     //end update
     let updateBody: UpdateQuery<detailSaleDocument> = {
@@ -835,13 +866,15 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[4] * data[1],
       tankNo: tankNo,
-      tankBalance: volume + Number(data[2]),
+      tankBalance: volume,
       isError: "A",
     };
 
     await detailSaleModel.findByIdAndUpdate(lastData[1]._id, updateBody);
 
     let result = await detailSaleModel.findById(lastData[1]._id);
+
+    mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
 
     if (!result) {
       throw new Error("Final send in error");
@@ -918,8 +951,6 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         result.nozzleNo
       );
     }
-
-    mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
 
     // get tank data by today date
 

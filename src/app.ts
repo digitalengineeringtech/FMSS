@@ -62,6 +62,7 @@ client.on("message", async (topic, message) => {
   }
 
   if (data[2] == "Final") {
+    console.log("final is here");
     // when final topic come
     // liveDataChangeHandler(message.toString());
     detailSaleUpdateByDevice(data[3], message.toString()); // add final data to detail sale vocono
