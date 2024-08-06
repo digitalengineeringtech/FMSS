@@ -341,24 +341,22 @@ export const addDetailSale = async (
                 stationId: ea.stationId,
                 fuelType: ea.fuelType,
                 capacity: ea.capacity,
-                opening: ea.todayTank != 0 ? (ea.todayTank + ea.fuelIn) : (ea.opening + ea.fuelIn),
+                opening: ea.todayTank != 0 ? (ea.todayTank) : (ea.opening + ea.fuelIn),
                 tankNo: ea.tankNo,
                 createAt: result?.dailyReportDate,
                 nozzles: ea.nozzles,
-                balance: ea.todayTank != 0 ? (ea.todayTank + ea.fuelIn) : (ea.opening + ea.fuelIn),
-                todayTank: ea.todayTank
+                balance: ea.todayTank != 0 ? (ea.todayTank) : (ea.opening + ea.fuelIn),
               } as fuelBalanceDocument;
             } else {
               obj = {
                 stationId: ea.stationId,
                 fuelType: ea.fuelType,
                 capacity: ea.capacity,
-                opening: ea.todayTank != 0 ? (ea.todayTank + ea.fuelIn - ea.cash) : (ea.opening + ea.fuelIn - ea.cash),
+                opening: ea.todayTank != 0 ? (ea.todayTank) : (ea.opening + ea.fuelIn),
                 tankNo: ea.tankNo,
                 createAt: result?.dailyReportDate,
                 nozzles: ea.nozzles,
-                balance: ea.todayTank != 0 ? (ea.todayTank + ea.fuelIn - ea.cash) : (ea.opening + ea.fuelIn - ea.cash),
-                todayTank: ea.todayTank
+                balance: ea.todayTank != 0 ? (ea.todayTank) : (ea.opening + ea.fuelIn),
               } as fuelBalanceDocument;
             }
   
@@ -577,7 +575,6 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
                   createAt: result?.dailyReportDate,
                   nozzles: ea.nozzles,
                   balance: ea.opening + ea.fuelIn,
-                  todayTank: ea.todayTank,
                 } as fuelBalanceDocument;
               } else {
                 obj = {
@@ -589,7 +586,6 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
                   createAt: result?.dailyReportDate,
                   nozzles: ea.nozzles,
                   balance: ea.opening + ea.fuelIn - ea.cash,
-                  todayTank: ea.todayTank,
                 } as fuelBalanceDocument;
               }
   
@@ -896,7 +892,6 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
                   createAt: result?.dailyReportDate,
                   nozzles: ea.nozzles,
                   balance: ea.opening + ea.fuelIn,
-                  todayTank: ea.todayTank,
                 } as fuelBalanceDocument;
               } else {
                 obj = {
@@ -908,7 +903,6 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
                   createAt: result?.dailyReportDate,
                   nozzles: ea.nozzles,
                   balance: ea.opening + ea.fuelIn - ea.cash,
-                  todayTank: ea.todayTank,
                 } as fuelBalanceDocument;
               }
   
