@@ -431,7 +431,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
 
     let query = {
       nozzleNo: data[0],
-      // isCancel: 0,
+      isCancel: 0,
     };
 
     // console.log(message);
@@ -649,60 +649,66 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       }
     }
 
+
+    // cloud upload condition 0 
     let prevDate = previous(new Date(result.dailyReportDate));
-    // console.log(prevDate, "this is prev date");
 
     let checkErrorData = await detailSaleModel.find({
-      asyncAlready: 0,
+      asyncAlready: '0',
       dailyReportDate: prevDate,
     });
 
     if (checkErrorData.length > 0) {
-      // console.log(checkErrorData, "this is error");
-
-      // cloud upload 0 condition
-      for (const ea of checkErrorData) {
-        try {
-          let url = config.get<string>("detailsaleCloudUrl");
-          let response = await axios.post(url, ea);
-          if (response.status == 200) {
-            await detailSaleModel.findByIdAndUpdate(ea._id, {
-              asyncAlready: "2",
-            });
-          } else {
-            break;
-          }
-        } catch (error) {
-          if (error.response && error.response.status === 409) {
-          } else {
-          }
-        }
-      }
+      await sendToCloud(checkErrorData);
+      // loop through checkErrorData asyncAlready 0 condition and send one by one to cloud backend ( OLd Code ) 
+        // for (const ea of checkErrorData) {
+        //   try {
+        //     let url = config.get<string>("detailsaleCloudUrl");
+        //     let response = await axios.post(url, ea);
+        //     if (response.status == 200) {
+        //       await detailSaleModel.findByIdAndUpdate(ea._id, {
+        //         asyncAlready: "2",
+        //       });
+        //     } else {
+        //       break;
+        //     }
+        //   } catch (error) {
+        //     if (error.response && error.response.status === 409) {
+        //     } else {
+        //     }
+        //   }
+        // }
     }
 
     //cloud upload 1 conditon
-    let finalData = await detailSaleModel.find({ asyncAlready: 1 });
-    for (const ea of finalData) {
-      try {
-        let url = config.get<string>("detailsaleCloudUrl");
-        let response = await axios.post(url, ea);
-        if (response.status == 200) {
-          await detailSaleModel.findByIdAndUpdate(ea._id, {
-            asyncAlready: "2",
-          });
-        } else {
-          break;
-        }
-      } catch (error) {
-        // console.log(error);
-        if (error.response && error.response.status === 409) {
-        } else {
-        }
-      }
+    let finalData = await detailSaleModel.find({ asyncAlready: '1' });
+
+    if(finalData.length > 0){
+      await sendToCloud(finalData);
+    // loop through finalData asyncAlready 1 condition and send one by one to cloud backend ( OLd Code ) 
+      // for (const ea of finalData) {
+      //   try {
+      //     let url = config.get<string>("detailsaleCloudUrl");
+      //     let response = await axios.post(url, ea);
+      //     if (response.status == 200) {
+      //       await detailSaleModel.findByIdAndUpdate(ea._id, {
+      //         asyncAlready: "2",
+      //       });
+      //     } else {
+      //       break;
+      //     }
+      //   } catch (error) {
+      //     // console.log(error);
+      //     if (error.response && error.response.status === 409) {
+      //     } else {
+      //     }
+      //   }
+      // }
     }
+   
 
     let checkErrorFuelInData = await fuelInModel.find({
-      asyncAlready: 1,
+      asyncAlready: '1',
       // dailyReportDate: prevDate,
     });
 
@@ -1282,3 +1288,28 @@ export const detailSaleStatement = async (reqDate: string) => {
 
   return fuelTypeTotalArray.flat();
 };
+
+// common used functions for detail sale syncAlready 0 condition and 1 condition
+const sendToCloud = async (data) => {
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  // await delay(3 * 60 * 1000);
+  try {
+    let url = config.get<string>("detailsaleCloudUrl");
+    let response = await axios.post(url, data);
+    if (response.status == 200) {
+      await detailSaleModel.updateMany(
+        { _id: { $in: data.map(ea => ea._id) } },
+        { asyncAlready: "2" }
+      );
+    } else {
+      console.log("Error sending data to cloud backend");
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 409) {
+      console.log("Failed to upload data, status:", error.message);
+    } else {
+      console.log("Request error:", error.message);
+    }
+  }
+}
