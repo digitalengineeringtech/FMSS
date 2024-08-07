@@ -650,123 +650,133 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     }
 
 
-    // cloud upload condition 0 
-    let prevDate = previous(new Date(result.dailyReportDate));
-
-    let checkErrorData = await detailSaleModel.find({
-      asyncAlready: '0',
-      dailyReportDate: prevDate,
-    });
-
-    if (checkErrorData.length > 0) {
-      await sendToCloud(checkErrorData);
-      // loop through checkErrorData asyncAlready 0 condition and send one by one to cloud backend ( OLd Code ) 
-        // for (const ea of checkErrorData) {
-        //   try {
-        //     let url = config.get<string>("detailsaleCloudUrl");
-        //     let response = await axios.post(url, ea);
-        //     if (response.status == 200) {
-        //       await detailSaleModel.findByIdAndUpdate(ea._id, {
-        //         asyncAlready: "2",
-        //       });
-        //     } else {
-        //       break;
-        //     }
-        //   } catch (error) {
-        //     if (error.response && error.response.status === 409) {
-        //     } else {
-        //     }
-        //   }
-        // }
-    }
-
-    //cloud upload 1 conditon
-    let finalData = await detailSaleModel.find({ asyncAlready: '1' });
-
-    if(finalData.length > 0){
-      await sendToCloud(finalData);
-    // loop through finalData asyncAlready 1 condition and send one by one to cloud backend ( OLd Code ) 
-      // for (const ea of finalData) {
-      //   try {
-      //     let url = config.get<string>("detailsaleCloudUrl");
-      //     let response = await axios.post(url, ea);
-      //     if (response.status == 200) {
-      //       await detailSaleModel.findByIdAndUpdate(ea._id, {
-      //         asyncAlready: "2",
-      //       });
-      //     } else {
-      //       break;
-      //     }
-      //   } catch (error) {
-      //     // console.log(error);
-      //     if (error.response && error.response.status === 409) {
-      //     } else {
-      //     }
-      //   }
-      // }
-    }
-   
-
-    let checkErrorFuelInData = await fuelInModel.find({
-      asyncAlready: '1',
-      // dailyReportDate: prevDate,
-    });
-
-    if (checkErrorFuelInData.length > 0) {
-      for (const ea of checkErrorFuelInData) {
+    // schedule to send data to cloud every 3 minutes
+    const sendDataToCloud = async () => {
         try {
-          let no = await fuelInModel.count();
-          let tankCondition = await getFuelBalance({
-            stationId: ea.stationDetailId,
-            fuelType: ea.fuel_type,
-            tankNo: Number(ea.tankNo),
-            createAt: ea.receive_date,
-          });
+           // cloud upload condition 0 
+            let prevDate = previous(new Date(result.dailyReportDate));
 
-          const updatedBody = {
-            driver: ea.driver,
-            bowser: ea.bowser,
-            tankNo: ea.tankNo,
-            fuel_type: ea.fuel_type,
-            receive_balance: ea.receive_balance.toString(),
-            receive_date: ea.receive_date,
-            asyncAlready: ea.asyncAlready,
-            stationId: ea.stationDetailId,
-            stationDetailId: ea.stationDetailId,
-            fuel_in_code: no + 1,
-            tank_balance: tankCondition[0]?.balance || 0,
-          };
+            let checkErrorData = await detailSaleModel.find({
+              asyncAlready: '0',
+              dailyReportDate: prevDate,
+            });
 
-          // console.log(updatedBody, "this is updatebody");
-
-          const url = config.get<string>("fuelInCloud");
-
-          try {
-            let response = await axios.post(url, updatedBody);
-
-            if (response.status == 200) {
-              await fuelInModel.findByIdAndUpdate(ea._id, {
-                asyncAlready: "2",
-              });
-            } else {
-              console.log("error is here fuel in");
+            if (checkErrorData.length > 0) {
+              await sendToCloud(checkErrorData);
+              // loop through checkErrorData asyncAlready 0 condition and send one by one to cloud backend ( OLd Code ) 
+                // for (const ea of checkErrorData) {
+                //   try {
+                //     let url = config.get<string>("detailsaleCloudUrl");
+                //     let response = await axios.post(url, ea);
+                //     if (response.status == 200) {
+                //       await detailSaleModel.findByIdAndUpdate(ea._id, {
+                //         asyncAlready: "2",
+                //       });
+                //     } else {
+                //       break;
+                //     }
+                //   } catch (error) {
+                //     if (error.response && error.response.status === 409) {
+                //     } else {
+                //     }
+                //   }
+                // }
             }
-          } catch (error) {
-            // console.log("errr", error);
-            if (error.response && error.response.status === 409) {
-            } else {
-            }
-          }
 
-          return result;
-        } catch (e) {
-          throw new Error(e);
+            //cloud upload 1 conditon
+            let finalData = await detailSaleModel.find({ asyncAlready: '1' });
+
+            if(finalData.length > 0){
+              await sendToCloud(finalData);
+            // loop through finalData asyncAlready 1 condition and send one by one to cloud backend ( OLd Code ) 
+              // for (const ea of finalData) {
+              //   try {
+              //     let url = config.get<string>("detailsaleCloudUrl");
+              //     let response = await axios.post(url, ea);
+              //     if (response.status == 200) {
+              //       await detailSaleModel.findByIdAndUpdate(ea._id, {
+              //         asyncAlready: "2",
+              //       });
+              //     } else {
+              //       break;
+              //     }
+              //   } catch (error) {
+              //     // console.log(error);
+              //     if (error.response && error.response.status === 409) {
+              //     } else {
+              //     }
+              //   }
+              // }
+            }
+
+            let checkErrorFuelInData = await fuelInModel.find({
+              asyncAlready: '1',
+              // dailyReportDate: prevDate,
+            });
+        
+            if (checkErrorFuelInData.length > 0) {
+              for (const ea of checkErrorFuelInData) {
+                try {
+                  let no = await fuelInModel.count();
+                  let tankCondition = await getFuelBalance({
+                    stationId: ea.stationDetailId,
+                    fuelType: ea.fuel_type,
+                    tankNo: Number(ea.tankNo),
+                    createAt: ea.receive_date,
+                  });
+        
+                  const updatedBody = {
+                    driver: ea.driver,
+                    bowser: ea.bowser,
+                    tankNo: ea.tankNo,
+                    fuel_type: ea.fuel_type,
+                    receive_balance: ea.receive_balance.toString(),
+                    receive_date: ea.receive_date,
+                    asyncAlready: ea.asyncAlready,
+                    stationId: ea.stationDetailId,
+                    stationDetailId: ea.stationDetailId,
+                    fuel_in_code: no + 1,
+                    tank_balance: tankCondition[0]?.balance || 0,
+                  };
+        
+                  // console.log(updatedBody, "this is updatebody");
+        
+                  const url = config.get<string>("fuelInCloud");
+        
+                  try {
+                    let response = await axios.post(url, updatedBody);
+        
+                    if (response.status == 200) {
+                      await fuelInModel.findByIdAndUpdate(ea._id, {
+                        asyncAlready: "2",
+                      });
+                    } else {
+                      console.log("error is here fuel in");
+                    }
+                  } catch (error) {
+                    // console.log("errr", error);
+                    if (error.response && error.response.status === 409) {
+                    } else {
+                    }
+                  }
+        
+                  return result;
+                } catch (e) {
+                  throw new Error(e);
+                }
+              }
+            }
+        } catch (error) {
+           console.log(error);
+        } finally {
+          setTimeout(sendDataToCloud, 3 * 60 * 1000);
         }
-      }
+    };
+    // Run it immediately for the first time
+    await sendDataToCloud();
+    } catch (e) {
+      throw new Error(e);
     }
-  } catch (e) {
-    throw new Error(e);
-  }
 };
 
 export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
@@ -1291,9 +1301,6 @@ export const detailSaleStatement = async (reqDate: string) => {
 
 // common used functions for detail sale syncAlready 0 condition and 1 condition
 const sendToCloud = async (data) => {
-  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-  // await delay(3 * 60 * 1000);
   try {
     let url = config.get<string>("detailsaleCloudUrl");
     let response = await axios.post(url, data);
@@ -1307,7 +1314,7 @@ const sendToCloud = async (data) => {
     }
   } catch (error) {
     if (error.response && error.response.status === 409) {
-      console.log("Failed to upload data, status:", error.message);
+      console.log("Failed to upload data, status:", error);
     } else {
       console.log("Request error:", error.message);
     }
