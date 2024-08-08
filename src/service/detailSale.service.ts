@@ -648,9 +648,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         console.error("Error handling tank data:", error);
       }
     }
-
-
-    // schedule to send data to cloud every 3 minutes
+    // cloud upload     
     const sendDataToCloud = async () => {
         try {
            // cloud upload condition 0 
@@ -708,72 +706,71 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
               //   }
               // }
             }
-
-            let checkErrorFuelInData = await fuelInModel.find({
-              asyncAlready: '1',
-              // dailyReportDate: prevDate,
-            });
-        
-            if (checkErrorFuelInData.length > 0) {
-              for (const ea of checkErrorFuelInData) {
-                try {
-                  let no = await fuelInModel.count();
-                  let tankCondition = await getFuelBalance({
-                    stationId: ea.stationDetailId,
-                    fuelType: ea.fuel_type,
-                    tankNo: Number(ea.tankNo),
-                    createAt: ea.receive_date,
-                  });
-        
-                  const updatedBody = {
-                    driver: ea.driver,
-                    bowser: ea.bowser,
-                    tankNo: ea.tankNo,
-                    fuel_type: ea.fuel_type,
-                    receive_balance: ea.receive_balance.toString(),
-                    receive_date: ea.receive_date,
-                    asyncAlready: ea.asyncAlready,
-                    stationId: ea.stationDetailId,
-                    stationDetailId: ea.stationDetailId,
-                    fuel_in_code: no + 1,
-                    tank_balance: tankCondition[0]?.balance || 0,
-                  };
-        
-                  // console.log(updatedBody, "this is updatebody");
-        
-                  const url = config.get<string>("fuelInCloud");
-        
-                  try {
-                    let response = await axios.post(url, updatedBody);
-        
-                    if (response.status == 200) {
-                      await fuelInModel.findByIdAndUpdate(ea._id, {
-                        asyncAlready: "2",
-                      });
-                    } else {
-                      console.log("error is here fuel in");
-                    }
-                  } catch (error) {
-                    // console.log("errr", error);
-                    if (error.response && error.response.status === 409) {
-                    } else {
-                    }
-                  }
-        
-                  return result;
-                } catch (e) {
-                  throw new Error(e);
-                }
-              }
-            }
         } catch (error) {
-           console.log(error);
-        } finally {
-          setTimeout(sendDataToCloud, 3 * 60 * 1000);
+           console.log(error.message);
         }
     };
-    // Run it immediately for the first time
-    await sendDataToCloud();
+    
+    // schedule to send data to cloud after 10 minutes
+    setTimeout(sendDataToCloud, 10 * 60 * 1000);
+
+    let checkErrorFuelInData = await fuelInModel.find({
+      asyncAlready: '1',
+      // dailyReportDate: prevDate,
+    });
+
+    if (checkErrorFuelInData.length > 0) {
+      for (const ea of checkErrorFuelInData) {
+        try {
+          let no = await fuelInModel.count();
+          let tankCondition = await getFuelBalance({
+            stationId: ea.stationDetailId,
+            fuelType: ea.fuel_type,
+            tankNo: Number(ea.tankNo),
+            createAt: ea.receive_date,
+          });
+
+          const updatedBody = {
+            driver: ea.driver,
+            bowser: ea.bowser,
+            tankNo: ea.tankNo,
+            fuel_type: ea.fuel_type,
+            receive_balance: ea.receive_balance.toString(),
+            receive_date: ea.receive_date,
+            asyncAlready: ea.asyncAlready,
+            stationId: ea.stationDetailId,
+            stationDetailId: ea.stationDetailId,
+            fuel_in_code: no + 1,
+            tank_balance: tankCondition[0]?.balance || 0,
+          };
+
+          // console.log(updatedBody, "this is updatebody");
+
+          const url = config.get<string>("fuelInCloud");
+
+          try {
+            let response = await axios.post(url, updatedBody);
+
+            if (response.status == 200) {
+              await fuelInModel.findByIdAndUpdate(ea._id, {
+                asyncAlready: "2",
+              });
+            } else {
+              console.log("error is here fuel in");
+            }
+          } catch (error) {
+            // console.log("errr", error);
+            if (error.response && error.response.status === 409) {
+            } else {
+            }
+          }
+
+          return result;
+        } catch (e) {
+          throw new Error(e);
+        }
+      }
+    }
     } catch (e) {
       throw new Error(e);
     }
