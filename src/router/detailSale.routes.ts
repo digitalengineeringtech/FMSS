@@ -1,3 +1,4 @@
+import { statementReportHandler } from './../controller/detailSale.controller';
 import {
   addDetailSaleHandler,
   deleteDetailSaleHandler,
@@ -104,6 +105,14 @@ detailSaleRoute.post(
   validateAll(apSchema),
   updateDetailSaleByApHandler
 );
+
+detailSaleRoute.post(
+  "/statement-report",
+  // validateToken,
+  statementReportHandler
+);
+
+
 
 //new fms update
 detailSaleRoute.get(

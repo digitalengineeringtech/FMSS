@@ -24,6 +24,7 @@ import {
   autoAddTotalBalance,
   getTotalBalance,
 } from "../service/balanceStatement.service";
+import deviceModel from "../model/device.model";
 
 export const getDetailSaleHandler = async (
   req: Request,
@@ -329,6 +330,196 @@ export const detailSaleUpdateByCard = async (
     fMsg(res, "card attched successful");
   } catch (e) {
     next(e);
+  }
+};
+
+export const statementReportHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const sDate: any = req.query.sDate;
+    const eDate: any = req.query.eDate;
+
+    delete req.query.sDate;
+    delete req.query.eDate;
+
+    const test = await deviceModel.find().lean();
+
+    // if (!req.query.stationDetailId) throw new Error("You need stationDetailId");
+    if (!sDate) throw new Error("You need start date");
+
+    const startDate: Date = new Date(sDate);
+    const endDate: Date = eDate ? new Date(eDate) : new Date();
+
+    // const model: any = req.query.accessDb || req.body.accessDb;
+
+    // const stationDetail = await getStationDetail(
+    //   {
+    //     _id: req.query.stationDetailId,
+    //   },
+    //   model
+    // );
+
+    const nozzleCount = test?.length;
+    // const nozzleCount = stationDetail[0].nozzleCount;
+    const finalData: any[] = []; // Array to store final results
+
+    for (let i: number = 1; i <= 10; i++) {
+      const noz = i.toString().padStart(2, "0");
+
+      let query = {
+        ...req.query,
+        nozzleNo: noz,
+      };
+
+      const value = await detailSaleByDate(query, startDate, endDate);
+      const result = value.reverse();
+
+      // Organize data by date and include date in each entry
+      const dateGroupedData: { [date: string]: any[] } = {};
+      let count = result.length;
+      if (count == 0) {
+        query = {
+          ...query,
+          nozzleNo: noz,
+        };
+        // let lastData = await getLastDetailSale(query, model);
+        let lastData = await detailSaleModel
+          .findOne(query)
+          .sort({ _id: -1, createAt: -1 });
+        // console.log(
+        //   lastData,
+        //   "this is last Data....................................................."
+        // );
+
+        if (lastData) {
+          let data = {
+            date: "-",
+            // stationId: stationDetail[0].name,
+            // station: stationDetail,
+            nozzle: noz,
+            price: "0",
+            fuelType: lastData?.fuelType,
+            totalizer_opening: lastData?.devTotalizar_liter,
+            totalizer_closing: lastData?.devTotalizar_liter,
+            totalizer_different: 0,
+            totalSaleLiter: 0,
+            totalSalePrice: 0,
+            other: 0,
+            pumptest: 0,
+          };
+
+          finalData.push(data);
+        } else {
+          let data = {
+            date: "-",
+            // stationId: stationDetail[0].name,
+            // station: stationDetail,
+            nozzle: noz,
+            price: "0",
+            fuelType: "-",
+            totalizer_opening: "0",
+            totalizer_closing: "0",
+            totalizer_different: 0,
+            totalSaleLiter: 0,
+            totalSalePrice: 0,
+            other: 0,
+            pumptest: 0,
+          };
+
+          finalData.push(data);
+        }
+      } else {
+        for (const entry of result) {
+          const entryDate = new Date(entry.dailyReportDate)
+            .toISOString()
+            .split("T")[0]; // Extract date part (YYYY-MM-DD)
+
+          if (!dateGroupedData[entryDate]) {
+            dateGroupedData[entryDate] = [];
+          }
+
+          let totalSaleLiter: number = result
+            .map((ea) => ea["saleLiter"])
+            .reduce((pv: number, cv: number): number => pv + cv, 0);
+
+          let pumptest: number = result
+            .filter((ea) => ea.vehicleType == "Pump Test")
+            .map((ea) => ea.totalPrice)
+            .reduce((pv: number, cv: number): number => pv + cv, 0);
+
+          let data = {
+            date: entryDate,
+            // stationId: stationDetail[0].name,
+            // station: stationDetail,
+            nozzle: noz,
+            fuelType: entry.fuelType,
+            price: entry.salePrice,
+            totalizer_opening: entry.devTotalizar_liter - entry.saleLiter,
+            totalizer_closing: entry.devTotalizar_liter,
+            totalizer_different:
+              entry.devTotalizar_liter -
+              (entry.devTotalizar_liter - entry.saleLiter),
+            totalSaleLiter: entry.saleLiter,
+            totalSalePrice: entry.totalPrice,
+            pumptest: entry.vehicleType === "Pump Test" ? entry.saleLiter : 0,
+          };
+
+          dateGroupedData[entryDate].push(data);
+        }
+      }
+
+      // Fill in data for dates with no transactions
+      for (const date in dateGroupedData) {
+        let totalSaleLiter = dateGroupedData[date].reduce(
+          (acc, item) => acc + item.totalSaleLiter,
+          0
+        );
+        let totalSalePrice = dateGroupedData[date].reduce(
+          (acc, item) => acc + item.totalSalePrice,
+          0
+        );
+        let pumptest = dateGroupedData[date].reduce(
+          (acc, item) => acc + item.pumptest,
+          0
+        );
+
+        finalData.push({
+          date,
+          // stationId: stationDetail[0].name,
+          // station: stationDetail,
+          nozzle: noz,
+          fuelType: dateGroupedData[date][0]?.fuelType || "-",
+          price: dateGroupedData[date][0]?.price || "0",
+          totalizer_opening: dateGroupedData[date][0]?.totalizer_opening || "0",
+          totalizer_closing:
+            dateGroupedData[date][dateGroupedData[date].length - 1]
+              ?.totalizer_closing || "0",
+          totalizer_different:
+            dateGroupedData[date][dateGroupedData[date].length - 1]
+              ?.totalizer_closing -
+              dateGroupedData[date][0]?.totalizer_opening || "0",
+          totalSaleLiter: (totalSaleLiter - pumptest).toFixed(3),
+          totalSalePrice: totalSalePrice.toFixed(3),
+          // other: dateGroupedData[date][0]?.other,
+          // Compute this if needed based on your logic
+          pumptest: pumptest.toFixed(3),
+          other: Math.abs(
+            Number(
+              dateGroupedData[date][dateGroupedData[date].length - 1]
+                ?.totalizer_closing -
+                dateGroupedData[date][0]?.totalizer_opening
+            ) - Number(totalSaleLiter.toFixed(3))
+          ),
+        });
+      }
+    }
+
+    fMsg(res, "Final data by date", finalData);
+  } catch (e: any) {
+    next(new Error(e));
   }
 };
 
