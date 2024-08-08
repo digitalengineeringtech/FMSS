@@ -69,7 +69,7 @@ const detailSaleSchema = new Schema({
     type: String,
     default: new Date().toLocaleDateString("fr-CA"),
   },
-  isError: { type: String, default: "0", enum: ["0", "R", "E"] },
+  isError: { type: String, default: "0", enum: ["0", "R", "E", "A"] },
   // 0 = manual permited
   // AU = auto permited
   // A = final completed process
