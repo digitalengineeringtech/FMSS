@@ -136,13 +136,13 @@ export const addDetailSaleHandler = async (
     let result = await addDetailSale(depNo, nozzleNo, req.body);
 
     let balanceStatementData = await getTotalBalance({
-      dateOfDay: result.dailyReportDate,
+      dateOfDay: result?.dailyReportDate,
     });
 
     // console.log(balanceStatementData);
 
     if (balanceStatementData.length == 0) {
-      await autoAddTotalBalance(result.dailyReportDate);
+      result && (await autoAddTotalBalance(result.dailyReportDate));
     }
 
     fMsg(res, "New DetailSale data was added", result);
