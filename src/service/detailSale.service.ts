@@ -494,16 +494,16 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
         )?.volume;
 
         if (volume === undefined) {
-          volume = Number(lastData[1]?.tankBalance) + Number(saleLiter);
+          volume = Number(lastData[1]?.tankBalance) + Number(data[2]);
         }
       } catch (e: any) {
         console.log(`Failed to fetch tank data: ${e.message}`);
-        volume = Number(lastData[1]?.tankBalance) + Number(saleLiter);
+        volume = Number(lastData[1]?.tankBalance) + Number(data[2]);
       }
     } else {
       volume =
         Number(fuelBalances?.find((e) => e.tankNo == tankNo)?.balance) +
-        Number(saleLiter);
+        Number(data[2]);
     }
 
     // console.log(
@@ -516,15 +516,15 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     let updateBody: UpdateQuery<detailSaleDocument> = {
       nozzleNo: data[0],
       salePrice: data[1],
-      saleLiter: saleLiter,
+      saleLiter: data[2],
       // saleLiter: data[2],
-      totalPrice: totalPrice ? totalPrice : 0,
-      // totalPrice: data[2] * data[1],
+      // totalPrice: totalPrice ? totalPrice : 0,
+      totalPrice: data[3],
       asyncAlready: lastData[0].asyncAlready == "a0" ? "a" : "1",
       totalizer_liter:
-        lastData[1].totalizer_liter + Number(saleLiter ? saleLiter : 0),
+        lastData[1].totalizer_liter + Number(data[2] ? data[2] : 0),
       totalizer_amount:
-        lastData[1].totalizer_amount + Number(totalPrice ? totalPrice : 0),
+        lastData[1].totalizer_amount + Number(data[3] ? data[3] : 0),
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[4] * data[1],
       tankNo: tankNo,
@@ -771,211 +771,416 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     let totalPrice = deviceLiveData.get(data[0])?.[1];
     let depNo = topic;
 
+    console.log(
+      data,
+      data[0],
+      typeof data[1],
+      typeof data[2],
+      typeof data[3],
+      data[4]
+    );
+
     let query = {
       nozzleNo: data[0],
       devTotalizar_liter: 0,
       isCancel: 0,
     };
 
-    const lastData: any[] = await detailSaleModel
-      .find(query)
-      .limit(2)
-      .sort({ _id: -1, createdAt: -1 })
-      .lean();
+    if (data[1] == "" || data[2] == "" || data[3] == "") {
+      let query = {
+        nozzleNo: data[0],
+        // devTotalizar_liter: 0,
+        isCancel: 0,
+      };
+      const lastData: any[] = await detailSaleModel
+        .find(query)
+        .limit(3)
+        .sort({ _id: -1, createdAt: -1 })
+        .lean();
+      console.log(lastData, ".....");
 
-    // console.log(lastData);
+      const prevDev_TzrLiter = lastData?.[2].devTotalizar_liter;
+      const prevSalePrice = lastData?.[2].salePrice;
 
-    if (!lastData[0] || !lastData[1]) {
-      return;
-    }
+      console.log(prevSalePrice, prevDev_TzrLiter);
 
-    let tankCount = await get("tankCount");
-
-    let fuelBalances = await getFuelBalance(
-      {
-        stationId: lastData[0].stationDetailId,
-        // createAt: prevDate,
-      },
-      tankCount
-    );
-
-    let tankNo;
-
-    // await Promise.all(
-    //   fuelBalances
-    //     .reverse()
-    //     .slice(0, tankCount)
-    //     .map(async (ea) => {
-    //       if (ea.nozzles.includes(data[0] as never)) {
-    //         tankNo = ea.tankNo;
-    //       } else {
-    //         return;
-    //       }
-    //     })
-    // );
-
-    fuelBalances.map(async (ea) => {
-      // console.log("nozzles", ea.nozzles);
-      if (ea.nozzles.includes(data[0] as never)) {
-        tankNo = ea.tankNo;
+      if (!lastData[0] || !lastData[1] || !lastData[2]) {
+        console.log("there's no last three data");
+        return;
       }
-    });
 
-    let volume: number;
+      let tankCount = await get("tankCount");
 
-    let tankUrl = config.get<string>("tankDataUrl");
+      let fuelBalances = await getFuelBalance(
+        {
+          // stationId: lastData[0].stationDetailId,
+          // createAt: prevDate,
+        },
+        tankCount
+      );
+      // console.log(fuelBalances);
 
-    if (tankUrl != "") {
-      try {
-        let tankRealTimeData;
-        tankRealTimeData = await axios.post(tankUrl);
+      let tankNo;
 
-        if (tankRealTimeData.status !== 200) {
-          throw new Error(
-            `Unexpected response status: ${tankRealTimeData.status}`
-          );
+      // await Promise.all(
+      //   fuelBalances
+      //     .reverse()
+      //     .slice(0, tankCount)
+      //     .map(async (ea) => {
+      //       if (ea.nozzles.includes(data[0] as never)) {
+      //         tankNo = ea.tankNo;
+      //       } else {
+      //         return;
+      //       }
+      //     })
+      // );
+
+      fuelBalances.map(async (ea) => {
+        // console.log("nozzles", ea.nozzles);
+        if (ea.nozzles.includes(data[0] as never)) {
+          tankNo = ea.tankNo;
         }
+      });
 
-        volume = tankRealTimeData.data.data.find(
-          (ea) => ea.id === tankNo
-        )?.volume;
+      let volume: number;
 
-        if (volume === undefined) {
+      let tankUrl = config.get<string>("tankDataUrl");
+
+      if (tankUrl != "") {
+        try {
+          let tankRealTimeData;
+          tankRealTimeData = await axios.post(tankUrl);
+
+          if (tankRealTimeData.status !== 200) {
+            throw new Error(
+              `Unexpected response status: ${tankRealTimeData.status}`
+            );
+          }
+
+          volume = tankRealTimeData.data.data.find(
+            (ea) => ea.id === tankNo
+          )?.volume;
+
+          if (volume === undefined) {
+            volume = Number(lastData[1]?.tankBalance) + Number(data[2] || 0);
+          }
+        } catch (e: any) {
+          console.log(`Failed to fetch tank data: ${e.message}`);
           volume = Number(lastData[1]?.tankBalance) + Number(data[2] || 0);
         }
-      } catch (e: any) {
-        console.log(`Failed to fetch tank data: ${e.message}`);
-        volume = Number(lastData[1]?.tankBalance) + Number(data[2] || 0);
+      } else {
+        volume =
+          Number(fuelBalances?.find((e) => e.tankNo == tankNo)?.balance) +
+          Number(data[2] || 0);
       }
-    } else {
-      volume =
-        Number(fuelBalances?.find((e) => e.tankNo == tankNo)?.balance) +
-        Number(data[2] || 0);
-    }
-    //end update
-    let updateBody: UpdateQuery<detailSaleDocument> = {
-      nozzleNo: data[0],
-      salePrice: data[1],
-      saleLiter: data[2],
-      totalPrice: data[3],
-      asyncAlready: lastData[0].asyncAlready == "a0" ? "a" : "1",
-      totalizer_liter:
-        lastData[1].totalizer_liter ?? +Number(saleLiter ? saleLiter : 0),
-      totalizer_amount:
-        lastData[1].totalizer_amount ?? +Number(totalPrice ? totalPrice : 0),
-      devTotalizar_liter: data[4],
-      devTotalizar_amount: data[4] * data[1],
-      tankNo: tankNo,
-      tankBalance: volume,
-      isError: "A",
-    };
+      //end update
+      let updateBody: UpdateQuery<detailSaleDocument> = {
+        nozzleNo: data[0],
+        salePrice: prevSalePrice,
+        saleLiter: (Number(data[4]) - Number(prevDev_TzrLiter)).toFixed(3),
+        totalPrice: Math.floor(
+          prevSalePrice * (Number(data[4]) - Number(prevDev_TzrLiter))
+        ),
+        asyncAlready: lastData[0].asyncAlready == "a0" ? "a" : "1",
+        totalizer_liter:
+          lastData[1].totalizer_liter ??
+          +Number(prevSalePrice ? prevSalePrice : 0),
+        totalizer_amount:
+          lastData[1].totalizer_amount ??
+          +Number(
+            Number(data[4]) - Number(prevDev_TzrLiter)
+              ? Number(data[4]) - Number(prevDev_TzrLiter)
+              : 0
+          ),
+        devTotalizar_liter: data[4],
+        devTotalizar_amount: data[4] * prevSalePrice,
+        tankNo: tankNo,
+        tankBalance: volume,
+        isError: "A",
+      };
 
-    await detailSaleModel.findByIdAndUpdate(lastData[1]._id, updateBody);
+      await detailSaleModel.findByIdAndUpdate(lastData[1]._id, updateBody);
 
-    let result = await detailSaleModel.findById(lastData[1]._id);
+      let result = await detailSaleModel.findById(lastData[1]._id);
 
-    mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
+      mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
 
-    if (!result) {
-      throw new Error("Final send in error");
-    }
+      if (!result) {
+        throw new Error("Final send in error");
+      }
 
-    let checkRpDate = await getDailyReport({
-      stationId: result.stationDetailId,
-      dateOfDay: result.dailyReportDate,
-    });
-
-    if (checkRpDate.length == 0) {
-      await addDailyReport({
+      let checkRpDate = await getDailyReport({
         stationId: result.stationDetailId,
         dateOfDay: result.dailyReportDate,
       });
-    }
 
-    if (tankUrl == "") {
-      let checkDate = await getFuelBalance({
-        stationId: result.stationDetailId,
-        createAt: result.dailyReportDate,
-      });
+      if (checkRpDate.length == 0) {
+        await addDailyReport({
+          stationId: result.stationDetailId,
+          dateOfDay: result.dailyReportDate,
+        });
+      }
 
-      if (checkDate.length == 0) {
-        let prevResult = await getFuelBalance(
+      if (tankUrl == "") {
+        let checkDate = await getFuelBalance({
+          stationId: result.stationDetailId,
+          createAt: result.dailyReportDate,
+        });
+
+        if (checkDate.length == 0) {
+          let prevResult = await getFuelBalance(
+            {
+              stationId: result.stationDetailId,
+            },
+            tankCount
+          );
+
+          await Promise.all(
+            prevResult
+              .reverse()
+              .slice(0, tankCount)
+              .map(async (ea) => {
+                let obj: fuelBalanceDocument;
+                if (ea.balance == 0) {
+                  obj = {
+                    stationId: ea.stationId,
+                    fuelType: ea.fuelType,
+                    capacity: ea.capacity,
+                    opening: ea.opening + ea.fuelIn,
+                    tankNo: ea.tankNo,
+                    createAt: result?.dailyReportDate,
+                    nozzles: ea.nozzles,
+                    balance: ea.opening + ea.fuelIn,
+                  } as fuelBalanceDocument;
+                } else {
+                  obj = {
+                    stationId: ea.stationId,
+                    fuelType: ea.fuelType,
+                    capacity: ea.capacity,
+                    opening: ea.opening + ea.fuelIn - ea.cash,
+                    tankNo: ea.tankNo,
+                    createAt: result?.dailyReportDate,
+                    nozzles: ea.nozzles,
+                    balance: ea.opening + ea.fuelIn - ea.cash,
+                  } as fuelBalanceDocument;
+                }
+
+                await addFuelBalance(obj);
+              })
+          );
+        }
+
+        await calcFuelBalance(
           {
             stationId: result.stationDetailId,
+            fuelType: result.fuelType,
+            createAt: result.dailyReportDate,
           },
-          tankCount
-        );
-
-        await Promise.all(
-          prevResult
-            .reverse()
-            .slice(0, tankCount)
-            .map(async (ea) => {
-              let obj: fuelBalanceDocument;
-              if (ea.balance == 0) {
-                obj = {
-                  stationId: ea.stationId,
-                  fuelType: ea.fuelType,
-                  capacity: ea.capacity,
-                  opening: ea.opening + ea.fuelIn,
-                  tankNo: ea.tankNo,
-                  createAt: result?.dailyReportDate,
-                  nozzles: ea.nozzles,
-                  balance: ea.opening + ea.fuelIn,
-                } as fuelBalanceDocument;
-              } else {
-                obj = {
-                  stationId: ea.stationId,
-                  fuelType: ea.fuelType,
-                  capacity: ea.capacity,
-                  opening: ea.opening + ea.fuelIn - ea.cash,
-                  tankNo: ea.tankNo,
-                  createAt: result?.dailyReportDate,
-                  nozzles: ea.nozzles,
-                  balance: ea.opening + ea.fuelIn - ea.cash,
-                } as fuelBalanceDocument;
-              }
-
-              await addFuelBalance(obj);
-            })
+          { liter: result.saleLiter },
+          result.nozzleNo
         );
       }
 
-      await calcFuelBalance(
-        {
-          stationId: result.stationDetailId,
-          fuelType: result.fuelType,
-          createAt: result.dailyReportDate,
-        },
-        { liter: result.saleLiter },
-        result.nozzleNo
-      );
-    }
+      // get tank data by today date
 
-    // get tank data by today date
+      if (tankUrl != "") {
+        const tankData = await getTankData({
+          stationDetailId: result.stationDetailId,
+          dateOfDay: moment().format("YYYY-MM-DD"),
+        });
 
-    if (tankUrl != "") {
-      const tankData = await getTankData({
-        stationDetailId: result.stationDetailId,
-        dateOfDay: moment().format("YYYY-MM-DD"),
-      });
-
-      // check if tank data exists
-      try {
-        if (tankData.length === 0) {
-          await addTankData({
-            stationDetailId: result.stationDetailId,
-            vocono: lastData[0].vocono,
-            nozzleNo: lastData[0].nozzleNo,
-          });
-        } else {
-          await updateExistingTankData({
-            id: tankData[0]._id,
-            stationDetailId: result.stationDetailId,
-          });
+        // check if tank data exists
+        try {
+          if (tankData.length === 0) {
+            await addTankData({
+              stationDetailId: result.stationDetailId,
+              vocono: lastData[0].vocono,
+              nozzleNo: lastData[0].nozzleNo,
+            });
+          } else {
+            await updateExistingTankData({
+              id: tankData[0]._id,
+              stationDetailId: result.stationDetailId,
+            });
+          }
+        } catch (error) {
+          console.error("Error handling tank data:", error.message);
         }
-      } catch (error) {
-        console.error("Error handling tank data:", error.message);
+      }
+    } else {
+      const lastData: any[] = await detailSaleModel
+        .find(query)
+        .limit(2)
+        .sort({ _id: -1, createdAt: -1 })
+        .lean();
+      // console.log(lastData);
+      if (!lastData[0] || !lastData[1]) {
+        return;
+      }
+      let tankCount = await get("tankCount");
+      let fuelBalances = await getFuelBalance(
+        {
+          stationId: lastData[0].stationDetailId,
+          // createAt: prevDate,
+        },
+        tankCount
+      );
+      let tankNo;
+      // await Promise.all(
+      //   fuelBalances
+      //     .reverse()
+      //     .slice(0, tankCount)
+      //     .map(async (ea) => {
+      //       if (ea.nozzles.includes(data[0] as never)) {
+      //         tankNo = ea.tankNo;
+      //       } else {
+      //         return;
+      //       }
+      //     })
+      // );
+      fuelBalances.map(async (ea) => {
+        // console.log("nozzles", ea.nozzles);
+        if (ea.nozzles.includes(data[0] as never)) {
+          tankNo = ea.tankNo;
+        }
+      });
+      let volume: number;
+      let tankUrl = config.get<string>("tankDataUrl");
+      if (tankUrl != "") {
+        try {
+          let tankRealTimeData;
+          tankRealTimeData = await axios.post(tankUrl);
+          if (tankRealTimeData.status !== 200) {
+            throw new Error(
+              `Unexpected response status: ${tankRealTimeData.status}`
+            );
+          }
+          volume = tankRealTimeData.data.data.find(
+            (ea) => ea.id === tankNo
+          )?.volume;
+          if (volume === undefined) {
+            volume = Number(lastData[1]?.tankBalance) + Number(data[2] || 0);
+          }
+        } catch (e: any) {
+          console.log(`Failed to fetch tank data: ${e.message}`);
+          volume = Number(lastData[1]?.tankBalance) + Number(data[2] || 0);
+        }
+      } else {
+        volume =
+          Number(fuelBalances?.find((e) => e.tankNo == tankNo)?.balance) +
+          Number(data[2] || 0);
+      }
+      //end update
+      let updateBody: UpdateQuery<detailSaleDocument> = {
+        nozzleNo: data[0],
+        salePrice: data[1],
+        saleLiter: data[2],
+        totalPrice: data[3],
+        asyncAlready: lastData[0].asyncAlready == "a0" ? "a" : "1",
+        totalizer_liter:
+          lastData[1].totalizer_liter ?? +Number(data[2] ? data[2] : 0),
+        totalizer_amount:
+          lastData[1].totalizer_amount ?? +Number(data[3] ? data[3] : 0),
+        devTotalizar_liter: data[4],
+        devTotalizar_amount: data[4] * data[1],
+        tankNo: tankNo,
+        tankBalance: volume,
+        isError: "A",
+      };
+      await detailSaleModel.findByIdAndUpdate(lastData[1]._id, updateBody);
+      let result = await detailSaleModel.findById(lastData[1]._id);
+      mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
+      if (!result) {
+        throw new Error("Final send in error");
+      }
+      let checkRpDate = await getDailyReport({
+        stationId: result.stationDetailId,
+        dateOfDay: result.dailyReportDate,
+      });
+      if (checkRpDate.length == 0) {
+        await addDailyReport({
+          stationId: result.stationDetailId,
+          dateOfDay: result.dailyReportDate,
+        });
+      }
+      if (tankUrl == "") {
+        let checkDate = await getFuelBalance({
+          stationId: result.stationDetailId,
+          createAt: result.dailyReportDate,
+        });
+        if (checkDate.length == 0) {
+          let prevResult = await getFuelBalance(
+            {
+              stationId: result.stationDetailId,
+            },
+            tankCount
+          );
+          await Promise.all(
+            prevResult
+              .reverse()
+              .slice(0, tankCount)
+              .map(async (ea) => {
+                let obj: fuelBalanceDocument;
+                if (ea.balance == 0) {
+                  obj = {
+                    stationId: ea.stationId,
+                    fuelType: ea.fuelType,
+                    capacity: ea.capacity,
+                    opening: ea.opening + ea.fuelIn,
+                    tankNo: ea.tankNo,
+                    createAt: result?.dailyReportDate,
+                    nozzles: ea.nozzles,
+                    balance: ea.opening + ea.fuelIn,
+                  } as fuelBalanceDocument;
+                } else {
+                  obj = {
+                    stationId: ea.stationId,
+                    fuelType: ea.fuelType,
+                    capacity: ea.capacity,
+                    opening: ea.opening + ea.fuelIn - ea.cash,
+                    tankNo: ea.tankNo,
+                    createAt: result?.dailyReportDate,
+                    nozzles: ea.nozzles,
+                    balance: ea.opening + ea.fuelIn - ea.cash,
+                  } as fuelBalanceDocument;
+                }
+                await addFuelBalance(obj);
+              })
+          );
+        }
+        await calcFuelBalance(
+          {
+            stationId: result.stationDetailId,
+            fuelType: result.fuelType,
+            createAt: result.dailyReportDate,
+          },
+          { liter: result.saleLiter },
+          result.nozzleNo
+        );
+      }
+      // get tank data by today date
+      if (tankUrl != "") {
+        const tankData = await getTankData({
+          stationDetailId: result.stationDetailId,
+          dateOfDay: moment().format("YYYY-MM-DD"),
+        });
+        // check if tank data exists
+        try {
+          if (tankData.length === 0) {
+            await addTankData({
+              stationDetailId: result.stationDetailId,
+              vocono: lastData[0].vocono,
+              nozzleNo: lastData[0].nozzleNo,
+            });
+          } else {
+            await updateExistingTankData({
+              id: tankData[0]._id,
+              stationDetailId: result.stationDetailId,
+            });
+          }
+        } catch (error) {
+          console.error("Error handling tank data:", error.message);
+        }
       }
     }
   } catch (error) {
