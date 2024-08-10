@@ -32,6 +32,7 @@ import { escape } from "querystring";
 import { string } from "zod";
 import { log } from "console";
 import { create } from "domain";
+import logger from "../utils/logger";
 
 interface Data {
   depNo: string;
@@ -533,6 +534,13 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     };
 
     await detailSaleModel.findByIdAndUpdate(lastData[0]._id, updateBody);
+
+    logger.warn(`
+    ========== start ==========
+    Function: Update In DetailSale
+    Updated Body: ${JSON.stringify(updateBody)}
+    ========== ended ==========
+    `, { file: 'detailsale.log' });
 
     let result = await detailSaleModel.findById(lastData[0]._id);
 
