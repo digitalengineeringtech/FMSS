@@ -504,21 +504,21 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
           );
         }
 
-        volume = tankRealTimeData.data.data.find(
-          (ea) => ea.id === tankNo
-        )?.volume;
+        volume =
+          tankRealTimeData.data.data.find((ea) => ea.id === tankNo)?.volume ||
+          0;
 
         if (volume === undefined) {
-          volume = Number(lastData[1]?.tankBalance) + Number(data[2]);
+          volume = Number(lastData[1]?.tankBalance) + Number(data[2]) || 0;
         }
       } catch (e: any) {
         console.log(`Failed to fetch tank data: ${e.message}`);
-        volume = Number(lastData[1]?.tankBalance) + Number(data[2]);
+        volume = Number(lastData[1]?.tankBalance) + Number(data[2]) || 0;
       }
     } else {
       volume =
         Number(fuelBalances?.find((e) => e.tankNo == tankNo)?.balance) +
-        Number(data[2]);
+          Number(data[2]) || 0;
     }
 
     // console.log(
@@ -543,7 +543,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[4] * data[1],
       tankNo: tankNo,
-      tankBalance: volume,
+      tankBalance: volume || 0,
       isError: "A",
     };
 
@@ -917,7 +917,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         devTotalizar_liter: data[4],
         devTotalizar_amount: data[4] * prevSalePrice,
         tankNo: tankNo,
-        tankBalance: volume,
+        tankBalance: volume || 0,
         isError: "A",
       };
 
@@ -1077,9 +1077,9 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
               `Unexpected response status: ${tankRealTimeData.status}`
             );
           }
-          volume = tankRealTimeData.data.data.find(
-            (ea) => ea.id === tankNo
-          )?.volume;
+          volume =
+            tankRealTimeData.data.data.find((ea) => ea.id === tankNo)?.volume ||
+            0;
           if (volume === undefined) {
             volume = Number(lastData[1]?.tankBalance) + Number(data[2] || 0);
           }
@@ -1106,7 +1106,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         devTotalizar_liter: data[4],
         devTotalizar_amount: data[4] * data[1],
         tankNo: tankNo,
-        tankBalance: volume,
+        tankBalance: volume || 0,
         isError: "A",
       };
       await detailSaleModel.findByIdAndUpdate(lastData[1]._id, updateBody);
