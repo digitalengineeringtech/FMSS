@@ -18,6 +18,7 @@
     "@types/mqtt": "^2.5.0",
     "@types/node-cron": "^3.0.7",
     "@types/socket.io": "^3.0.2",
+    "@types/winston": "^2.4.4",
     "async-redis": "^2.0.0",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
@@ -36,6 +37,7 @@
     "socket.io-client": "^4.7.0",
     "ts-node-dev": "^2.0.0",
     "uuid": "^9.0.0",
+    "winston": "^3.14.1",
     "zod": "^3.21.4"
   },
   "devDependencies": {
