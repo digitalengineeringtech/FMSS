@@ -443,6 +443,20 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       .limit(2)
       .lean();
 
+      logger.warn(`
+      ========== start ==========
+      Function: Last Data 0 In DetailSale
+      Updated Body: ${JSON.stringify(lastData[0])}
+      ========== ended ==========
+      `, { file: 'detailsale.log' });
+
+      logger.warn(`
+      ========== start ==========
+      Function: Last Data 1 In DetailSale
+      Updated Body: ${JSON.stringify(lastData[1])}
+      ========== ended ==========
+      `, { file: 'detailsale.log' });
+
     // console.log(lastData, "this is last data", data[0]);
     if (!lastData[0] || !lastData[1]) {
       return;
