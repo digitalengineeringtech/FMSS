@@ -435,27 +435,20 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       // isCancel: 0,
     };
 
-    // console.log(message);
+    logger.warn(`
+    ========== start ==========
+    Time: ${moment().format("YYYY-MM-DD HH:mm:ss")}
+    From: MQTT Lane
+    Topic: ${topic}
+    Message: ${message}
+    ========== ended ==========
+    `, { file: 'detailsale.log' });
 
     const lastData: any[] = await detailSaleModel
       .find(query)
       .sort({ _id: -1, createAt: -1 })
       .limit(2)
       .lean();
-
-      logger.warn(`
-      ========== start ==========
-      Function: Last Data 0 In DetailSale
-      Updated Body: ${JSON.stringify(lastData[0])}
-      ========== ended ==========
-      `, { file: 'detailsale.log' });
-
-      logger.warn(`
-      ========== start ==========
-      Function: Last Data 1 In DetailSale
-      Updated Body: ${JSON.stringify(lastData[1])}
-      ========== ended ==========
-      `, { file: 'detailsale.log' });
 
     // console.log(lastData, "this is last data", data[0]);
     if (!lastData[0] || !lastData[1]) {
@@ -548,13 +541,6 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     };
 
     await detailSaleModel.findByIdAndUpdate(lastData[0]._id, updateBody);
-
-    logger.warn(`
-    ========== start ==========
-    Function: Update In DetailSale
-    Updated Body: ${JSON.stringify(updateBody)}
-    ========== ended ==========
-    `, { file: 'detailsale.log' });
 
     let result = await detailSaleModel.findById(lastData[0]._id);
 
