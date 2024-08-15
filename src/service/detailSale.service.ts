@@ -430,13 +430,19 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     let saleLiter = deviceLiveData.get(data[0])?.[0] || 0;
     let totalPrice = deviceLiveData.get(data[0])?.[1];
 
+    if(data[1] == "" || data[2] == "" || data[3] == ""){
+       await zeroDetailSaleUpdateByDevice(topic, message);
+       return;
+    }
+
     let query = {
       nozzleNo: data[0],
       // isCancel: 0,
     };
 
-    logger.warn(`
+    logger.info(`
     ========== start ==========
+    Function: detailSaleUpdateByDevice (Final)
     Time: ${moment().format("YYYY-MM-DD HH:mm:ss")}
     From: MQTT Lane
     Topic: ${topic}
@@ -779,6 +785,16 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     let saleLiter = deviceLiveData.get(data[0])?.[0];
     let totalPrice = deviceLiveData.get(data[0])?.[1];
     let depNo = topic;
+
+    logger.warn(`
+    ========== start ==========
+    Function: zeroDetailSaleUpdateByDevice (Reload)
+    Time: ${moment().format("YYYY-MM-DD HH:mm:ss")}
+    From: MQTT Lane
+    Topic: ${topic}
+    Message: ${message}
+    ========== ended ==========
+    `, { file: 'detailsale.log' });
 
     console.log(
       data,
