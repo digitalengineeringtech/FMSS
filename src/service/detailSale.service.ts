@@ -800,19 +800,29 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     if (data[1] == "" || data[2] == "" || data[3] == "") {
       let query = {
         nozzleNo: data[0],
-        devTotalizar_liter: { $ne: 0 },
+        // devTotalizar_liter: { $ne: 0 },
         isCancel: 0,
       };
       const lastData: any[] = await detailSaleModel
         .find(query)
-        .limit(3)
+        .limit(2)
         .sort({ _id: -1, createdAt: -1 })
         .lean();
 
-      const prevDev_TzrLiter = lastData?.[2].devTotalizar_liter;
-      const prevSalePrice = lastData?.[2].salePrice;
+      const noZeroLastData: any = await detailSaleModel
+            .findOne({
+              nozzleNo: data[0],
+              isCancel: 0,
+              devTotalizar_liter: { $ne: 0 },
+            })
+            .sort({ _id: -1, createdAt: -1 })
+            .lean();
 
-      if (!lastData[0] || !lastData[1] || !lastData[2]) {
+  
+      const prevDev_TzrLiter = noZeroLastData?.devTotalizar_liter;
+      const prevSalePrice = noZeroLastData?.salePrice;
+
+      if (!lastData[0] || !lastData[1]) {
         return;
       }
 
