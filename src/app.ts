@@ -32,8 +32,11 @@ import fuelInRoute from "./router/fuelIn.routes";
 import fuelBalanceRoute from "./router/fuelBalance.routes";
 import tankDataRoute from "./router/tankData.routes";
 import { requestLogger, dbLogger, errorLogger } from './middleware/logMiddleware';
+import stationRoute from "./router/station.routes";
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); 
 app.use(fileUpload());
 app.use(cors({ origin: "*" }));
 app.use(requestLogger);
@@ -140,6 +143,8 @@ app.use("/api/fuelIn", fuelInRoute);
 
 app.use("/api/fuel-balance", fuelBalanceRoute);
 app.use("/api/tank-data", tankDataRoute);
+
+app.use('/api/station', stationRoute);
 
 // error handling and response
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
