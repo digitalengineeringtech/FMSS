@@ -797,16 +797,10 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     ========== ended ==========
     `, { file: 'detailsale.log' });
 
-    let query = {
-      nozzleNo: data[0],
-      devTotalizar_liter: 0,
-      isCancel: 0,
-    };
-
     if (data[1] == "" || data[2] == "" || data[3] == "") {
       let query = {
         nozzleNo: data[0],
-        // devTotalizar_liter: 0,
+        devTotalizar_liter: { $ne: 0 },
         isCancel: 0,
       };
       const lastData: any[] = await detailSaleModel
@@ -1021,6 +1015,11 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         }
       }
     } else {
+      let query = {
+        nozzleNo: data[0],
+        devTotalizar_liter: 0,
+        isCancel: 0,
+      };
       const lastData: any[] = await detailSaleModel
         .find(query)
         .limit(2)
