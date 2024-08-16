@@ -33,6 +33,8 @@ import fuelBalanceRoute from "./router/fuelBalance.routes";
 import tankDataRoute from "./router/tankData.routes";
 import { requestLogger, dbLogger, errorLogger } from './middleware/logMiddleware';
 import stationRoute from "./router/station.routes";
+import logger from "./utils/logger";
+import moment from "moment";
 
 const app = express();
 app.use(express.json());
@@ -51,6 +53,16 @@ client.on("message", async (topic, message) => {
   let data = topic.split("/"); // data spliting from mqtt
 
   // console.log(data, message.toString());
+
+  logger.warn(`
+  ========== start ==========
+  Function: zeroDetailSaleUpdateByDevice (Reload)
+  Time: ${moment().format("YYYY-MM-DD HH:mm:ss")}
+  From: MQTT Lane
+  Topic: ${topic}
+  Message: ${message}
+  ========== ended ==========
+  `, { file: 'detailsale.log' });
 
   if (data[2] == "active") {
     // when active topic come
