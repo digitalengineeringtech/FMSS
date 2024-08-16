@@ -531,6 +531,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       nozzleNo: data[0],
       salePrice: data[1],
       saleLiter: data[2],
+      depNo: topic,
       // saleLiter: data[2],
       // totalPrice: totalPrice ? totalPrice : 0,
       totalPrice: data[3],
@@ -796,15 +797,6 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     ========== ended ==========
     `, { file: 'detailsale.log' });
 
-    console.log(
-      data,
-      data[0],
-      typeof data[1],
-      typeof data[2],
-      typeof data[3],
-      data[4]
-    );
-
     let query = {
       nozzleNo: data[0],
       devTotalizar_liter: 0,
@@ -822,15 +814,11 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         .limit(3)
         .sort({ _id: -1, createdAt: -1 })
         .lean();
-      console.log(lastData, ".....");
 
       const prevDev_TzrLiter = lastData?.[2].devTotalizar_liter;
       const prevSalePrice = lastData?.[2].salePrice;
 
-      console.log(prevSalePrice, prevDev_TzrLiter);
-
       if (!lastData[0] || !lastData[1] || !lastData[2]) {
-        console.log("there's no last three data");
         return;
       }
 
@@ -890,7 +878,6 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
             volume = Number(lastData[1]?.tankBalance) + Number(data[2] || 0);
           }
         } catch (e: any) {
-          console.log(`Failed to fetch tank data: ${e.message}`);
           volume = Number(lastData[1]?.tankBalance) + Number(data[2] || 0);
         }
       } else {
@@ -900,6 +887,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       }
       //end update
       let updateBody: UpdateQuery<detailSaleDocument> = {
+        depNo: depNo,
         nozzleNo: data[0],
         salePrice: prevSalePrice,
         saleLiter: (Number(data[4]) - Number(prevDev_TzrLiter)).toFixed(3),
@@ -1097,6 +1085,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       }
       //end update
       let updateBody: UpdateQuery<detailSaleDocument> = {
+        depNo: depNo,
         nozzleNo: data[0],
         salePrice: data[1],
         saleLiter: data[2],
