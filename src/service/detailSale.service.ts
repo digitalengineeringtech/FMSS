@@ -67,10 +67,6 @@ export const preSetDetailSale = async (
   type: string,
   body
 ) => {
-  // console.log("====================================");
-  // console.log(body);
-  // console.log("====================================");
-
   const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
   const cuurentDateForVocono = moment().tz("Asia/Yangon").format("DDMMYYYY");
 
@@ -124,7 +120,7 @@ export const preSetDetailSale = async (
   //   casherCode: body.user.name,
   //   asyncAlready: "0",
   //   totalizer_liter: lastDocument?.totalizer_liter,
-  //   totalizer_amount: lastDocument?.totalizer_amount,
+  //   totalizer_amount: lastDocument?.totalizer_amount,၇
   //   preset: `${preset} ${type}`,
   //   createAt: iso,
   // };
@@ -144,6 +140,11 @@ export const preSetDetailSale = async (
   };
 
   let result = await new detailSaleModel(body).save();
+
+  if (lastDocument?.devTotalizar_liter === 0) {
+    mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
+    return;
+  }
 
   // let checkRpDate = await getDailyReport({
   //   stationId: result.stationDetailId,
@@ -298,10 +299,10 @@ export const addDetailSale = async (
 
     let result = await new detailSaleModel(body).save();
 
-    //if (lastDocument?.devTotalizar_liter === 0) {
-      //mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
-      //return;
-    //}
+    if (lastDocument?.devTotalizar_liter === 0) {
+      mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
+      return;
+    }
 
     let checkRpDate = await getDailyReport({
       stationId: result.stationDetailId,
@@ -430,10 +431,10 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     let saleLiter = deviceLiveData.get(data[0])?.[0] || 0;
     let totalPrice = deviceLiveData.get(data[0])?.[1];
 
-    // if(data[1] == "" && data[2] == "" && data[3] == ""){
-    //    await zeroDetailSaleUpdateByDevice(topic, message);
-    //    return;
-    // }
+    if(data[1] == "" && data[2] == "" && data[3] == ""){
+       await zeroDetailSaleUpdateByDevice(topic, message);
+       return;
+    }
 
     let query = {
       nozzleNo: data[0],
