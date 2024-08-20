@@ -1124,8 +1124,8 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         throw new Error("Final send in error");
       }
 
-      if(result?.preset != null) {
-          const { preset , type } = presetFormat(result?.preset);
+      if(lastData[0]?.preset != null) {
+          const { preset , type } = presetFormat(lastData[0]?.preset);
           mqttEmitter(`detpos/local_server/preset`, result?.nozzleNo + type + preset);
       } else {
           mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
