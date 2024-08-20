@@ -298,10 +298,10 @@ export const addDetailSale = async (
 
     let result = await new detailSaleModel(body).save();
 
-    if (lastDocument?.devTotalizar_liter === 0) {
-      mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
-      return;
-    }
+    //if (lastDocument?.devTotalizar_liter === 0) {
+      //mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
+      //return;
+    //}
 
     let checkRpDate = await getDailyReport({
       stationId: result.stationDetailId,
