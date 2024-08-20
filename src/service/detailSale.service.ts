@@ -4,7 +4,7 @@ import detailSaleModel, { detailSaleDocument } from "../model/detailSale.model";
 import config from "config";
 import { UserDocument } from "../model/user.model";
 import moment from "moment-timezone";
-import { get, mqttEmitter, previous, set } from "../utils/helper";
+import { get, mqttEmitter, presetFormat, previous, set } from "../utils/helper";
 import axios, { isCancel } from "axios";
 import {
   addTankData,
@@ -921,10 +921,15 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
 
       let result = await detailSaleModel.findById(lastData[1]._id);
 
-      mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
-
       if (!result) {
         throw new Error("Final send in error");
+      }
+
+      if(result?.preset != null) {
+        const { preset , type } = presetFormat(result?.preset);
+        mqttEmitter(`detpos/local_server/preset`, result?.nozzleNo + type + preset);
+      } else {
+          mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
       }
 
       let checkRpDate = await getDailyReport({
@@ -1112,11 +1117,20 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         isError: "A",
       };
       await detailSaleModel.findByIdAndUpdate(lastData[1]._id, updateBody);
+
       let result = await detailSaleModel.findById(lastData[1]._id);
-      mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
+
       if (!result) {
         throw new Error("Final send in error");
       }
+
+      if(result?.preset != null) {
+          const { preset , type } = presetFormat(result?.preset);
+          mqttEmitter(`detpos/local_server/preset`, result?.nozzleNo + type + preset);
+      } else {
+          mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
+      }
+
       let checkRpDate = await getDailyReport({
         stationId: result.stationDetailId,
         dateOfDay: result.dailyReportDate,

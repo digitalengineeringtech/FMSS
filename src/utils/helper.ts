@@ -68,4 +68,13 @@ export const drop = async (id: any) => await Redis.del(id.toString());
 
 export const cleanAll = async () => await Redis.flushdb();
 
+export const presetFormat = (preset) => {
+    const result = preset.split(" ");
+   
+    return {
+      preset: result[0],
+      type: result[1]
+    }
+}
+
 export default fMsg;
