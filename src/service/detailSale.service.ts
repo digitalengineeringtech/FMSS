@@ -431,9 +431,9 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     let saleLiter = deviceLiveData.get(data[0])?.[0] || 0;
     let totalPrice = deviceLiveData.get(data[0])?.[1];
 
-    if(data[1] == "" && data[2] == "" && data[3] == ""){
-       await zeroDetailSaleUpdateByDevice(topic, message);
-       return;
+    if (data[1] == "" && data[2] == "" && data[3] == "") {
+      await zeroDetailSaleUpdateByDevice(topic, message);
+      return;
     }
 
     let query = {
@@ -441,7 +441,8 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       // isCancel: 0,
     };
 
-    logger.info(`
+    logger.info(
+      `
     ========== start ==========
     Function: detailSaleUpdateByDevice (Final)
     Time: ${moment().format("YYYY-MM-DD HH:mm:ss")}
@@ -449,7 +450,9 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     Topic: ${topic}
     Message: ${message}
     ========== ended ==========
-    `, { file: 'detailsale.log' });
+    `,
+      { file: "detailsale.log" }
+    );
 
     const lastData: any[] = await detailSaleModel
       .find(query)
@@ -542,8 +545,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       totalizer_amount:
         lastData[1].totalizer_amount + Number(data[3] ? data[3] : 0),
       devTotalizar_liter: data[4],
-      devTotalizar_amount:
-        data[1] == "" ? data[4] * 1 : data[4] * data[1],
+      devTotalizar_amount: data[1] == "" ? data[4] * 1 : data[4] * data[1],
       tankNo: tankNo,
       tankBalance: volume || 0,
       isError: "A",
@@ -788,7 +790,8 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     let totalPrice = deviceLiveData.get(data[0])?.[1];
     let depNo = topic;
 
-    logger.warn(`
+    logger.warn(
+      `
     ========== start ==========
     Function: zeroDetailSaleUpdateByDevice (Reload)
     Time: ${moment().format("YYYY-MM-DD HH:mm:ss")}
@@ -796,7 +799,9 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     Topic: ${topic}
     Message: ${message}
     ========== ended ==========
-    `, { file: 'detailsale.log' });
+    `,
+      { file: "detailsale.log" }
+    );
 
     if (data[1] == "" && data[2] == "" && data[3] == "") {
       let query = {
@@ -811,15 +816,14 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         .lean();
 
       const noZeroLastData: any = await detailSaleModel
-            .findOne({
-              nozzleNo: data[0],
-              isCancel: 0,
-              devTotalizar_liter: { $ne: 0 },
-            })
-            .sort({ _id: -1, createdAt: -1 })
-            .lean();
+        .findOne({
+          nozzleNo: data[0],
+          isCancel: 0,
+          devTotalizar_liter: { $ne: 0 },
+        })
+        .sort({ _id: -1, createdAt: -1 })
+        .lean();
 
-  
       const prevDev_TzrLiter = noZeroLastData?.devTotalizar_liter;
       const prevSalePrice = noZeroLastData?.salePrice;
 
@@ -925,11 +929,14 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         throw new Error("Final send in error");
       }
 
-      if(result?.preset != null) {
-        const { preset , type } = presetFormat(result?.preset);
-        mqttEmitter(`detpos/local_server/preset`, result?.nozzleNo + type + preset);
+      if (result?.preset != null) {
+        const { preset, type } = presetFormat(result?.preset);
+        mqttEmitter(
+          `detpos/local_server/preset`,
+          result?.nozzleNo + type + preset
+        );
       } else {
-          mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
+        mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
       }
 
       let checkRpDate = await getDailyReport({
@@ -1124,11 +1131,14 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         throw new Error("Final send in error");
       }
 
-      if(lastData[0]?.preset != null) {
-          const { preset , type } = presetFormat(lastData[0]?.preset);
-          mqttEmitter(`detpos/local_server/preset`, result?.nozzleNo + type + preset);
+      if (lastData[0]?.preset != null) {
+        const { preset, type } = presetFormat(lastData[0]?.preset);
+        mqttEmitter(
+          `detpos/local_server/preset`,
+          result?.nozzleNo + type + preset
+        );
       } else {
-          mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
+        mqttEmitter(`detpos/local_server/${depNo}`, result?.nozzleNo + "appro");
       }
 
       let checkRpDate = await getDailyReport({
