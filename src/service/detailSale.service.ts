@@ -298,10 +298,10 @@ export const addDetailSale = async (
 
     let result = await new detailSaleModel(body).save();
 
-    if (lastDocument?.devTotalizar_liter === 0) {
-      mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
-      return;
-    }
+    //if (lastDocument?.devTotalizar_liter === 0) {
+      //mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
+      //return;
+    //}
 
     let checkRpDate = await getDailyReport({
       stationId: result.stationDetailId,
@@ -531,6 +531,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
       nozzleNo: data[0],
       salePrice: data[1],
       saleLiter: data[2],
+      depNo: topic,
       // saleLiter: data[2],
       // totalPrice: totalPrice ? totalPrice : 0,
       totalPrice: data[3],
@@ -796,41 +797,32 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     ========== ended ==========
     `, { file: 'detailsale.log' });
 
-    console.log(
-      data,
-      data[0],
-      typeof data[1],
-      typeof data[2],
-      typeof data[3],
-      data[4]
-    );
-
-    let query = {
-      nozzleNo: data[0],
-      devTotalizar_liter: 0,
-      isCancel: 0,
-    };
-
     if (data[1] == "" || data[2] == "" || data[3] == "") {
       let query = {
         nozzleNo: data[0],
-        // devTotalizar_liter: 0,
+        // devTotalizar_liter: { $ne: 0 },
         isCancel: 0,
       };
       const lastData: any[] = await detailSaleModel
         .find(query)
-        .limit(3)
+        .limit(2)
         .sort({ _id: -1, createdAt: -1 })
         .lean();
-      console.log(lastData, ".....");
 
-      const prevDev_TzrLiter = lastData?.[2].devTotalizar_liter;
-      const prevSalePrice = lastData?.[2].salePrice;
+      const noZeroLastData: any = await detailSaleModel
+            .findOne({
+              nozzleNo: data[0],
+              isCancel: 0,
+              devTotalizar_liter: { $ne: 0 },
+            })
+            .sort({ _id: -1, createdAt: -1 })
+            .lean();
 
-      console.log(prevSalePrice, prevDev_TzrLiter);
+  
+      const prevDev_TzrLiter = noZeroLastData?.devTotalizar_liter;
+      const prevSalePrice = noZeroLastData?.salePrice;
 
-      if (!lastData[0] || !lastData[1] || !lastData[2]) {
-        console.log("there's no last three data");
+      if (!lastData[0] || !lastData[1]) {
         return;
       }
 
@@ -890,7 +882,6 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
             volume = Number(lastData[1]?.tankBalance) + Number(data[2] || 0);
           }
         } catch (e: any) {
-          console.log(`Failed to fetch tank data: ${e.message}`);
           volume = Number(lastData[1]?.tankBalance) + Number(data[2] || 0);
         }
       } else {
@@ -900,6 +891,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       }
       //end update
       let updateBody: UpdateQuery<detailSaleDocument> = {
+        depNo: depNo,
         nozzleNo: data[0],
         salePrice: prevSalePrice,
         saleLiter: (Number(data[4]) - Number(prevDev_TzrLiter)).toFixed(3),
@@ -1033,6 +1025,11 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
         }
       }
     } else {
+      let query = {
+        nozzleNo: data[0],
+        devTotalizar_liter: 0,
+        isCancel: 0,
+      };
       const lastData: any[] = await detailSaleModel
         .find(query)
         .limit(2)
@@ -1097,6 +1094,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
       }
       //end update
       let updateBody: UpdateQuery<detailSaleDocument> = {
+        depNo: depNo,
         nozzleNo: data[0],
         salePrice: data[1],
         saleLiter: data[2],
