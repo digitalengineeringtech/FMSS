@@ -798,7 +798,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     ========== ended ==========
     `, { file: 'detailsale.log' });
 
-    if (data[1] == "" || data[2] == "" || data[3] == "") {
+    if (data[1] == "" && data[2] == "" && data[3] == "") {
       let query = {
         nozzleNo: data[0],
         // devTotalizar_liter: { $ne: 0 },
