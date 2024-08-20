@@ -430,10 +430,10 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     let saleLiter = deviceLiveData.get(data[0])?.[0] || 0;
     let totalPrice = deviceLiveData.get(data[0])?.[1];
 
-    if(data[1] == "" || data[2] == "" || data[3] == ""){
-       await zeroDetailSaleUpdateByDevice(topic, message);
-       return;
-    }
+    // if(data[1] == "" && data[2] == "" && data[3] == ""){
+    //    await zeroDetailSaleUpdateByDevice(topic, message);
+    //    return;
+    // }
 
     let query = {
       nozzleNo: data[0],
