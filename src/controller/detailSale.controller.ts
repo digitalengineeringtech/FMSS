@@ -14,6 +14,7 @@ import {
   updateDetailSaleByAp,
   getLastDetailSaleData,
   detailSaleStatement,
+  detailSaleSummary,
   // detailSaleByDate,
 } from "../service/detailSale.service";
 
@@ -231,6 +232,36 @@ export const getDetailSaleByDateHandler = async (
     next(e);
   }
 };
+
+export const getDetailSaleSummaryHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let sDate: any = req.query.sDate;
+    let eDate: any = req.query.eDate;
+
+    delete req.query.sDate;
+    delete req.query.eDate;
+
+    let query = req.query;
+
+    if (!sDate) {
+      throw new Error("you need date");
+    }
+    if (!eDate) {
+      eDate = new Date();
+    }
+    //if date error ? you should use split with T or be sure detail Id
+    const startDate: Date = new Date(sDate);
+    const endDate: Date = new Date(eDate);
+    let result = await detailSaleSummary(query, startDate, endDate);
+    fMsg(res, "detail sale between two date", result);
+  } catch (e) {
+    next(e);
+  }
+}
 
 export const getDetailSaleDatePagiHandler = async (
   req: Request,

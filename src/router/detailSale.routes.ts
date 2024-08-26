@@ -1,4 +1,4 @@
-import { statementReportHandler } from './../controller/detailSale.controller';
+import { getDetailSaleSummaryHandler, statementReportHandler } from './../controller/detailSale.controller';
 import {
   addDetailSaleHandler,
   deleteDetailSaleHandler,
@@ -44,6 +44,13 @@ detailSaleRoute.get(
   validateToken2,
   hasAnyPermit(["view"]),
   getDetailSaleByDateHandler
+);
+
+detailSaleRoute.get(
+  '/sale-summary',
+  validateToken2,
+  hasAnyPermit(["view"]),
+  getDetailSaleSummaryHandler
 );
 
 detailSaleRoute.get(

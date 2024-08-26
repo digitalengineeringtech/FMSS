@@ -33,6 +33,7 @@ import { string } from "zod";
 import { log } from "console";
 import { create } from "domain";
 import logger from "../utils/logger";
+import deviceModel from "../model/device.model";
 
 interface Data {
   depNo: string;
@@ -1304,6 +1305,77 @@ export const detailSaleByDate = async (
     .find(filter)
     .sort({ createAt: -1 })
     .select("-__v");
+
+  return result;
+};
+
+export const detailSaleSummary = async (
+  query: FilterQuery<detailSaleDocument>,
+  d1: Date,
+  d2: Date
+) : Promise<any> => {
+  const filter: FilterQuery<detailSaleDocument> = {
+    ...query,
+    createAt: {
+      $gt: d1,
+      $lt: d2,
+    },
+  };
+
+  let devices = await deviceModel.find()
+                    .select(['nozzle_no', 'fuel_type'])
+                    .exec();
+
+  let detailsales  = await detailSaleModel
+    .find(filter)
+    .sort({ createAt: -1 })
+    .select("-__v");
+
+  let result = devices.map((device) => {
+    let salesForNozzle = detailsales?.filter((sale) => sale.nozzleNo === device.nozzle_no)
+                          ?.filter((ea) => ea.asyncAlready != '0')
+                          ?.filter((e) => e.devTotalizar_liter != 0);
+
+    if(salesForNozzle.length > 0) {
+      let pricePerLiter = salesForNozzle[0].salePrice;
+      let openingTotalizerLiter = salesForNozzle[salesForNozzle.length - 1].devTotalizar_liter;
+      let closingTotalizerLiter = salesForNozzle[0].devTotalizar_liter;
+      let differentLiter = closingTotalizerLiter - openingTotalizerLiter;
+      let saleLiter = salesForNozzle.reduce((sum, sale) => sum + sale.saleLiter, 0);
+      let saleDifferentLiter = differentLiter - saleLiter;
+      let totalPrice = salesForNozzle.reduce((sum, sale) => sum + sale.totalPrice, 0);
+      let priceDifferent = (differentLiter * pricePerLiter) - totalPrice;
+
+
+      let calculated = {
+        nozzleNo: device.nozzle_no,
+        fuelType: device.fuel_type,
+        pricePerLiter, 
+        openingTotalizerLiter,
+        closingTotalizerLiter,
+        differentLiter,
+        saleLiter,
+        saleDifferentLiter,
+        totalPrice,
+        priceDifferent
+      }
+
+      return calculated
+    } else {
+      return {
+        nozzleNo: device.nozzle_no,
+        fuelType: device.fuel_type,
+        pricePerLiter: 0, 
+        openingTotalizerLiter: 0,
+        closingTotalizerLiter: 0,
+        differentLiter: 0,
+        saleLiter: 0,
+        saleDifferentLiter: 0,
+        totalPrice: 0,
+        priceDifferent: 0
+      };
+    }  
+  })
 
   return result;
 };
