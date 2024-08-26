@@ -1,4 +1,4 @@
-import { getDetailSaleSummaryHandler, statementReportHandler } from './../controller/detailSale.controller';
+import { getDetailSaleSummaryDetailHandler, getDetailSaleSummaryHandler, statementReportHandler } from './../controller/detailSale.controller';
 import {
   addDetailSaleHandler,
   deleteDetailSaleHandler,
@@ -52,6 +52,15 @@ detailSaleRoute.get(
   hasAnyPermit(["view"]),
   getDetailSaleSummaryHandler
 );
+
+detailSaleRoute.get(
+  '/sale-summary-detail',
+  validateToken2,
+  hasAnyPermit(["view"]),
+  getDetailSaleSummaryDetailHandler
+);
+
+
 
 detailSaleRoute.get(
   "/pagi/by-date/:page",
