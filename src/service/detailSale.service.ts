@@ -1320,6 +1320,65 @@ export const detailSaleSummary = async (
       $gt: d1,
       $lt: d2,
     },
+    asyncAlready: { $ne: 0 },
+    devTotalizar_liter: { $ne: 0}
+  };
+
+  let beforeStartDate = await detailSaleModel
+  .find({
+      ...query,
+      createAt: {
+        $lt: d1,
+      },
+      asyncAlready: { $ne: 0 },
+      devTotalizar_liter: { $ne: 0}
+  })
+  .sort({ createAt: -1 })
+  .select("-__v");
+
+  let detailsales  = await detailSaleModel
+    .find(filter)
+    .sort({ createAt: -1 })
+    .select("-__v");
+
+  let nozzleNos = detailsales.map((sale) => sale.nozzleNo)
+
+  let nozzles = [...new Set(nozzleNos)];
+
+  let result = nozzles.map((nozzle) => {
+     const salesForNozzle = detailsales.filter((sale) => sale.nozzleNo == nozzle);
+
+     if(salesForNozzle.length > 0) {
+        let openingTotalizerLiter = beforeStartDate[0]?.devTotalizar_liter;
+        let closingTotallizerLiter = salesForNozzle[0]?.devTotalizar_liter;
+        let devTotalizerDif = closingTotallizerLiter - openingTotalizerLiter;
+        let totalPrice = salesForNozzle.reduce((sum, sale) => sum + sale.totalPrice, 0);
+
+
+        return {
+          nozzleNo: nozzle,
+          data: salesForNozzle,
+          fuel_type: salesForNozzle[0].fuelType,
+          devTotalizerDif: devTotalizerDif,
+          totalPrice,
+       }
+     }
+  })
+
+  return result;
+};
+
+export const detailSaleSummaryDetail = async (
+  query: FilterQuery<detailSaleDocument>,
+  d1: Date,
+  d2: Date
+) : Promise<any> => {
+  const filter: FilterQuery<detailSaleDocument> = {
+    ...query,
+    createAt: {
+      $gt: d1,
+      $lt: d2,
+    },
   };
 
   let devices = await deviceModel.find()
