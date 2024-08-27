@@ -1324,7 +1324,7 @@ export const detailSaleSummary = async (
     devTotalizar_liter: { $ne: 0}
   };
 
-  let beforeStartDate = await detailSaleModel
+  let beforeDetailSales = await detailSaleModel
   .find({
       ...query,
       createAt: {
@@ -1347,7 +1347,8 @@ export const detailSaleSummary = async (
 
   let result = nozzles.map((nozzle) => {
      const salesForNozzle = detailsales.filter((sale) => sale.nozzleNo == nozzle);
-
+     const beforeStartDate = beforeDetailSales?.filter((sale) => sale.nozzleNo === nozzle);
+     
      if(salesForNozzle.length > 0) {
         let openingTotalizerLiter = beforeStartDate[0]?.devTotalizar_liter;
         let closingTotallizerLiter = salesForNozzle[0]?.devTotalizar_liter;
@@ -1357,14 +1358,15 @@ export const detailSaleSummary = async (
 
         return {
           nozzleNo: nozzle,
-          data: salesForNozzle,
+          // data: salesForNozzle,
           fuel_type: salesForNozzle[0].fuelType,
           devTotalizerDif: devTotalizerDif,
           totalPrice,
        }
      }
-  })
-
+  });
+  
+  
   return result;
 };
 
@@ -1385,6 +1387,18 @@ export const detailSaleSummaryDetail = async (
                     .select(['nozzle_no', 'fuel_type'])
                     .exec();
 
+  let beforeDetailSales = await detailSaleModel
+  .find({
+      ...query,
+      createAt: {
+        $lt: d1,
+      },
+      asyncAlready: { $ne: 0 },
+      devTotalizar_liter: { $ne: 0}
+  })
+  .sort({ createAt: -1 })
+  .select("-__v");
+
   let detailsales  = await detailSaleModel
     .find(filter)
     .sort({ createAt: -1 })
@@ -1395,9 +1409,12 @@ export const detailSaleSummaryDetail = async (
                           ?.filter((ea) => ea.asyncAlready != '0')
                           ?.filter((e) => e.devTotalizar_liter != 0);
 
+    let beforeStartDate = beforeDetailSales?.filter((sale) => sale.nozzleNo === device.nozzle_no);
+                          
+
     if(salesForNozzle.length > 0) {
       let pricePerLiter = salesForNozzle[0].salePrice;
-      let openingTotalizerLiter = salesForNozzle[salesForNozzle.length - 1].devTotalizar_liter;
+      let openingTotalizerLiter = beforeStartDate[0].devTotalizar_liter;
       let closingTotalizerLiter = salesForNozzle[0].devTotalizar_liter;
       let differentLiter = closingTotalizerLiter - openingTotalizerLiter;
       let saleLiter = salesForNozzle.reduce((sum, sale) => sum + sale.saleLiter, 0);
