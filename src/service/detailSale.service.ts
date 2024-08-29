@@ -142,7 +142,7 @@ export const preSetDetailSale = async (
 
   let result = await new detailSaleModel(body).save();
 
-  if (lastDocument?.devTotalizar_liter === 0) {
+  if (lastDocument?.devTotalizar_liter === 0 && lastDocument?.isCancel === 0) {
     mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
     return;
   }
@@ -300,7 +300,10 @@ export const addDetailSale = async (
 
     let result = await new detailSaleModel(body).save();
 
-    if (lastDocument?.devTotalizar_liter === 0) {
+    if (
+      lastDocument?.devTotalizar_liter === 0 &&
+      lastDocument?.isCancel === 0
+    ) {
       mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
       return;
     }
@@ -1313,7 +1316,7 @@ export const detailSaleSummary = async (
   query: FilterQuery<detailSaleDocument>,
   d1: Date,
   d2: Date
-) : Promise<any> => {
+): Promise<any> => {
   const filter: FilterQuery<detailSaleDocument> = {
     ...query,
     createAt: {
@@ -1321,52 +1324,57 @@ export const detailSaleSummary = async (
       $lt: d2,
     },
     asyncAlready: { $ne: 0 },
-    devTotalizar_liter: { $ne: 0}
+    devTotalizar_liter: { $ne: 0 },
   };
 
   let beforeDetailSales = await detailSaleModel
-  .find({
+    .find({
       ...query,
       createAt: {
         $lt: d1,
       },
       asyncAlready: { $ne: 0 },
-      devTotalizar_liter: { $ne: 0}
-  })
-  .sort({ createAt: -1 })
-  .select("-__v");
+      devTotalizar_liter: { $ne: 0 },
+    })
+    .sort({ createAt: -1 })
+    .select("-__v");
 
-  let detailsales  = await detailSaleModel
+  let detailsales = await detailSaleModel
     .find(filter)
     .sort({ createAt: -1 })
     .select("-__v");
 
-  let nozzleNos = detailsales.map((sale) => sale.nozzleNo)
+  let nozzleNos = detailsales.map((sale) => sale.nozzleNo);
 
   let nozzles = [...new Set(nozzleNos)];
 
   let result = nozzles.map((nozzle) => {
-     const salesForNozzle = detailsales.filter((sale) => sale.nozzleNo == nozzle);
-     const beforeStartDate = beforeDetailSales?.filter((sale) => sale.nozzleNo === nozzle);
-     
-     if(salesForNozzle.length > 0) {
-        let openingTotalizerLiter = beforeStartDate[0]?.devTotalizar_liter;
-        let closingTotallizerLiter = salesForNozzle[0]?.devTotalizar_liter;
-        let devTotalizerDif = closingTotallizerLiter - openingTotalizerLiter;
-        let totalPrice = salesForNozzle.reduce((sum, sale) => sum + sale.totalPrice, 0);
+    const salesForNozzle = detailsales.filter(
+      (sale) => sale.nozzleNo == nozzle
+    );
+    const beforeStartDate = beforeDetailSales?.filter(
+      (sale) => sale.nozzleNo === nozzle
+    );
 
+    if (salesForNozzle.length > 0) {
+      let openingTotalizerLiter = beforeStartDate[0]?.devTotalizar_liter;
+      let closingTotallizerLiter = salesForNozzle[0]?.devTotalizar_liter;
+      let devTotalizerDif = closingTotallizerLiter - openingTotalizerLiter;
+      let totalPrice = salesForNozzle.reduce(
+        (sum, sale) => sum + sale.totalPrice,
+        0
+      );
 
-        return {
-          nozzleNo: nozzle,
-          // data: salesForNozzle,
-          fuel_type: salesForNozzle[0].fuelType,
-          devTotalizerDif: devTotalizerDif,
-          totalPrice,
-       }
-     }
+      return {
+        nozzleNo: nozzle,
+        // data: salesForNozzle,
+        fuel_type: salesForNozzle[0].fuelType,
+        devTotalizerDif: devTotalizerDif,
+        totalPrice,
+      };
+    }
   });
-  
-  
+
   return result;
 };
 
@@ -1374,7 +1382,7 @@ export const detailSaleSummaryDetail = async (
   query: FilterQuery<detailSaleDocument>,
   d1: Date,
   d2: Date
-) : Promise<any> => {
+): Promise<any> => {
   const filter: FilterQuery<detailSaleDocument> = {
     ...query,
     createAt: {
@@ -1383,75 +1391,83 @@ export const detailSaleSummaryDetail = async (
     },
   };
 
-  let devices = await deviceModel.find()
-                    .select(['nozzle_no', 'fuel_type'])
-                    .exec();
+  let devices = await deviceModel
+    .find()
+    .select(["nozzle_no", "fuel_type"])
+    .exec();
 
   let beforeDetailSales = await detailSaleModel
-  .find({
+    .find({
       ...query,
       createAt: {
         $lt: d1,
       },
       asyncAlready: { $ne: 0 },
-      devTotalizar_liter: { $ne: 0}
-  })
-  .sort({ createAt: -1 })
-  .select("-__v");
+      devTotalizar_liter: { $ne: 0 },
+    })
+    .sort({ createAt: -1 })
+    .select("-__v");
 
-  let detailsales  = await detailSaleModel
+  let detailsales = await detailSaleModel
     .find(filter)
     .sort({ createAt: -1 })
     .select("-__v");
 
   let result = devices.map((device) => {
-    let salesForNozzle = detailsales?.filter((sale) => sale.nozzleNo === device.nozzle_no)
-                          ?.filter((ea) => ea.asyncAlready != '0')
-                          ?.filter((e) => e.devTotalizar_liter != 0);
+    let salesForNozzle = detailsales
+      ?.filter((sale) => sale.nozzleNo === device.nozzle_no)
+      ?.filter((ea) => ea.asyncAlready != "0")
+      ?.filter((e) => e.devTotalizar_liter != 0);
 
-    let beforeStartDate = beforeDetailSales?.filter((sale) => sale.nozzleNo === device.nozzle_no);
-                          
+    let beforeStartDate = beforeDetailSales?.filter(
+      (sale) => sale.nozzleNo === device.nozzle_no
+    );
 
-    if(salesForNozzle.length > 0) {
+    if (salesForNozzle.length > 0) {
       let pricePerLiter = salesForNozzle[0].salePrice;
       let openingTotalizerLiter = beforeStartDate[0].devTotalizar_liter;
       let closingTotalizerLiter = salesForNozzle[0].devTotalizar_liter;
       let differentLiter = closingTotalizerLiter - openingTotalizerLiter;
-      let saleLiter = salesForNozzle.reduce((sum, sale) => sum + sale.saleLiter, 0);
+      let saleLiter = salesForNozzle.reduce(
+        (sum, sale) => sum + sale.saleLiter,
+        0
+      );
       let saleDifferentLiter = differentLiter - saleLiter;
-      let totalPrice = salesForNozzle.reduce((sum, sale) => sum + sale.totalPrice, 0);
-      let priceDifferent = (differentLiter * pricePerLiter) - totalPrice;
-
+      let totalPrice = salesForNozzle.reduce(
+        (sum, sale) => sum + sale.totalPrice,
+        0
+      );
+      let priceDifferent = differentLiter * pricePerLiter - totalPrice;
 
       let calculated = {
         nozzleNo: device.nozzle_no,
         fuelType: device.fuel_type,
-        pricePerLiter, 
+        pricePerLiter,
         openingTotalizerLiter,
         closingTotalizerLiter,
         differentLiter,
         saleLiter,
         saleDifferentLiter,
         totalPrice,
-        priceDifferent
-      }
+        priceDifferent,
+      };
 
-      return calculated
+      return calculated;
     } else {
       return {
         nozzleNo: device.nozzle_no,
         fuelType: device.fuel_type,
-        pricePerLiter: 0, 
+        pricePerLiter: 0,
         openingTotalizerLiter: 0,
         closingTotalizerLiter: 0,
         differentLiter: 0,
         saleLiter: 0,
         saleDifferentLiter: 0,
         totalPrice: 0,
-        priceDifferent: 0
+        priceDifferent: 0,
       };
-    }  
-  })
+    }
+  });
 
   return result;
 };
