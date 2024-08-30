@@ -428,7 +428,7 @@ export const detailSaleUpdateError = async (
   }
 };
 
-export const detailSaleUpdateByDevice = async (topic: string, message) => {
+export const detailSaleUpdateByDevice = async (topic: string, message, lane) => {
   try {
     const regex = /[A-Z]/g;
     let data: any[] = message.split(regex);
@@ -436,7 +436,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     let totalPrice = deviceLiveData.get(data[0])?.[1];
 
     if (data[1] == "" && data[2] == "" && data[3] == "") {
-      await zeroDetailSaleUpdateByDevice(topic, message);
+      await zeroDetailSaleUpdateByDevice(topic, message, lane);
       return;
     }
 
@@ -450,7 +450,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
     ========== start ==========
     Function: detailSaleUpdateByDevice (Final)
     From: MQTT Lane
-    Topic: ${topic}
+    Topic: ${lane}
     Message: ${message}
     ========== ended ==========
     `,
@@ -785,7 +785,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message) => {
   }
 };
 
-export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
+export const zeroDetailSaleUpdateByDevice = async (topic: string, message, lane) => {
   try {
     const regex = /[A-Z]/g;
     let data: any[] = message.split(regex);
@@ -798,7 +798,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message) => {
     ========== start ==========
     Function: zeroDetailSaleUpdateByDevice (Reload)
     From: MQTT Lane
-    Topic: ${topic}
+    Topic: ${lane}
     Message: ${message}
     ========== ended ==========
     `,
