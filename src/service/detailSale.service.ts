@@ -445,7 +445,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message, lane) => 
       // isCancel: 0,
     };
 
-    logger.info(
+    logger.warn(
       `
     ========== start ==========
     Function: detailSaleUpdateByDevice (Final)
