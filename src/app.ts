@@ -80,14 +80,16 @@ client.on("message", async (topic, message) => {
   if (data[2] == "Reload") {
     // console.log(topic, message);
     // liveDataChangeHandler(message.toString());
-    zeroDetailSaleUpdateByDevice(data[3], message.toString());
+    const lane = topic;
+    zeroDetailSaleUpdateByDevice(data[3], message.toString(), lane);
     // detailSaleUpdateByDevice(data[3], message.toString());
   }
 
   if (data[2] == "Final") {
     // console.log("final is here");
-    // when final topic come
-    detailSaleUpdateByDevice(data[3], message.toString()); // add final data to detail sale vocono
+    // when final topic come]
+    const lane = topic;
+    detailSaleUpdateByDevice(data[3], message.toString(), lane); // add final data to detail sale vocono
   }
 
   if (data[2] == "livedata") {
