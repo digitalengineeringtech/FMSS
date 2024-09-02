@@ -44,10 +44,10 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
-app.use(cors({ origin: "*" }));
-app.use(requestLogger);
-app.use(dbLogger);
-app.use(errorLogger);
+app.use(cors({ origin: ['*', 'http://localhost:5173'] , credentials: true }));
+// app.use(requestLogger);
+// app.use(dbLogger);
+// app.use(errorLogger);
 
 const server = require("http").createServer(app);
 
@@ -56,7 +56,7 @@ client.on("connect", connect);
 client.on("message", async (topic, message) => {
   let data = topic.split("/"); // data spliting from mqtt
 
-  console.log(data, message.toString());
+  // console.log(data, message.toString());
 
   // logger.warn(`
   // ========== start ==========

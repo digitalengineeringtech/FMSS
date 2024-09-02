@@ -1,6 +1,6 @@
 import { FilterQuery, UpdateQuery } from "mongoose";
 import userModel, { UserInput, UserDocument } from "../model/user.model";
-import { compass, createToken, set } from "../utils/helper";
+import { compass, createToken, set, createRefreshToken } from '../utils/helper';
 import { permitDocument } from "../model/permit.model";
 import config from "config";
 
@@ -43,6 +43,7 @@ export const loginUser = async ({
 
   let userObj: Partial<UserDocument> = user.toObject();
   userObj["token"] = createToken(userObj);
+  userObj["refreshToken"] = createRefreshToken(userObj);
   userObj["hasAtg"] = hasAtg;
   
   delete userObj.password;

@@ -14,6 +14,7 @@ export interface UserInput {
   stationNo: number;
   cardId: string;
   tankCount: number;
+  refreshToken?: string;
 }
 
 export interface UserDocument extends UserInput, mongoose.Document {

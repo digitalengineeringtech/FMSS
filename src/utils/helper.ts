@@ -16,14 +16,14 @@ const salt = bcrypt.genSaltSync(saltWorkFactor);
 
 //password checking and converting
 export const encode = (payload: string) => bcrypt.hashSync(payload, salt);
-export const compass = (payload: string, dbPass: string) =>
-  bcrypt.compareSync(payload, dbPass);
-
+// compare dbPass
+export const compass = (payload: string, dbPass: string) => bcrypt.compareSync(payload, dbPass);
 //tokenization
-export const createToken = (payload: {}) =>
-  jwt.sign(payload, secretKey, { expiresIn: "24h" });
-export const checkToken = (payload: string): any =>
-  jwt.verify(payload, secretKey);
+export const createToken = (payload: {}) => jwt.sign(payload, secretKey, { expiresIn: "24h" });
+// refresh token 
+export const createRefreshToken = (payload: {}) => jwt.sign(payload, secretKey, { expiresIn: "7d" });
+// check token 
+export const checkToken = (payload: string): any => jwt.verify(payload, secretKey);
 
 //get prev date
 export let previous = (date = new Date()) => {

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-import fMsg, { get } from "../utils/helper";
+import fMsg, { createRefreshToken, get } from "../utils/helper";
 import { getPermit } from "../service/permit.service";
 import { getRole } from "../service/role.service";
 import {
@@ -42,6 +42,12 @@ export const loginUserHandler = async (
     if (mode == "dead") throw new Error("Your are out of service");
 
     let result = await loginUser(req.body);
+
+    res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    })
+    
     fMsg(res, "logined users", result);
   } catch (e) {
     next(e);
