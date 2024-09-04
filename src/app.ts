@@ -39,12 +39,16 @@ import {
 import stationRoute from "./router/station.routes";
 import logger from "./utils/logger";
 import moment from "moment";
+import corsOptions from './utils/corsOptions';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
-app.use(cors({ origin: ['*', 'http://localhost:5173'] , credentials: true }));
+app.use(cookieParser());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); 
 // app.use(requestLogger);
 // app.use(dbLogger);
 // app.use(errorLogger);

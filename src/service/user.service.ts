@@ -1,6 +1,6 @@
 import { FilterQuery, UpdateQuery } from "mongoose";
 import userModel, { UserInput, UserDocument } from "../model/user.model";
-import { compass, createToken, set, createRefreshToken } from '../utils/helper';
+import { compass, createToken, set, createRefreshToken, checkToken } from '../utils/helper';
 import { permitDocument } from "../model/permit.model";
 import config from "config";
 
@@ -53,6 +53,45 @@ export const loginUser = async ({
   set('tankCount', userObj.tankCount);
   return userObj;
 };
+
+export const refreshToken = async (refreshToken) => {
+    try {
+        const decoded = checkToken(refreshToken);
+        const email = decoded.email;
+
+        let user = await userModel
+                    .findOne({ email })
+                    .populate("roles permits")
+                    .select("-__v");
+
+        if(!user) {
+          throw new Error('Not valid cookies');
+        } 
+
+        const tankDataUrl = config.get<string>("tankDataUrl");
+
+        let hasAtg: boolean;
+
+        if (tankDataUrl != '') {
+          hasAtg = true;
+        } else {
+          hasAtg = false;
+        }
+
+        let userObj: Partial<UserDocument> = user.toObject();
+        userObj["token"] = createToken(userObj);
+        userObj["hasAtg"] = hasAtg;
+
+        delete userObj.password;
+        set(user._id, userObj);
+        set("stationNo", userObj.stationNo);
+        set("stationId", userObj.stationId);
+        set('tankCount', userObj.tankCount);
+        return userObj;
+    } catch(e) {
+       throw new Error(e);
+    }
+}
 
 export const cardAuth = async (cardId: string): Promise<{ token: string }> => {
   let user = await userModel.findOne({ cardId });

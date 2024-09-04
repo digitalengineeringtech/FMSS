@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-import fMsg, { createRefreshToken, get } from "../utils/helper";
+import fMsg, { get } from "../utils/helper";
 import { getPermit } from "../service/permit.service";
 import { getRole } from "../service/role.service";
 import {
@@ -8,6 +8,7 @@ import {
   deleteUser,
   getUser,
   loginUser,
+  refreshToken,
   registerUser,
   updateUser,
   userAddPermit,
@@ -47,12 +48,31 @@ export const loginUserHandler = async (
         httpOnly: true,
         maxAge: 7 * 24 * 60 * 60 * 1000
     })
+
+    delete result.refreshToken;
     
     fMsg(res, "logined users", result);
   } catch (e) {
     next(e);
   }
 };
+
+export const refreshTokenHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let mode = await get("mode");
+    if (mode == "dead") throw new Error("Your are out of service");
+
+    let result = await refreshToken(req.cookies.refreshToken);
+
+    fMsg(res, 'Token refresh success', result);
+  } catch (e) {
+    next(e);
+  }
+}
 
 export const cardAuthHandler = async (
   req: Request,
