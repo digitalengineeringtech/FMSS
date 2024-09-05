@@ -654,12 +654,37 @@ export const detailSaleUpdateByDevice = async (topic: string, message, lane) => 
       // check if tank data exists
       try {
         if (tankData.length == 0) {
+          logger.warn(
+            `
+          ========== start ==========
+          Function: Add Tank Data
+          From: Final Detail Sale
+          tankData: ${tankData.length} 
+          stationDetailId: ${result.stationDetailId}
+          vocono: ${lastData[0].vocono}
+          nozzleNo: ${lastData[0].nozzleNo}
+          ========== ended ==========
+          `,
+            { file: "tankdata.log" }
+          );
           await addTankData({
             stationDetailId: result.stationDetailId,
             vocono: lastData[0].vocono,
             nozzleNo: lastData[0].nozzleNo,
           });
         } else {
+          logger.warn(
+            `
+          ========== start ==========
+          Function: Update Tank Data
+          From: Final Detail Sale
+          tankData: ${tankData.length} 
+          stationDetailId: ${result.stationDetailId}
+          vocono: ${lastData[0].vocono}
+          ========== ended ==========
+          `,
+            { file: "tankdata.log" }
+          );
           await updateExistingTankData({
             id: tankData[0]._id,
             vocono: lastData[0].vocono,
