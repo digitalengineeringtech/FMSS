@@ -26,7 +26,7 @@ export interface detailSaleDocument extends mongoose.Document {
   isError: string;
   preset: string;
   device: string;
-  isCancel: number;
+  isReload: number;
   createAt: Date;
 }
 
@@ -75,7 +75,7 @@ const detailSaleSchema = new Schema({
   // A = final completed process
   // R = reload error
   // "E" = Error cash update
-  isCancel: { type: Number, default: 0 },
+  isReload: { type: Number, default: 0 },
   preset: { type: String, default: null },
   device: { type: String, required: true },
   createAt: { type: Date, default: Date.now },

@@ -219,27 +219,6 @@ export const preSetDetailSale = async (
   return result;
 };
 
-export const cancelDetailSale = async (message) => {
-  let data: any[] = [message.slice(0, 2), message.slice(2).trim()];
-
-  const query = {
-    nozzleNo: data[0],
-    preset: { $ne: null },
-    dailyReportDate: moment().tz("Asia/Yangon").format("YYYY-MM-DD"),
-  };
-
-  if (data[1] == "cancel") {
-    const lastDetailSale = await detailSaleModel
-      .findOne(query)
-      .sort({ _id: -1, createAt: -1 });
-
-    if (lastDetailSale) {
-      lastDetailSale.isCancel = 1;
-      await lastDetailSale.save();
-    }
-  }
-};
-
 export const addDetailSale = async (
   depNo: string,
   nozzleNo: string,
@@ -946,6 +925,7 @@ export const zeroDetailSaleUpdateByDevice = async (
         devTotalizar_amount: data[4] * prevSalePrice,
         tankNo: tankNo,
         tankBalance: volume || 0,
+        isReload: 1,
         isError: "A",
       };
 
@@ -1148,6 +1128,7 @@ export const zeroDetailSaleUpdateByDevice = async (
         devTotalizar_amount: data[4] * data[1],
         tankNo: tankNo,
         tankBalance: volume || 0,
+        isReload: 1,
         isError: "A",
       };
       await detailSaleModel.findByIdAndUpdate(lastData[1]._id, updateBody);
