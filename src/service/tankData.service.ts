@@ -3,6 +3,7 @@ import tankDataModel, { tankDataDocument } from "../model/tankData.model";
 import config from "config";
 import axios from "axios";
 import moment from "moment-timezone";
+import logger from "../utils/logger";
 
 export const getTankData = async (query: FilterQuery<tankDataDocument>) => {
   try {
@@ -31,6 +32,19 @@ export const addTankData = async (body) => {
     //   tankRealTimeData,
     //   ".........this is tank realtime data................"
     // );
+
+    logger.warn(
+      `
+    ========== start ==========
+    Function: Add Tank Data
+    From: Final Detail Sale
+    url: ${url} 
+    realTimeData: ${JSON.stringify(tankRealTimeData.data.data)}
+    body: ${JSON.stringify(body)}
+    ========== ended ==========
+    `,
+      { file: "tankdata.log" }
+    );
 
     let saveData = {
       ...body,
@@ -70,6 +84,19 @@ export const updateExistingTankData = async (body) => {
  
   let url = config.get<string>("tankDataUrl");
   let tankRealTimeData = await axios.post(url);
+
+  logger.warn(
+    `
+  ========== start ==========
+  Function: Update Tank Data
+  From: Final Detail Sale
+  url: ${url} 
+  realTimeData: ${JSON.stringify(tankRealTimeData.data.data)}
+  body: ${JSON.stringify(body)}
+  ========== ended ==========
+  `,
+    { file: "tankdata.log" }
+  );
 
   const updateData = {
      ...body,
