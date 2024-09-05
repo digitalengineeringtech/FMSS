@@ -141,10 +141,10 @@ export const preSetDetailSale = async (
 
   let result = await new detailSaleModel(body).save();
 
-  // if (lastDocument?.devTotalizar_liter === 0) {
-  //   mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
-  //   return;
-  // }
+  if (lastDocument?.devTotalizar_liter === 0) {
+    mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
+    return;
+  }
 
   // let checkRpDate = await getDailyReport({
   //   stationId: result.stationDetailId,
@@ -299,12 +299,10 @@ export const addDetailSale = async (
 
     let result = await new detailSaleModel(body).save();
 
-    // if (
-    //   lastDocument?.devTotalizar_liter === 0
-    // ) {
-    //   mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
-    //   return;
-    // }
+    if (lastDocument?.devTotalizar_liter === 0) {
+      mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
+      return;
+    }
 
     let checkRpDate = await getDailyReport({
       stationId: result.stationDetailId,
@@ -426,7 +424,11 @@ export const detailSaleUpdateError = async (
   }
 };
 
-export const detailSaleUpdateByDevice = async (topic: string, message, lane) => {
+export const detailSaleUpdateByDevice = async (
+  topic: string,
+  message,
+  lane
+) => {
   try {
     const regex = /[A-Z]/g;
     let data: any[] = message.split(regex);
@@ -439,7 +441,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message, lane) => 
     // }
 
     let query = {
-      nozzleNo: data[0]
+      nozzleNo: data[0],
     };
 
     logger.warn(
@@ -807,7 +809,11 @@ export const detailSaleUpdateByDevice = async (topic: string, message, lane) => 
   }
 };
 
-export const zeroDetailSaleUpdateByDevice = async (topic: string, message, lane) => {
+export const zeroDetailSaleUpdateByDevice = async (
+  topic: string,
+  message,
+  lane
+) => {
   try {
     const regex = /[A-Z]/g;
     let data: any[] = message.split(regex);
