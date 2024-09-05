@@ -5,7 +5,7 @@ import config from "config";
 import { UserDocument } from "../model/user.model";
 import moment from "moment-timezone";
 import { get, mqttEmitter, presetFormat, previous, set } from "../utils/helper";
-import axios, { isCancel } from "axios";
+import axios from "axios";
 import {
   addTankData,
   getTankData,
@@ -136,13 +136,12 @@ export const preSetDetailSale = async (
     totalizer_liter: lastDocument?.totalizer_liter,
     totalizer_amount: lastDocument?.totalizer_amount,
     preset: `${preset} ${type}`,
-    isCancel: 0,
     createAt: iso,
   };
 
   let result = await new detailSaleModel(body).save();
 
-  if (lastDocument?.devTotalizar_liter === 0 && lastDocument?.isCancel === 0) {
+  if (lastDocument?.devTotalizar_liter === 0) {
     mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
     return;
   }
@@ -281,7 +280,7 @@ export const addDetailSale = async (
     }
 
     const lastDocument = await detailSaleModel
-      .findOne({ nozzleNo: body.nozzleNo, isCancel: 0 })
+      .findOne({ nozzleNo: body.nozzleNo })
       .sort({ _id: -1, createAt: -1 });
 
     body = {
@@ -300,10 +299,7 @@ export const addDetailSale = async (
 
     let result = await new detailSaleModel(body).save();
 
-    if (
-      lastDocument?.devTotalizar_liter === 0 &&
-      lastDocument?.isCancel === 0
-    ) {
+    if (lastDocument?.devTotalizar_liter === 0) {
       mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
       return;
     }
@@ -441,8 +437,7 @@ export const detailSaleUpdateByDevice = async (topic: string, message, lane) => 
     }
 
     let query = {
-      nozzleNo: data[0],
-      // isCancel: 0,
+      nozzleNo: data[0]
     };
 
     logger.warn(
@@ -834,7 +829,6 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message, lane)
       let query = {
         nozzleNo: data[0],
         // devTotalizar_liter: { $ne: 0 },
-        isCancel: 0,
       };
       const lastData: any[] = await detailSaleModel
         .find(query)
@@ -845,7 +839,6 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message, lane)
       const noZeroLastData: any = await detailSaleModel
         .findOne({
           nozzleNo: data[0],
-          isCancel: 0,
           devTotalizar_liter: { $ne: 0 },
         })
         .sort({ _id: -1, createdAt: -1 })
@@ -1068,7 +1061,6 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message, lane)
       let query = {
         nozzleNo: data[0],
         devTotalizar_liter: 0,
-        isCancel: 0,
       };
       const lastData: any[] = await detailSaleModel
         .find(query)
