@@ -3,6 +3,7 @@ import tankDataModel, { tankDataDocument } from "../model/tankData.model";
 import config from "config";
 import axios from "axios";
 import moment from "moment-timezone";
+import logger from "../utils/logger";
 
 export const getTankData = async (query: FilterQuery<tankDataDocument>) => {
   try {
@@ -22,8 +23,6 @@ export const getTankDataCount = async () => {
 
 export const addTankData = async (body) => {
   try {
-    
-
     let url = config.get<string>("tankDataUrl");
     let tankRealTimeData = await axios.post(url);
 
@@ -31,6 +30,19 @@ export const addTankData = async (body) => {
     //   tankRealTimeData,
     //   ".........this is tank realtime data................"
     // );
+
+    logger.warn(
+      `
+    ========== start ==========
+    Function: Add Tank Data
+    From: Final Detail Sale
+    url: ${url} 
+    realTimeData: ${JSON.stringify(tankRealTimeData.data.data)}
+    body: ${JSON.stringify(body)}
+    ========== ended ==========
+    `,
+      { file: "tankdata.log" }
+    );
 
     let saveData = {
       ...body,
@@ -43,52 +55,64 @@ export const addTankData = async (body) => {
 
     let uploadData = await getTankData({
       stationDetailId: body.stationDetailId,
-      dailyReportDate: moment().format("YYYY-MM-DD"),
+      dateOfDay: moment().format("YYYY-MM-DD"),
     });
 
     if (uploadData.length == 0) return;
 
-      try {
-        let url = config.get<string>("tankDataCloudUrl");
+    try {
+      let url = config.get<string>("tankDataCloudUrl");
 
-        let response = await axios.post(url, uploadData[0]);
+      let response = await axios.post(url, uploadData[0]);
 
-        if (response.status == 200) {
-          await tankDataModel.findByIdAndUpdate(uploadData[0]._id, {
-            asyncAlready: "2",
-          });
-        }
-      } catch (e) {
-        console.log(e.message, "error from add tank data");       
-      }
+      // if (response.status == 200) {
+      //   await tankDataModel.findByIdAndUpdate(uploadData[0]._id, {
+      //     asyncAlready: "2",
+      //   });
+      // }
+    } catch (e) {
+      console.log(e.message, "error from add tank data");
+    }
   } catch (e) {
     throw new Error(e);
   }
-}
+};
 export const updateExistingTankData = async (body) => {
- try {
- 
-  let url = config.get<string>("tankDataUrl");
-  let tankRealTimeData = await axios.post(url);
-
-  const updateData = {
-     ...body,
-    //  syncAlready: "0",
-     data: tankRealTimeData.data.data,
-  }
-
-  await tankDataModel.findByIdAndUpdate(body.id, updateData);
-
-  const uploadData = await getTankData({
-    // asyncAlready: "0",
-    _id: body.id,
-  });
-
-  if (uploadData.length == 0) return;
-
   try {
+    let url = config.get<string>("tankDataUrl");
+    let tankRealTimeData = await axios.post(url);
+
+    logger.warn(
+      `
+  ========== start ==========
+  Function: Update Tank Data
+  From: Final Detail Sale
+  url: ${url} 
+  realTimeData: ${JSON.stringify(tankRealTimeData.data.data)}
+  body: ${JSON.stringify(body)}
+  ========== ended ==========
+  `,
+      { file: "tankdata.log" }
+    );
+
+    const updateData = {
+      ...body,
+      //  syncAlready: "0",
+      data: tankRealTimeData.data.data,
+    };
+
+    await tankDataModel.findByIdAndUpdate(body.id, updateData);
+
+    const uploadData = await getTankData({
+      // asyncAlready: "0",
+      _id: body.id,
+    });
+
+    if (uploadData.length == 0) return;
+
+    try {
       let url = config.get<string>("tankDataCloudUrl");
-  
+
       await axios.post(url, uploadData[0]);
     } catch (e) {
       console.log(e.response, "from add tank data");
@@ -96,7 +120,7 @@ export const updateExistingTankData = async (body) => {
   } catch (error) {
     throw new Error(error);
   }
-}
+};
 
 export const updateTankData = async (
   query: FilterQuery<tankDataDocument>,

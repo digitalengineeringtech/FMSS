@@ -11,7 +11,6 @@ import deviceRoute from "./router/device.routes";
 import dailyReportRoute from "./router/dailyReport.routes";
 import { liveDataChangeHandler } from "./connection/liveTimeData";
 import {
-  cancelDetailSale,
   detailSaleUpdateByDevice,
   zeroDetailSaleUpdateByDevice,
 } from "./service/detailSale.service";
@@ -76,11 +75,7 @@ client.on("message", async (topic, message) => {
     // when active topic come
     // blinkLed(Number(data[3]));                                      // for blink led
   }
-
-  if (data[2] == "req") {
-    cancelDetailSale(message.toString());
-  }
-
+  
   if (data[2] == "Reload") {
     // console.log(topic, message);
     // liveDataChangeHandler(message.toString());

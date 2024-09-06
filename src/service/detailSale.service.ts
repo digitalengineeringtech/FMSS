@@ -5,7 +5,7 @@ import config from "config";
 import { UserDocument } from "../model/user.model";
 import moment from "moment-timezone";
 import { get, mqttEmitter, presetFormat, previous, set } from "../utils/helper";
-import axios, { isCancel } from "axios";
+import axios from "axios";
 import {
   addTankData,
   getTankData,
@@ -136,16 +136,15 @@ export const preSetDetailSale = async (
     totalizer_liter: lastDocument?.totalizer_liter,
     totalizer_amount: lastDocument?.totalizer_amount,
     preset: `${preset} ${type}`,
-    isCancel: 0,
     createAt: iso,
   };
 
   let result = await new detailSaleModel(body).save();
 
-  // if (lastDocument?.devTotalizar_liter === 0 && lastDocument?.isCancel === 0) {
-  //   mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
-  //   return;
-  // }
+  if (lastDocument?.devTotalizar_liter === 0) {
+    mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
+    return;
+  }
 
   // let checkRpDate = await getDailyReport({
   //   stationId: result.stationDetailId,
@@ -220,27 +219,6 @@ export const preSetDetailSale = async (
   return result;
 };
 
-export const cancelDetailSale = async (message) => {
-  let data: any[] = [message.slice(0, 2), message.slice(2).trim()];
-
-  const query = {
-    nozzleNo: data[0],
-    preset: { $ne: null },
-    dailyReportDate: moment().tz("Asia/Yangon").format("YYYY-MM-DD"),
-  };
-
-  if (data[1] == "cancel") {
-    const lastDetailSale = await detailSaleModel
-      .findOne(query)
-      .sort({ _id: -1, createAt: -1 });
-
-    if (lastDetailSale) {
-      lastDetailSale.isCancel = 1;
-      await lastDetailSale.save();
-    }
-  }
-};
-
 export const addDetailSale = async (
   depNo: string,
   nozzleNo: string,
@@ -281,7 +259,7 @@ export const addDetailSale = async (
     }
 
     const lastDocument = await detailSaleModel
-      .findOne({ nozzleNo: body.nozzleNo, isCancel: 0 })
+      .findOne({ nozzleNo: body.nozzleNo })
       .sort({ _id: -1, createAt: -1 });
 
     body = {
@@ -300,13 +278,10 @@ export const addDetailSale = async (
 
     let result = await new detailSaleModel(body).save();
 
-    // if (
-    //   lastDocument?.devTotalizar_liter === 0 &&
-    //   lastDocument?.isCancel === 0
-    // ) {
-    //   mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
-    //   return;
-    // }
+    if (lastDocument?.devTotalizar_liter === 0) {
+      mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
+      return;
+    }
 
     let checkRpDate = await getDailyReport({
       stationId: result.stationDetailId,
@@ -428,7 +403,11 @@ export const detailSaleUpdateError = async (
   }
 };
 
-export const detailSaleUpdateByDevice = async (topic: string, message, lane) => {
+export const detailSaleUpdateByDevice = async (
+  topic: string,
+  message,
+  lane
+) => {
   try {
     const regex = /[A-Z]/g;
     let data: any[] = message.split(regex);
@@ -442,7 +421,6 @@ export const detailSaleUpdateByDevice = async (topic: string, message, lane) => 
 
     let query = {
       nozzleNo: data[0],
-      // isCancel: 0,
     };
 
     logger.warn(
@@ -654,12 +632,37 @@ export const detailSaleUpdateByDevice = async (topic: string, message, lane) => 
       // check if tank data exists
       try {
         if (tankData.length == 0) {
+          logger.warn(
+            `
+          ========== start ==========
+          Function: Add Tank Data
+          From: Final Detail Sale
+          tankData: ${tankData.length} 
+          stationDetailId: ${result.stationDetailId}
+          vocono: ${lastData[0].vocono}
+          nozzleNo: ${lastData[0].nozzleNo}
+          ========== ended ==========
+          `,
+            { file: "tankdata.log" }
+          );
           await addTankData({
             stationDetailId: result.stationDetailId,
             vocono: lastData[0].vocono,
             nozzleNo: lastData[0].nozzleNo,
           });
         } else {
+          logger.warn(
+            `
+          ========== start ==========
+          Function: Update Tank Data
+          From: Final Detail Sale
+          tankData: ${tankData.length} 
+          stationDetailId: ${result.stationDetailId}
+          vocono: ${lastData[0].vocono}
+          ========== ended ==========
+          `,
+            { file: "tankdata.log" }
+          );
           await updateExistingTankData({
             id: tankData[0]._id,
             vocono: lastData[0].vocono,
@@ -785,7 +788,11 @@ export const detailSaleUpdateByDevice = async (topic: string, message, lane) => 
   }
 };
 
-export const zeroDetailSaleUpdateByDevice = async (topic: string, message, lane) => {
+export const zeroDetailSaleUpdateByDevice = async (
+  topic: string,
+  message,
+  lane
+) => {
   try {
     const regex = /[A-Z]/g;
     let data: any[] = message.split(regex);
@@ -809,7 +816,6 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message, lane)
       let query = {
         nozzleNo: data[0],
         // devTotalizar_liter: { $ne: 0 },
-        isCancel: 0,
       };
       const lastData: any[] = await detailSaleModel
         .find(query)
@@ -820,7 +826,6 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message, lane)
       const noZeroLastData: any = await detailSaleModel
         .findOne({
           nozzleNo: data[0],
-          isCancel: 0,
           devTotalizar_liter: { $ne: 0 },
         })
         .sort({ _id: -1, createdAt: -1 })
@@ -920,6 +925,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message, lane)
         devTotalizar_amount: data[4] * prevSalePrice,
         tankNo: tankNo,
         tankBalance: volume || 0,
+        isReload: 1,
         isError: "A",
       };
 
@@ -1043,7 +1049,6 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message, lane)
       let query = {
         nozzleNo: data[0],
         devTotalizar_liter: 0,
-        isCancel: 0,
       };
       const lastData: any[] = await detailSaleModel
         .find(query)
@@ -1123,6 +1128,7 @@ export const zeroDetailSaleUpdateByDevice = async (topic: string, message, lane)
         devTotalizar_amount: data[4] * data[1],
         tankNo: tankNo,
         tankBalance: volume || 0,
+        isReload: 1,
         isError: "A",
       };
       await detailSaleModel.findByIdAndUpdate(lastData[1]._id, updateBody);
