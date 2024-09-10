@@ -74,6 +74,20 @@ export const refreshTokenHandler = async (
   }
 }
 
+export const logoutUserHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+    try {
+      res.cookie('refreshToken', '', { maxAge: 0} );
+
+      fMsg(res, 'Logout successfully');
+    } catch (error) {
+        next(error);
+    }
+}
+
 export const cardAuthHandler = async (
   req: Request,
   res: Response,

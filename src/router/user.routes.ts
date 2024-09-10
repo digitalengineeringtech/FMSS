@@ -14,6 +14,7 @@ import {
   getUserByAdminHandler,
   getUserHandler,
   loginUserHandler,
+  logoutUserHandler,
   refreshTokenHandler,
   registerUserHandler,
   updateUserHandler,
@@ -37,8 +38,12 @@ userRoute.post("/register", validateAll(createUserSchema), registerUserHandler);
 //login user
 userRoute.post("/login", validateAll(loginUserSchema), loginUserHandler);
 
+// logout user
+userRoute.post('/logout', logoutUserHandler);
+
 // refresh token
 userRoute.get('/refresh-token', refreshTokenHandler);
+
 
 userRoute.post("/cardAuth", validateAll(cardIdSchema), cardAuthHandler);
 
