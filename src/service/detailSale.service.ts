@@ -141,10 +141,10 @@ export const preSetDetailSale = async (
 
   let result = await new detailSaleModel(body).save();
 
-  if (lastDocument?.devTotalizar_liter === 0) {
-    mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
-    return;
-  }
+  // if (lastDocument?.devTotalizar_liter === 0) {
+  //   mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
+  //   return;
+  // }
 
   // let checkRpDate = await getDailyReport({
   //   stationId: result.stationDetailId,
@@ -278,10 +278,10 @@ export const addDetailSale = async (
 
     let result = await new detailSaleModel(body).save();
 
-    if (lastDocument?.devTotalizar_liter === 0) {
-      mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
-      return;
-    }
+    // if (lastDocument?.devTotalizar_liter === 0) {
+    //   mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
+    //   return;
+    // }
 
     let checkRpDate = await getDailyReport({
       stationId: result.stationDetailId,
@@ -665,7 +665,6 @@ export const detailSaleUpdateByDevice = async (
           );
           await updateExistingTankData({
             id: tankData[0]._id,
-            vocono: lastData[0].vocono,
             stationDetailId: result.stationDetailId,
           });
         }
