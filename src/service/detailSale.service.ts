@@ -443,7 +443,7 @@ export const detailSaleUpdateByDevice = async (
       .lean();
 
     // console.log(lastData, "this is last data", data[0]);
-    if (!lastData[0] || !lastData[1] || lastData[0].asyncAlready == '2') {
+    if (!lastData[0] || !lastData[1] || lastData[0].asyncAlready == '1' || lastData[0].asyncAlready == '2') {
       return;
     }
 
