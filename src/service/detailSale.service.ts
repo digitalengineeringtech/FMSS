@@ -421,6 +421,7 @@ export const detailSaleUpdateByDevice = async (
 
     let query = {
       nozzleNo: data[0],
+      // asyncAlready: { $ne: "2" }
     };
 
     logger.warn(
@@ -442,7 +443,7 @@ export const detailSaleUpdateByDevice = async (
       .lean();
 
     // console.log(lastData, "this is last data", data[0]);
-    if (!lastData[0] || !lastData[1]) {
+    if (!lastData[0] || !lastData[1] || lastData[0].asyncAlready == '2') {
       return;
     }
 
