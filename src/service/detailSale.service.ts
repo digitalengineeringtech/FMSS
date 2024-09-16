@@ -424,17 +424,17 @@ export const detailSaleUpdateByDevice = async (
       // asyncAlready: { $ne: "2" }
     };
 
-    logger.warn(
-      `
-    ========== start ==========
-    Function: detailSaleUpdateByDevice (Final)
-    From: MQTT Lane
-    Topic: ${lane}
-    Message: ${message}
-    ========== ended ==========
-    `,
-      { file: "detailsale.log" }
-    );
+    // logger.warn(
+    //   `
+    // ========== start ==========
+    // Function: detailSaleUpdateByDevice (Final)
+    // From: MQTT Lane
+    // Topic: ${lane}
+    // Message: ${message}
+    // ========== ended ==========
+    // `,
+    //   { file: "detailsale.log" }
+    // );
 
     const lastData: any[] = await detailSaleModel
       .find(query)
@@ -633,37 +633,37 @@ export const detailSaleUpdateByDevice = async (
       // check if tank data exists
       try {
         if (tankData.length == 0) {
-          logger.warn(
-            `
-          ========== start ==========
-          Function: Add Tank Data
-          From: Final Detail Sale
-          tankData: ${tankData.length} 
-          stationDetailId: ${result.stationDetailId}
-          vocono: ${lastData[0].vocono}
-          nozzleNo: ${lastData[0].nozzleNo}
-          ========== ended ==========
-          `,
-            { file: "tankdata.log" }
-          );
+          // logger.warn(
+          //   `
+          // ========== start ==========
+          // Function: Add Tank Data
+          // From: Final Detail Sale
+          // tankData: ${tankData.length} 
+          // stationDetailId: ${result.stationDetailId}
+          // vocono: ${lastData[0].vocono}
+          // nozzleNo: ${lastData[0].nozzleNo}
+          // ========== ended ==========
+          // `,
+          //   { file: "tankdata.log" }
+          // );
           await addTankData({
             stationDetailId: result.stationDetailId,
             vocono: lastData[0].vocono,
             nozzleNo: lastData[0].nozzleNo,
           });
         } else {
-          logger.warn(
-            `
-          ========== start ==========
-          Function: Update Tank Data
-          From: Final Detail Sale
-          tankData: ${tankData.length} 
-          stationDetailId: ${result.stationDetailId}
-          vocono: ${lastData[0].vocono}
-          ========== ended ==========
-          `,
-            { file: "tankdata.log" }
-          );
+          // logger.warn(
+          //   `
+          // ========== start ==========
+          // Function: Update Tank Data
+          // From: Final Detail Sale
+          // tankData: ${tankData.length} 
+          // stationDetailId: ${result.stationDetailId}
+          // vocono: ${lastData[0].vocono}
+          // ========== ended ==========
+          // `,
+          //   { file: "tankdata.log" }
+          // );
           await updateExistingTankData({
             id: tankData[0]._id,
             stationDetailId: result.stationDetailId,
@@ -800,17 +800,17 @@ export const zeroDetailSaleUpdateByDevice = async (
     let totalPrice = deviceLiveData.get(data[0])?.[1];
     let depNo = topic;
 
-    logger.warn(
-      `
-    ========== start ==========
-    Function: zeroDetailSaleUpdateByDevice (Reload)
-    From: MQTT Lane
-    Topic: ${lane}
-    Message: ${message}
-    ========== ended ==========
-    `,
-      { file: "detailsale.log" }
-    );
+    // logger.warn(
+    //   `
+    // ========== start ==========
+    // Function: zeroDetailSaleUpdateByDevice (Reload)
+    // From: MQTT Lane
+    // Topic: ${lane}
+    // Message: ${message}
+    // ========== ended ==========
+    // `,
+    //   { file: "detailsale.log" }
+    // );
 
     if (data[1] == "" && data[2] == "" && data[3] == "") {
       let query = {
