@@ -650,7 +650,7 @@ export const detailSaleUpdateByDevice = async (
             stationDetailId: result.stationDetailId,
             vocono: lastData[0].vocono,
             nozzleNo: lastData[0].nozzleNo,
-            dateOfDate: moment().tz("Asia/Yangon").format("YYYY-MM-DD"),
+            dateOfDate: lastData[0].dailyReportDate,
           });
         } else {
           logger.warn(
@@ -670,7 +670,7 @@ export const detailSaleUpdateByDevice = async (
             vocono: lastData[0].vocono,
             nozzleNo: lastData[0].nozzleNo,
             stationDetailId: result.stationDetailId,
-            dateOfDay:  moment().tz("Asia/Yangon").format("YYYY-MM-DD"),
+            dateOfDay:  lastData[0].dailyReportDate,
           });
         }
       } catch (error) {
