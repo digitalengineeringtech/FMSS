@@ -627,7 +627,7 @@ export const detailSaleUpdateByDevice = async (
     if (tankUrl != "") {
       const tankData = await getTankData({
         stationDetailId: result.stationDetailId,
-        dateOfDay: moment().format("YYYY-MM-DD"),
+        dateOfDay:  moment().tz("Asia/Yangon").format("YYYY-MM-DD"),
       });
 
       // check if tank data exists
@@ -666,6 +666,7 @@ export const detailSaleUpdateByDevice = async (
           );
           await updateExistingTankData({
             id: tankData[0]._id,
+            vocono: lastData[0].vocono,
             stationDetailId: result.stationDetailId,
           });
         }
