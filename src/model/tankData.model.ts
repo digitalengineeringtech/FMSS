@@ -44,8 +44,9 @@ const tankDataSchema = new Schema({
   data: { type: Array, default: [] },
   dateOfDay: {
     type: String,
-    default: new Date().toLocaleDateString(`fr-CA`),
+    default: Date.now,
   },
+  createAt: { type: Date, default: Date.now },
 });
 
 const tankDataModel = mongoose.model<tankDataDocument>(
