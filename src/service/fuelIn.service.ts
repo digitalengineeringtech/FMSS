@@ -161,13 +161,13 @@ export const addAtgFuelIn = async (body: any) => {
 
     let fuel_type;
 
-    if (oilType === "Petrol 92") {
+    if (oilType == "Petrol 92") {
       fuel_type = "001-Octane Ron(92)";
-    } else if (oilType === "95 Octane") {
+    } else if (oilType == "95 Octane") {
       fuel_type = "002-Octane Ron(95)";
-    } else if (oilType === "HSD") {
+    } else if (oilType == "HSD" || oilType == 'Diesel') {
       fuel_type = "004-Diesel";
-    } else if (oilType === "PHSD") {
+    } else if (oilType == "PHSD" || oilType == 'Super Diesel') {
       fuel_type = "005-Premium Diesel";
     }
 
@@ -194,6 +194,7 @@ export const addAtgFuelIn = async (body: any) => {
 };
 
 export const updateAtgFuelIn = async (body: any) => {
+  
   try {
     let tankUrl = config.get<string>("tankDataUrl");
 
@@ -217,8 +218,6 @@ export const updateAtgFuelIn = async (body: any) => {
     });
 
     const result = await fuelInModel.findById(body.id);
-
-    console.log(result, "this is result");
 
     try {
       const url = config.get<string>("atgFuelInCloud");
