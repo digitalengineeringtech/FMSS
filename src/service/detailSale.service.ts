@@ -424,18 +424,6 @@ export const detailSaleUpdateByDevice = async (
       // asyncAlready: { $ne: "2" }
     };
 
-    logger.warn(
-      `
-    ========== start ==========
-    Function: detailSaleUpdateByDevice (Final)
-    From: MQTT Lane
-    Topic: ${lane}
-    Message: ${message}
-    ========== ended ==========
-    `,
-      { file: "detailsale.log" }
-    );
-
     const lastData: any[] = await detailSaleModel
       .find(query)
       .sort({ _id: -1, createAt: -1 })
@@ -633,19 +621,7 @@ export const detailSaleUpdateByDevice = async (
       // check if tank data exists
       try {
         if (tankData.length == 0) {
-          logger.warn(
-            `
-          ========== start ==========
-          Function: Add Tank Data
-          From: Final Detail Sale
-          tankData: ${tankData.length} 
-          stationDetailId: ${result.stationDetailId}
-          vocono: ${lastData[0].vocono}
-          nozzleNo: ${lastData[0].nozzleNo}
-          ========== ended ==========
-          `,
-            { file: "tankdata.log" }
-          );
+          
           await addTankData({
             stationDetailId: result.stationDetailId,
             // vocono: lastData[0].vocono,
@@ -653,18 +629,6 @@ export const detailSaleUpdateByDevice = async (
             dateOfDay: moment(lastData[0].dailyReportDate).tz("Asia/Yangon").format("YYYY-MM-DD"),
           });
         } else {
-          logger.warn(
-            `
-          ========== start ==========
-          Function: Update Tank Data
-          From: Final Detail Sale
-          tankData: ${tankData.length} 
-          stationDetailId: ${result.stationDetailId}
-          vocono: ${lastData[0].vocono}
-          ========== ended ==========
-          `,
-            { file: "tankdata.log" }
-          );
           await updateExistingTankData({
             id: tankData[0]._id,
             vocono: lastData[0].vocono,
@@ -803,19 +767,7 @@ export const zeroDetailSaleUpdateByDevice = async (
     let saleLiter = deviceLiveData.get(data[0])?.[0];
     let totalPrice = deviceLiveData.get(data[0])?.[1];
     let depNo = topic;
-
-    logger.warn(
-      `
-    ========== start ==========
-    Function: zeroDetailSaleUpdateByDevice (Reload)
-    From: MQTT Lane
-    Topic: ${lane}
-    Message: ${message}
-    ========== ended ==========
-    `,
-      { file: "detailsale.log" }
-    );
-
+    
     if (data[1] == "" && data[2] == "" && data[3] == "") {
       let query = {
         nozzleNo: data[0],
