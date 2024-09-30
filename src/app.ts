@@ -30,11 +30,6 @@ import balanceStatementRoute from "./router/balanceStatement.routes";
 import fuelInRoute from "./router/fuelIn.routes";
 import fuelBalanceRoute from "./router/fuelBalance.routes";
 import tankDataRoute from "./router/tankData.routes";
-import {
-  requestLogger,
-  dbLogger,
-  errorLogger,
-} from "./middleware/logMiddleware";
 import stationRoute from "./router/station.routes";
 import logger from "./utils/logger";
 import moment from "moment";
@@ -44,9 +39,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use(cors({ origin: "*" }));
-app.use(requestLogger);
-app.use(dbLogger);
-app.use(errorLogger);
+
 
 const server = require("http").createServer(app);
 
