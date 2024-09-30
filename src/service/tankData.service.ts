@@ -31,18 +31,7 @@ export const addTankData = async (body) => {
     //   ".........this is tank realtime data................"
     // );
 
-    logger.warn(
-      `
-    ========== start ==========
-    Function: Add Tank Data
-    From: Final Detail Sale
-    url: ${url} 
-    realTimeData: ${JSON.stringify(tankRealTimeData.data.data)}
-    body: ${JSON.stringify(body)}
-    ========== ended ==========
-    `,
-      { file: "tankdata.log" }
-    );
+
 
     let saveData = {
       ...body,
@@ -81,20 +70,7 @@ export const updateExistingTankData = async (body) => {
   try {
     let url = config.get<string>("tankDataUrl");
     let tankRealTimeData = await axios.post(url);
-
-    logger.warn(
-      `
-  ========== start ==========
-  Function: Update Tank Data
-  From: Final Detail Sale
-  url: ${url} 
-  realTimeData: ${JSON.stringify(tankRealTimeData.data.data)}
-  body: ${JSON.stringify(body)}
-  ========== ended ==========
-  `,
-      { file: "tankdata.log" }
-    );
-
+    
     const updateData = {
       ...body,
       //  syncAlready: "0",

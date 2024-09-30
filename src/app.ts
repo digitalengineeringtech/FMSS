@@ -57,16 +57,6 @@ client.on("message", async (topic, message) => {
 
   console.log(data, message.toString());
 
-  // logger.warn(`
-  // ========== start ==========
-  // Function: zeroDetailSaleUpdateByDevice (Reload)
-  // Time: ${moment().format("YYYY-MM-DD HH:mm:ss")}
-  // From: MQTT Lane
-  // Topic: ${topic}
-  // Message: ${message}
-  // ========== ended ==========
-  // `, { file: 'detailsale.log' });
-
   if (data[2] == "active") {
     // when active topic come
     // blinkLed(Number(data[3]));                                      // for blink led
