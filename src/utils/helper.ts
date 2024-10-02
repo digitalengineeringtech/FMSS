@@ -38,10 +38,19 @@ const fMsg = (
   res: Response,
   msg: string = "all success",
   result: any = [],
-  totalCount: number | null = null
+  totalCount: number | null = null,
+  totalPrice: number | null = null,
+  totalLiter: number | null = null
 ) => {
   if (totalCount != null) {
-    res.status(200).json({ con: true, msg, result, totalCount });
+    res.status(200).json({ 
+      con: true, 
+      msg, 
+      result, 
+      totalCount,  
+      totalPrice,
+      totalLiter 
+    });
   } else {
     console.log("wk6");
     res.status(200).json({ con: true, msg, result });
