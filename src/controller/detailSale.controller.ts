@@ -16,6 +16,7 @@ import {
   detailSaleStatement,
   detailSaleSummaryDetail,
   detailSaleSummary,
+  detailSaleWithoutPagiByDate,
   // detailSaleByDate,
 } from "../service/detailSale.service";
 
@@ -27,6 +28,7 @@ import {
   getTotalBalance,
 } from "../service/balanceStatement.service";
 import deviceModel from "../model/device.model";
+
 
 export const getDetailSaleHandler = async (
   req: Request,
@@ -333,6 +335,40 @@ export const getDetailSaleDatePagiHandler = async (
     next(e);
   }
 };
+
+ export const getDetailSaleWithoutPagiHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let sDate: any = req.query.sDate;
+    let eDate: any = req.query.eDate;
+
+    delete req.query.sDate;
+    delete req.query.eDate;
+
+    let query = req.query;
+
+    if (!sDate) {
+      throw new Error("You need to provide a start date.");
+    }
+    if (!eDate) {
+      eDate = new Date();
+    }
+
+    // Ensure the start and end dates are correctly formatted
+    const startDate: Date = new Date(sDate);
+    const endDate: Date = new Date(eDate);
+
+    // Call the updated function without pagination
+    let { data, count, sumTotalPrice, sumTotalLiter } = await detailSaleWithoutPagiByDate(query, startDate, endDate);
+
+    fMsg(res, "Detail sale between two dates", data, count, sumTotalPrice, sumTotalLiter);
+  } catch (e) {
+    next(e);
+  }
+}
 
 export const initialDetailHandler = async (
   req: Request,

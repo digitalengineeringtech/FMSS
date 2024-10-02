@@ -1,4 +1,4 @@
-import { getDetailSaleSummaryDetailHandler, getDetailSaleSummaryHandler, statementReportHandler } from './../controller/detailSale.controller';
+import { getDetailSaleSummaryDetailHandler, getDetailSaleSummaryHandler, getDetailSaleWithoutPagiHandler, statementReportHandler } from './../controller/detailSale.controller';
 import {
   addDetailSaleHandler,
   deleteDetailSaleHandler,
@@ -67,6 +67,13 @@ detailSaleRoute.get(
   validateToken2,
   hasAnyPermit(["view"]),
   getDetailSaleDatePagiHandler
+);
+
+detailSaleRoute.get(
+  "/without-pagi/by-date",
+  validateToken2,
+  hasAnyPermit(["view"]),
+  getDetailSaleWithoutPagiHandler
 );
 
 //that for only device

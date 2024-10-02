@@ -1467,6 +1467,42 @@ export const detailSaleByDateAndPagi = async (
   }
 };
 
+export const detailSaleWithoutPagiByDate = async (
+  query: FilterQuery<detailSaleDocument>,
+  d1: Date,
+  d2: Date
+): Promise<{ count: number; data: detailSaleDocument[]; sumTotalPrice: number; sumTotalLiter: number }> => {
+  try {
+    const filter: FilterQuery<detailSaleDocument> = {
+      ...query,
+      createAt: {
+        $gt: d1,
+        $lt: d2,
+      },
+    };
+
+    // Fetch all data without pagination
+    const dataQuery = detailSaleModel
+      .find(filter)
+      .sort({ createAt: -1 })
+      .select("-__v");
+
+    const countQuery = detailSaleModel.countDocuments(filter);
+
+    const [data, count] = await Promise.all([dataQuery, countQuery]);
+
+    const sumResults = await detailSaleModel.find(filter).select("saleLiter totalPrice").exec();
+    
+    const sumTotalPrice = sumResults.reduce((acc: any, item: { totalPrice: any }) => acc + item.totalPrice, 0);
+    const sumTotalLiter = sumResults.reduce((acc: any, item: { saleLiter: any }) => acc + item.saleLiter, 0);
+
+    return { data, count, sumTotalPrice, sumTotalLiter };
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 export const initialDetail = async (body) => {
   try {
     body.vocono = Date.now();
