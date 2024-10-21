@@ -5,6 +5,8 @@ export interface customerDocument extends mongoose.Document {
   cusPhone: string;
   cusVehicleType: string;
   cusCarNo: string;
+  cusDebLiter: number;
+  cusDebAmount: number;
 }
 
 const customerSchema = new Schema({
@@ -13,6 +15,8 @@ const customerSchema = new Schema({
   cusCardId: { type: String },
   cusVehicleType: { type: String, required: true },
   cusCarNo: { type: String, required: true },
+  cusDebLiter: { type: Number, default: 0 },
+  cusDebAmount: { type: Number, default: 0 },
 });
 
 const customerModel = mongoose.model<customerDocument>(
