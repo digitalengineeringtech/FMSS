@@ -31,8 +31,7 @@ import fuelInRoute from "./router/fuelIn.routes";
 import fuelBalanceRoute from "./router/fuelBalance.routes";
 import tankDataRoute from "./router/tankData.routes";
 import stationRoute from "./router/station.routes";
-import logger from "./utils/logger";
-import moment from "moment";
+import creditCustomerRoute from "./router/customerCredit.routes";
 
 const app = express();
 app.use(express.json());
@@ -133,6 +132,7 @@ app.use("/api/daily-price", dailyPriceRoute); // daily price route
 
 // update route
 app.use("/api/customer", customerRoute);
+app.use("/api/customer-credit", creditCustomerRoute);
 app.use("/api/total-statement", totalStatementRoute);
 app.use("/api/balance-statement", balanceStatementRoute);
 app.use("/api/fuelIn", fuelInRoute);
