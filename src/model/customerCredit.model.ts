@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
 export interface customerCreditDocument extends mongoose.Document {
-     cusId: string;
+     customer: string;
      creditType: string;
      creditDueDate: Date;
      limitAmount: number;
@@ -9,7 +9,7 @@ export interface customerCreditDocument extends mongoose.Document {
 }
 
 const customerCreditSchema = new Schema({
-  cusId: { type: Schema.Types.ObjectId, ref: 'customer' },
+  customer: { type: Schema.Types.ObjectId, ref: 'customer' },
   creditType: { type: String, required: true }, // LimitByAmount or LimitByDate
   creditDueDate: { type: Date },
   limitAmount: { type: Number, default: 0 },

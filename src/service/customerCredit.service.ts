@@ -3,7 +3,7 @@ import customerCreditModel, { customerCreditDocument } from "../model/customerCr
 
 
 export const getCreditCustomer = async (query: FilterQuery<customerCreditDocument>) => {
-    return await customerCreditModel.find(query).lean().select("-__v");
+    return await customerCreditModel.find(query).populate("customer");
 };
 export const addCreditCustomer = async (body: customerCreditDocument) => {
     return await new customerCreditModel(body).save();
