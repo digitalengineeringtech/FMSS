@@ -10,19 +10,22 @@ export const addCustomer = async (body) => {
   const customer = await customerModel.create({
      cusName: body.cusName,
      cusPhone: body.cusPhone,
+     cusType: body.cusType,
      cusVehicleType: body.cusVehicleType,
      cusCarNo: body.cusCarNo,
      cusDebAmount: body.cusDebAmount,
      cusDebLiter: body.cusDebLiter
   });
 
-  await customerCreditModel.create({
-    customer: customer._id,
-    creditType: body.creditType,
-    creditDueDate: body.creditDueDate,
-    limitAmount: body.limitAmount
-  });
-
+  if(body.cusType === 'credit') {
+    await customerCreditModel.create({
+      customer: customer._id,
+      creditType: body.creditType,
+      creditDueDate: body.creditDueDate,
+      limitAmount: body.limitAmount
+    });
+  }
+  
   return customer;
 };
 
