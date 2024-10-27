@@ -27,6 +27,7 @@ export interface detailSaleDocument extends mongoose.Document {
   preset: string;
   device: string;
   isReload: number;
+  creditPaid: boolean;
   createAt: Date;
 }
 
@@ -36,13 +37,13 @@ const detailSaleSchema = new Schema({
     required: true,
     ref: "stationDetail",
   },
+  customerId: { type: Schema.Types.ObjectId, ref: "customer", default: null },
   vocono: { type: String, required: true, unique: true },
   carNo: { type: String, required: true },
   vehicleType: { type: String, required: true },
   depNo: { type: String, default: '0' },
   nozzleNo: { type: String, required: true },
   fuelType: { type: String, required: true },
-
   cashType: {
     type: String,
     default: "paided",
@@ -55,7 +56,6 @@ const detailSaleSchema = new Schema({
     default: "0",
     enum: ["0", "1", "a0", "a", "2"],
   },
-
   salePrice: { type: Number, default: 0 },
   saleLiter: { type: Number, default: 0 },
   totalPrice: { type: Number, default: 0 },
@@ -78,6 +78,7 @@ const detailSaleSchema = new Schema({
   isReload: { type: Number, default: 0 },
   preset: { type: String, default: null },
   device: { type: String, required: true },
+  creditPaid: { type: Boolean, default: false },
   createAt: { type: Date, default: Date.now },
 });
 

@@ -11,6 +11,7 @@ export const addCustomer = async (body) => {
      cusName: body.cusName,
      cusPhone: body.cusPhone,
      cusType: body.cusType,
+     cusCardId: body.cusCardId,
      cusVehicleType: body.cusVehicleType,
      cusCarNo: body.cusCarNo,
      cusDebAmount: body.cusDebAmount,

@@ -34,8 +34,12 @@ import { log } from "console";
 import { create } from "domain";
 import logger from "../utils/logger";
 import deviceModel from "../model/device.model";
+import customerModel from "../model/customer.model";
+import { getCustomerByCardId } from "./customer.service";
+import { checkCreditLimit } from "./customerCredit.service";
 
 interface Data {
+  cusCardId: string;
   depNo: string;
   nozzleNo: string;
   fuelType: string;
@@ -43,6 +47,7 @@ interface Data {
   casherCode: string;
   asyncAlready: string;
   stationDetailId: string;
+  customerId: string | undefined;
   cashType: string;
   couObjId: string;
   totalizer_liter: number | undefined;
@@ -68,6 +73,23 @@ export const preSetDetailSale = async (
   type: string,
   body
 ) => {
+
+  let customerId;
+  
+  if(body.cashType == 'Credit') {
+    const customer = await getCustomerByCardId(body.cusCardId);
+
+    if(customer) {
+      const checkLimit = await checkCreditLimit(customer._id);
+  
+      if(checkLimit == false) {
+        throw new Error('Credit Limit Exceeded');
+      } 
+
+      customerId = customer._id;
+    }
+  }
+
   const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
   const cuurentDateForVocono = moment().tz("Asia/Yangon").format("DDMMYYYY");
 
@@ -82,22 +104,10 @@ export const preSetDetailSale = async (
   }
 
   let iso: Date = new Date(`${currentDate}T${currentDateTime}.000Z`);
-  //hk
-  // let rdsCount: number = await get(currentDate);
-  // if (!rdsCount) {
-  //   rdsCount = await detailSaleModel.countDocuments({
-  //     dailyReportDate: currentDate,
-  //   });
-  //   if (rdsCount == 0) await autoAddTotalBalance(currentDate);
-  // }
-
-  // let newCount = rdsCount + 1;
-
+ 
   const count = await detailSaleModel.countDocuments({
     dailyReportDate: currentDate,
   });
-
-  // console.log(count, count + 1, "............");
 
   await set(currentDate, count + 1);
 
@@ -114,22 +124,12 @@ export const preSetDetailSale = async (
     .findOne({ nozzleNo: body.nozzleNo })
     .sort({ _id: -1, createAt: -1 });
 
-  // body = {
-  //   ...body,
-  //   vocono: `${stationNo}/${body.user.name}/${cuurentDateForVocono}/${newCount}`,
-  //   stationDetailId: stationId,
-  //   casherCode: body.user.name,
-  //   asyncAlready: "0",
-  //   totalizer_liter: lastDocument?.totalizer_liter,
-  //   totalizer_amount: lastDocument?.totalizer_amount,၇
-  //   preset: `${preset} ${type}`,
-  //   createAt: iso,
-  // };
   body = {
     ...body,
     vocono: `${body.user.stationNo}/${body.user.name}/${cuurentDateForVocono}/${
       count + 1
     }`,
+    customerId: customerId,
     stationDetailId: body.user.stationId,
     casherCode: body.user.name,
     asyncAlready: "0",
@@ -225,6 +225,21 @@ export const addDetailSale = async (
   body: Data
 ) => {
   try {
+    let customerId;
+  
+    if(body.cashType == 'Credit') {
+      const customer = await getCustomerByCardId(body.cusCardId);
+  
+      if(customer) {
+        const checkLimit = await checkCreditLimit(customer._id);
+    
+        if(checkLimit == false) {
+          throw new Error('Credit Limit Exceeded');
+        } 
+  
+        customerId = customer._id;
+      }
+    }
     //for time
     const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
     const cuurentDateForVocono = moment().tz("Asia/Yangon").format("DDMMYYYY");
@@ -268,6 +283,7 @@ export const addDetailSale = async (
         body.user.name
       }/${cuurentDateForVocono}/${count + 1}`,
       stationDetailId: body.user.stationId,
+      customerId: customerId,
       casherCode: body.user.name,
       asyncAlready: "0",
       depNo: depNo,

@@ -4,6 +4,7 @@ export interface customerDocument extends mongoose.Document {
   cusName: string;
   cusPhone: string;
   cusType: string;
+  cusCardId: string;
   cusVehicleType: string;
   cusCarNo: string;
   cusDebLiter: number;
