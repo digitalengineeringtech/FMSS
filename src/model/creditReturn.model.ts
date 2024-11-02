@@ -1,21 +1,25 @@
 import mongoose, { Schema } from "mongoose";
 
 export interface creditReturnDocument extends mongoose.Document {
-    createdAt: Date;
-    returnDate: Date;
+    cutomerCreditId: string;
     vocono: string;
-    creditAmount: number;
     returnAmount: number;
+    returnDate: Date;
+    creditAmount: number;
     creditDueDate: Date;
+    isPaid: boolean;
+    createdAt: Date;
 }
 
 const creditReturnSchema = new Schema({
-    createdAt: { type: Date, default: Date.now },
-    returnDate: { type: Date, default: Date.now },
+    cutomerCreditId: { type: Schema.Types.ObjectId, ref: 'customerCredit' },
     vocono: { type: String, required: true },
+    returnAmount: { type: Number },
+    returnDate: { type: Date },
     creditAmount: { type: Number, required: true },
-    returnAmount: { type: Number, required: true },
-    creditDueDate: { type: Date, required: true },
+    creditDueDate: { type: Date },
+    isPaid: { type: Boolean, default: false },
+    createdAt: { type: Date, default: Date.now },
 });
 
 const creditReturnModel = mongoose.model<creditReturnDocument>(

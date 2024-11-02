@@ -11,7 +11,7 @@ export interface customerCreditDocument extends mongoose.Document {
 const customerCreditSchema = new Schema({
   customer: { type: Schema.Types.ObjectId, ref: 'customer' },
   creditType: { type: String, required: true }, // LimitByAmount or LimitByDate
-  creditDueDate: { type: Date },
+  creditDueDate: { type: Date, required: true },
   limitAmount: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now }
 });

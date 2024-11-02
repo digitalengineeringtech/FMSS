@@ -27,7 +27,6 @@ export interface detailSaleDocument extends mongoose.Document {
   preset: string;
   device: string;
   isReload: number;
-  creditPaid: boolean;
   createAt: Date;
 }
 
@@ -78,7 +77,6 @@ const detailSaleSchema = new Schema({
   isReload: { type: Number, default: 0 },
   preset: { type: String, default: null },
   device: { type: String, required: true },
-  creditPaid: { type: Boolean, default: false },
   createAt: { type: Date, default: Date.now },
 });
 

@@ -37,6 +37,8 @@ import deviceModel from "../model/device.model";
 import customerModel from "../model/customer.model";
 import { getCustomerByCardId } from "./customer.service";
 import { checkCreditLimit } from "./customerCredit.service";
+import customerCreditModel from '../model/customerCredit.model';
+import creditReturnModel from '../model/creditReturn.model';
 
 interface Data {
   cusCardId: string;
@@ -540,6 +542,21 @@ export const detailSaleUpdateByDevice = async (
     await detailSaleModel.findByIdAndUpdate(lastData[0]._id, updateBody);
 
     let result = await detailSaleModel.findById(lastData[0]._id);
+
+    if(result.cashType == 'Credit') {
+        const customerCredit = await customerCreditModel.findOne({ customer: result.customerId });
+        if(customerCredit) {
+            customerCredit.limitAmount = Number(customerCredit.limitAmount) - Number(result.totalPrice);
+            await customerCredit.save();
+
+            const creditReturn = await creditReturnModel.create({
+                cutomerCreditId: customerCredit._id,
+                vocono: result.vocono,
+                creditAmount: result.totalPrice,
+                creditDueDate: customerCredit.creditDueDate
+            }); 
+        }
+    }
 
     if (!result) {
       throw new Error("Final send in error");
