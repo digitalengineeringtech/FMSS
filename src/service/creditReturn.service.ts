@@ -1,5 +1,6 @@
 import { FilterQuery, ObjectId } from "mongoose";
 import creditReturnModel, { creditReturnDocument } from '../model/creditReturn.model';
+import customerCreditModel from "../model/customerCredit.model";
 
 export const getCreditReturn = async (query: FilterQuery<creditReturnDocument>) => {
     return await creditReturnModel.find(query)
@@ -23,7 +24,7 @@ export const updateCreditReturn = async (body: creditReturnDocument) => {
                             .sort({ creditAmount: -1 })
                             .lean();
 
-    let paidedAmount = 0;  // Amount already paid
+    let paidedAmount = 0; 
     const fullyPaidIds: { _id: ObjectId, returnAmount: number }[] = [];  // To track fully paid records
 
     for (const record of creditReturns) {
@@ -69,7 +70,11 @@ export const updateCreditReturn = async (body: creditReturnDocument) => {
     }
 
     // Update the fully paid records to set isPaid to true
-    if(fullyPaidIds.length > 0) {
+    if(fullyPaidIds.length == 0) {
+        throw new Error('Failed to update credit return records.');
+    }
+
+    try {
         const updateQuery = fullyPaidIds.map(item => ({
             updateOne: {
                 filter: { _id: item._id },
@@ -80,10 +85,20 @@ export const updateCreditReturn = async (body: creditReturnDocument) => {
                 }
             }
         }));
-
-        await creditReturnModel.bulkWrite(updateQuery);
+    
+        const bulkUpdate = await creditReturnModel.bulkWrite(updateQuery);
+    
+        if(bulkUpdate.modifiedCount == fullyPaidIds.length) {
+            const customerCredit = await customerCreditModel.findById(body.customerCredit);
+            if (customerCredit) {
+                customerCredit.limitAmount += body.returnAmount; // Increase limit amount by returnAmount
+                await customerCredit.save(); // Save the updated customer credit document
+            }
+        
+            return await creditReturnModel.find({}).select('-__v').lean();
+        }
+    } catch (error) {
+        console.error('Error during updating credit return records:', error);
+        throw new Error('An error occurred while updating credit return records.');
     }
-
-    // Return the updated records or an appropriate response
-    return await creditReturnModel.find({}).lean(); // Or another appropriate query
 };
