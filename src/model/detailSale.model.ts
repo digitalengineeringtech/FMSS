@@ -3,6 +3,7 @@ import moment from "moment-timezone";
 
 export interface detailSaleDocument extends mongoose.Document {
   stationDetailId: string;
+  customerId: string;
   dailyReportDate: string;
   vocono: string;
   carNo: string;
@@ -36,7 +37,6 @@ const detailSaleSchema = new Schema({
     required: true,
     ref: "stationDetail",
   },
-  customerId: { type: Schema.Types.ObjectId, ref: "customer", default: null },
   vocono: { type: String, required: true, unique: true },
   carNo: { type: String, required: true },
   vehicleType: { type: String, required: true },
@@ -78,6 +78,7 @@ const detailSaleSchema = new Schema({
   preset: { type: String, default: null },
   device: { type: String, required: true },
   createAt: { type: Date, default: Date.now },
+  customer: { type: Schema.Types.ObjectId, ref: "customer", default: null },
 });
 
 detailSaleSchema.pre("save", function (next) {

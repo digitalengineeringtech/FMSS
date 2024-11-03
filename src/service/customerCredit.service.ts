@@ -1,11 +1,10 @@
 import mongoose, { FilterQuery } from "mongoose";
 import customerCreditModel, { customerCreditDocument } from "../model/customerCredit.model";
-import detailSaleModel from "../model/detailSale.model";
 import creditReturnModel from '../model/creditReturn.model';
 
 
 export const getCreditCustomer = async (query: FilterQuery<customerCreditDocument>) => {
-    return await customerCreditModel.find(query).populate("customer");
+    return await customerCreditModel.find(query).populate("customer", "-__v").select("-__v");
 };
 export const addCreditCustomer = async (body: customerCreditDocument) => {
     return await new customerCreditModel(body).save();

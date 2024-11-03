@@ -49,7 +49,7 @@ interface Data {
   casherCode: string;
   asyncAlready: string;
   stationDetailId: string;
-  customerId: string | undefined;
+  customer: string | undefined;
   cashType: string;
   couObjId: string;
   totalizer_liter: number | undefined;
@@ -131,7 +131,7 @@ export const preSetDetailSale = async (
     vocono: `${body.user.stationNo}/${body.user.name}/${cuurentDateForVocono}/${
       count + 1
     }`,
-    customerId: customerId,
+    customer: customerId,
     stationDetailId: body.user.stationId,
     casherCode: body.user.name,
     asyncAlready: "0",
@@ -285,7 +285,7 @@ export const addDetailSale = async (
         body.user.name
       }/${cuurentDateForVocono}/${count + 1}`,
       stationDetailId: body.user.stationId,
-      customerId: customerId,
+      customer: customerId,
       casherCode: body.user.name,
       asyncAlready: "0",
       depNo: depNo,
@@ -543,14 +543,14 @@ export const detailSaleUpdateByDevice = async (
 
     let result = await detailSaleModel.findById(lastData[0]._id);
 
-    if(result.cashType == 'Credit') {
+    if(result && result.cashType == 'Credit') {
         const customerCredit = await customerCreditModel.findOne({ customer: result.customerId });
         if(customerCredit) {
             customerCredit.limitAmount = Number(customerCredit.limitAmount) - Number(result.totalPrice);
             await customerCredit.save();
 
-            const creditReturn = await creditReturnModel.create({
-                cutomerCreditId: customerCredit._id,
+            await creditReturnModel.create({
+                cutomerCredit: customerCredit._id,
                 vocono: result.vocono,
                 creditAmount: result.totalPrice,
                 creditDueDate: customerCredit.creditDueDate

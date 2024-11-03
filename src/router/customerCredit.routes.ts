@@ -3,10 +3,10 @@ import {
     getCreditCustomerHandler,
   } from "../controller/customerCredit.controller";
   
-  const creditCustomerRoute = require("express").Router();
+  const customerCreditRoute = require("express").Router();
   
-  creditCustomerRoute.get("/", getCreditCustomerHandler);
+  customerCreditRoute.get("/", getCreditCustomerHandler);
   
-  creditCustomerRoute.post("/", addCreditCustomerHandler);
+  customerCreditRoute.post("/", addCreditCustomerHandler);
   
-  export default creditCustomerRoute;
+  export default customerCreditRoute;

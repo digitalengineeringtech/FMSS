@@ -1,7 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
 export interface creditReturnDocument extends mongoose.Document {
-    cutomerCreditId: string;
     vocono: string;
     returnAmount: number;
     returnDate: Date;
@@ -9,10 +8,10 @@ export interface creditReturnDocument extends mongoose.Document {
     creditDueDate: Date;
     isPaid: boolean;
     createdAt: Date;
+    customerCredit: string;
 }
 
 const creditReturnSchema = new Schema({
-    cutomerCreditId: { type: Schema.Types.ObjectId, ref: 'customerCredit' },
     vocono: { type: String, required: true },
     returnAmount: { type: Number },
     returnDate: { type: Date },
@@ -20,6 +19,7 @@ const creditReturnSchema = new Schema({
     creditDueDate: { type: Date },
     isPaid: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
+    customerCredit: { type: Schema.Types.ObjectId, ref: 'customerCredit' },
 });
 
 const creditReturnModel = mongoose.model<creditReturnDocument>(

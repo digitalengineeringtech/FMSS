@@ -1,19 +1,19 @@
 import mongoose, { Schema } from "mongoose";
 
 export interface customerCreditDocument extends mongoose.Document {
-     customer: string;
      creditType: string;
      creditDueDate: Date;
      limitAmount: number;
      createdAt: Date;
+     customer: string;
 }
 
 const customerCreditSchema = new Schema({
-  customer: { type: Schema.Types.ObjectId, ref: 'customer' },
   creditType: { type: String, required: true }, // LimitByAmount or LimitByDate
   creditDueDate: { type: Date, required: true },
   limitAmount: { type: Number, default: 0 },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  customer: { type: Schema.Types.ObjectId, ref: 'customer' },
 });
 
 const customerCreditModel = mongoose.model<customerCreditDocument>(
