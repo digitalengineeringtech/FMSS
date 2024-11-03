@@ -3,7 +3,6 @@ import moment from "moment-timezone";
 
 export interface detailSaleDocument extends mongoose.Document {
   stationDetailId: string;
-  customerId: string;
   dailyReportDate: string;
   vocono: string;
   carNo: string;
@@ -29,6 +28,7 @@ export interface detailSaleDocument extends mongoose.Document {
   device: string;
   isReload: number;
   createAt: Date;
+  customer: string;
 }
 
 const detailSaleSchema = new Schema({

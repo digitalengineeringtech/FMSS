@@ -9,10 +9,6 @@ export const getCreditReturn = async (query: FilterQuery<creditReturnDocument>) 
                     .lean();
 }
 
-export const addCreditReturn = async (body: creditReturnDocument) => {
-    return await creditReturnModel.create(body);
-}
-
 export const updateCreditReturn = async (body: creditReturnDocument) => {
     const query = {
         customerCredit: body.customerCredit,

@@ -1,5 +1,4 @@
 import {
-    addCreditReturnHandler,
     getCreditReturnHandler,
     updateCreditReturnHandler,
 } from "../controller/creditReturn.controller";
@@ -8,8 +7,6 @@ import {
 const creditReturnRoute = require("express").Router();
 
 creditReturnRoute.get("/", getCreditReturnHandler);
-
-creditReturnRoute.post("/", addCreditReturnHandler);
 
 creditReturnRoute.put("/", updateCreditReturnHandler);
 

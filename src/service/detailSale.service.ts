@@ -544,7 +544,7 @@ export const detailSaleUpdateByDevice = async (
     let result = await detailSaleModel.findById(lastData[0]._id);
 
     if(result && result.cashType == 'Credit') {
-        const customerCredit = await customerCreditModel.findOne({ customer: result.customerId });
+        const customerCredit = await customerCreditModel.findOne({ customer: result.customer });
         if(customerCredit) {
             customerCredit.limitAmount = Number(customerCredit.limitAmount) - Number(result.totalPrice);
             await customerCredit.save();
