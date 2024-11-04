@@ -17,7 +17,7 @@ const logger = createLogger({
     // new transports.Console(),
     // new transports.File({ filename: path.join(__dirname, '../../logs/combined.log'), level: 'info' }),
     // new transports.File({ filename: path.join(__dirname, '../../logs/error.log'), level: 'error' }),
-    new transports.File({ filename: path.join(__dirname, '../../logs/detailsale.log'), level: 'warn' }),
+    new transports.File({ filename: path.join(__dirname, '../../logs/detailsale.log'), level: 'info' }),
     new transports.File({ filename: path.join(__dirname, '../../logs/tankdata.log'), level: 'warn' })
   ]
 });

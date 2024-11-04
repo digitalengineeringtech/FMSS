@@ -691,6 +691,14 @@ export const detailSaleUpdateByDevice = async (
         try {
           let url = config.get<string>("detailsaleCloudUrl");
           let response = await axios.post(url, ea);
+
+          logger.info(`
+            ========== start ==========
+            function: Response Logger
+            Response: ${JSON.stringify(response.data)}
+            ========== ended ==========
+            `, { file: 'detailsale.log' });
+
           if (response.status == 200) {
             await detailSaleModel.findByIdAndUpdate(ea._id, {
               asyncAlready: "2",
@@ -712,6 +720,12 @@ export const detailSaleUpdateByDevice = async (
       try {
         let url = config.get<string>("detailsaleCloudUrl");
         let response = await axios.post(url, ea);
+        logger.info(`
+          ========== start ==========
+          function: Response Logger
+          Response: ${JSON.stringify(response.data)}
+          ========== ended ==========
+        `, { file: 'detailsale.log' });
         if (response.status == 200) {
           await detailSaleModel.findByIdAndUpdate(ea._id, {
             asyncAlready: "2",
