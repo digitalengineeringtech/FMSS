@@ -15,7 +15,7 @@ export const checkCreditLimit = async (id: mongoose.Types.ObjectId) => {
 
     if(customerCredit) {
         const credits = await creditReturnModel.find({
-            cutomerCreditId: customerCredit._id,
+            cutomerCredit: customerCredit._id,
             isPaid: false
         });
     
