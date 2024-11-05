@@ -658,7 +658,7 @@ export const detailSaleUpdateByDevice = async (
         try {
           let url = config.get<string>("detailsaleCloudUrl");
           let response = await axios.post(url, ea);
-          logger.warn(`
+          logger.info(`
             ========== start ==========
             function: Response Logger
             Response: ${JSON.stringify(response.data)}
@@ -685,7 +685,7 @@ export const detailSaleUpdateByDevice = async (
       try {
         let url = config.get<string>("detailsaleCloudUrl");
         let response = await axios.post(url, ea);
-        logger.warn(`
+        logger.info(`
           ========== start ==========
           function: Response Logger
           Response: ${JSON.stringify(response.data)}
