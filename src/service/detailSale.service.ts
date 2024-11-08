@@ -1514,6 +1514,42 @@ export const detailSaleByDateAndPagi = async (
   }
 };
 
+export const creditDetailSaleByDateAndPagi = async (
+  query: FilterQuery<detailSaleDocument>,
+  d1: Date,
+  d2: Date,
+  pageNo: number
+): Promise<{ count: number; data: detailSaleDocument[] }> => {
+  try {
+    const reqPage = pageNo == 1 ? 0 : pageNo - 1;
+    const skipCount = limitNo * reqPage;
+    const filter: FilterQuery<detailSaleDocument> = {
+      ...query,
+      createAt: {
+        $gt: d1,
+        $lt: d2,
+      },
+      cashType: 'Credit'
+    };
+
+    const dataQuery = detailSaleModel
+      .find(filter)
+      .sort({ createAt: -1 })
+      .skip(skipCount)
+      .limit(limitNo)
+      // .populate("stationDetailId")
+      .select("-__v");
+
+    const countQuery = detailSaleModel.countDocuments(filter);
+
+    const [data, count] = await Promise.all([dataQuery, countQuery]);
+
+    return { data, count };
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const detailSaleWithoutPagiByDate = async (
   query: FilterQuery<detailSaleDocument>,
   d1: Date,
