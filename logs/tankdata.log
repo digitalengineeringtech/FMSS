@@ -1,0 +1,93 @@
+2024-09-06T05:14:59.523Z [warn]: 
+    ========== start ==========
+    Function: detailSaleUpdateByDevice (Final)
+    From: MQTT Lane
+    Topic: detpos/device/Final/1
+    Message: 01S2000L1.220P1220T123.456
+    ========== ended ==========
+    
+2024-09-06T05:15:02.321Z [warn]: 
+          ========== start ==========
+          Function: Add Tank Data
+          From: Final Detail Sale
+          tankData: 0 
+          stationDetailId: 6464e9f1c45b82216ab1db6b
+          vocono: 27/test/06092024/1
+          nozzleNo: 01
+          ========== ended ==========
+          
+2024-09-06T05:15:02.735Z [warn]: 
+    ========== start ==========
+    Function: Add Tank Data
+    From: Final Detail Sale
+    url: https://e688ad90-86cd-43c9-a524-2aaccb212b97.mock.pstmn.io/data 
+    realTimeData: [{"stateInfo":"No alarm","oilType":"Petrol 92","weight":0,"level":2222,"oilRatio":0.3333,"waterRatio":0,"canAddOilWeight":0,"temperature":32.33,"volume":4444,"connect":3,"id":1},{"stateInfo":"No alarm","oilType":"Diesel","weight":0,"level":3333,"oilRatio":0.4444,"waterRatio":0,"canAddOilWeight":0,"temperature":33.33,"volume":5555,"connect":3,"id":2},{"stateInfo":"No alarm","oilType":"95 Octane","weight":0,"level":4444,"oilRatio":0.5555,"waterRatio":0,"canAddOilWeight":0,"temperature":34.33,"volume":6666,"connect":3,"id":3},{"stateInfo":"No alarm","oilType":"Super Diesel","weight":0,"level":5555,"oilRatio":0.6666,"waterRatio":0,"canAddOilWeight":0,"temperature":35.33,"volume":7777,"connect":3,"id":4}]
+    body: {"stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/test/06092024/1","nozzleNo":"01"}
+    ========== ended ==========
+    
+2024-09-06T05:16:31.492Z [warn]: 
+    ========== start ==========
+    Function: detailSaleUpdateByDevice (Final)
+    From: MQTT Lane
+    Topic: detpos/device/Final/1
+    Message: 01S2000L1.220P1220T123.456
+    ========== ended ==========
+    
+2024-09-06T05:16:34.237Z [warn]: 
+          ========== start ==========
+          Function: Update Tank Data
+          From: Final Detail Sale
+          tankData: 1 
+          stationDetailId: 6464e9f1c45b82216ab1db6b
+          vocono: 27/test/06092024/2
+          ========== ended ==========
+          
+2024-09-06T05:16:34.640Z [warn]: 
+  ========== start ==========
+  Function: Update Tank Data
+  From: Final Detail Sale
+  url: https://e688ad90-86cd-43c9-a524-2aaccb212b97.mock.pstmn.io/data 
+  realTimeData: [{"stateInfo":"No alarm","oilType":"Petrol 92","weight":0,"level":2222,"oilRatio":0.3333,"waterRatio":0,"canAddOilWeight":0,"temperature":32.33,"volume":4444,"connect":3,"id":1},{"stateInfo":"No alarm","oilType":"Diesel","weight":0,"level":3333,"oilRatio":0.4444,"waterRatio":0,"canAddOilWeight":0,"temperature":33.33,"volume":5555,"connect":3,"id":2},{"stateInfo":"No alarm","oilType":"95 Octane","weight":0,"level":4444,"oilRatio":0.5555,"waterRatio":0,"canAddOilWeight":0,"temperature":34.33,"volume":6666,"connect":3,"id":3},{"stateInfo":"No alarm","oilType":"Super Diesel","weight":0,"level":5555,"oilRatio":0.6666,"waterRatio":0,"canAddOilWeight":0,"temperature":35.33,"volume":7777,"connect":3,"id":4}]
+  body: {"id":"66da8fd67827622dc0330102","vocono":"27/test/06092024/2","stationDetailId":"6464e9f1c45b82216ab1db6b"}
+  ========== ended ==========
+  
+2024-09-20T08:30:27.696Z [warn]: 
+    ========== start ==========
+    Function: detailSaleUpdateByDevice (Final)
+    From: MQTT Lane
+    Topic: detpos/device/Final/1
+    Message: 01S2000L0.120P120T123.456
+    ========== ended ==========
+    
+2024-09-26T04:31:26.487Z [warn]: 
+    ========== start ==========
+    Function: detailSaleUpdateByDevice (Final)
+    From: MQTT Lane
+    Topic: detpos/device/Final/1
+    Message: 01S2000L1.220P1220T123.456
+    ========== ended ==========
+    
+2024-09-27T07:02:21.274Z [warn]: 
+    ========== start ==========
+    Function: detailSaleUpdateByDevice (Final)
+    From: MQTT Lane
+    Topic: detpos/device/Final/1
+    Message: 01L1.180P1180
+    ========== ended ==========
+    
+2024-09-27T07:04:06.276Z [warn]: 
+    ========== start ==========
+    Function: detailSaleUpdateByDevice (Final)
+    From: MQTT Lane
+    Topic: detpos/device/Final/1
+    Message: 01S2000L1.220P1220T123.456
+    ========== ended ==========
+    
+2024-10-02T03:04:01.828Z [warn]: 
+    ========== start ==========
+    Function: detailSaleUpdateByDevice (Final)
+    From: MQTT Lane
+    Topic: detpos/device/Final/1
+    Message: 01S2000L1.220P1220T123.456
+    ========== ended ==========
+    
