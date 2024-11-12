@@ -230,6 +230,7 @@ export const getDetailSaleByDateHandler = async (
     const startDate: Date = new Date(sDate);
     const endDate: Date = new Date(eDate);
     let result = await detailSaleByDate(query, startDate, endDate);
+    console.log(result, 'this is from by date')
     fMsg(res, "detail sale between two date", result);
   } catch (e) {
     next(e);
@@ -241,6 +242,7 @@ export const getDetailSaleSummaryHandler = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log(req.query, "....");
   try {
     let sDate: any = req.query.sDate;
     let eDate: any = req.query.eDate;
@@ -260,11 +262,12 @@ export const getDetailSaleSummaryHandler = async (
     const startDate: Date = new Date(sDate);
     const endDate: Date = new Date(eDate);
     let result = await detailSaleSummary(query, startDate, endDate);
+    console.log(result);
     fMsg(res, "detail sale between two date", result);
   } catch (e) {
     next(e);
   }
-}
+};
 
 export const getDetailSaleSummaryDetailHandler = async (
   req: Request,
@@ -294,9 +297,7 @@ export const getDetailSaleSummaryDetailHandler = async (
   } catch (e) {
     next(e);
   }
-}
-
-
+};
 
 export const getDetailSaleDatePagiHandler = async (
   req: Request,

@@ -626,7 +626,7 @@ export const detailSaleUpdateByDevice = async (
             stationDetailId: result.stationDetailId,
             vocono: lastData[0].vocono,
             nozzleNo: lastData[0].nozzleNo,
-            dateOfDate: moment(lastData[0].dailyReportDate).tz("Asia/Yangon").format("YYYY-MM-DD"),
+            dateOfDay: moment(lastData[0].dailyReportDate).tz("Asia/Yangon").format("YYYY-MM-DD"),
           });
         } else {
           await updateExistingTankData({
