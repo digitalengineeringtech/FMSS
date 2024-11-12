@@ -39,7 +39,7 @@ const tankDataSchema = new Schema({
     required: true,
   },
   asyncAlready: { type: String, required: true, default: "0" },
-  vocono: { type: String, required: true, unique: true },
+  vocono: { type: String, required: true },
   nozzleNo: { type: String, required: true },
   data: { type: Array, default: [] },
   dateOfDay: {
@@ -53,5 +53,7 @@ const tankDataModel = mongoose.model<tankDataDocument>(
   "tankData",
   tankDataSchema
 );
+
+
 
 export default tankDataModel;
