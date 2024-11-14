@@ -1,4 +1,4 @@
-import { getCreditDetailSaleDatePagiHandler, getDetailSaleSummaryDetailHandler, getDetailSaleSummaryHandler, getDetailSaleWithoutPagiHandler, statementReportHandler } from './../controller/detailSale.controller';
+import { getCreditDetailSaleDatePagiHandler, getCreditDetailSalePagiHandler, getDetailSaleSummaryDetailHandler, getDetailSaleSummaryHandler, getDetailSaleWithoutPagiHandler, statementReportHandler } from './../controller/detailSale.controller';
 import {
   addDetailSaleHandler,
   deleteDetailSaleHandler,
@@ -68,6 +68,13 @@ detailSaleRoute.get(
   hasAnyPermit(["view"]),
   getDetailSaleDatePagiHandler
 );
+
+detailSaleRoute.get(
+  "/credit/pagi/:page",
+  validateToken2,
+  hasAnyPermit(["view"]),
+  getCreditDetailSalePagiHandler
+)
 
 detailSaleRoute.get(
   "/credit/pagi/by-date/:page",

@@ -1514,6 +1514,36 @@ export const detailSaleByDateAndPagi = async (
   }
 };
 
+export const creditDetailSalePaginate = async (
+  pageNo: number,
+  query: FilterQuery<detailSaleDocument>
+) => {
+  try {
+    const reqPage = pageNo == 1 ? 0 : pageNo - 1;
+    const skipCount = limitNo * reqPage;
+
+    const filter = {
+      ...query,
+      cashType: 'Credit'
+    };
+
+    const data = await detailSaleModel.find(filter)
+                .populate({
+                  path: "customer",
+                  match: { cusCardId: query.cusCardId },
+                })
+                .skip(skipCount)
+                .limit(limitNo)
+                .select("-__v");
+
+    const count = await detailSaleModel.countDocuments(filter);
+
+    return { data, count };
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const creditDetailSaleByDateAndPagi = async (
   query: FilterQuery<detailSaleDocument>,
   d1: Date,
