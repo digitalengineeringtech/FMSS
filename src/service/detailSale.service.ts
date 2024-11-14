@@ -1522,16 +1522,19 @@ export const creditDetailSalePaginate = async (
     const reqPage = pageNo == 1 ? 0 : pageNo - 1;
     const skipCount = limitNo * reqPage;
 
-    const filter = {
-      ...query,
-      cashType: 'Credit'
-    };
+    let customerId = null;
+    if (query.cusCardId) {
+      const customer = await customerModel.findOne({ cusCardId: query.cusCardId }).select('_id');
+      if (customer) {
+        customerId = customer._id; // Store the customer ID if found
+      }
+    }
+
+    delete query.cusCardId;
+
+    const filter = customerId ? { ...query, customer: customerId } : query;
 
     const data = await detailSaleModel.find(filter)
-                .populate({
-                  path: "customer",
-                  match: { cusCardId: query.cusCardId },
-                })
                 .skip(skipCount)
                 .limit(limitNo)
                 .select("-__v");
