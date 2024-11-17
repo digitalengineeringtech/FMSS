@@ -19,6 +19,7 @@ import {
   detailSaleWithoutPagiByDate,
   creditDetailSaleByDateAndPagi,
   creditDetailSalePaginate,
+  creditDetailSaleOnlyPaginate,
   // detailSaleByDate,
 } from "../service/detailSale.service";
 
@@ -345,6 +346,20 @@ export const getCreditDetailSalePagiHandler = async (
   try {
     let pageNo = Number(req.params.page);
     let { data, count } = await creditDetailSalePaginate(pageNo, req.query);
+    fMsg(res, "DetailSale are here", data, count);
+  } catch (e) {
+    next(e);
+  }
+}
+
+export const getCreditDetailSaleOnlyPagiHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let pageNo = Number(req.params.page);
+    let { data, count } = await creditDetailSaleOnlyPaginate(pageNo);
     fMsg(res, "DetailSale are here", data, count);
   } catch (e) {
     next(e);

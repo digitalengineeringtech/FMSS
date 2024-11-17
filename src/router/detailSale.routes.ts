@@ -77,6 +77,13 @@ detailSaleRoute.get(
 )
 
 detailSaleRoute.get(
+  "/credit/only-pagi/:page",
+  validateToken2,
+  hasAnyPermit(["view"]),
+  getCreditDetailSalePagiHandler
+)
+
+detailSaleRoute.get(
   "/credit/pagi/by-date/:page",
   validateToken2,
   hasAnyPermit(["view"]),

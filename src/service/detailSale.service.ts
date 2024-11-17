@@ -1547,6 +1547,26 @@ export const creditDetailSalePaginate = async (
   }
 }
 
+export const creditDetailSaleOnlyPaginate = async(
+  pageNo: number,
+) => {
+  try {
+    const reqPage = pageNo == 1 ? 0 : pageNo - 1;
+    const skipCount = limitNo * reqPage;
+
+    const data = await detailSaleModel.find({ cashType: 'Credit' })
+                .skip(skipCount)
+                .limit(limitNo)
+                .select("-__v");
+
+  const count = await detailSaleModel.countDocuments({ cashType: 'Credit' });
+
+  return { data, count };
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const creditDetailSaleByDateAndPagi = async (
   query: FilterQuery<detailSaleDocument>,
   d1: Date,
