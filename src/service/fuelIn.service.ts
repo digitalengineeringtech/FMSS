@@ -1,9 +1,10 @@
 import { FilterQuery, UpdateQuery } from "mongoose";
 import fuelInModel, { fuelInDocument } from "../model/fuelIn.model";
-import { getFuelBalance, updateFuelBalance } from "./fuelBalance.service";
-import config from "config";
+import { addFuelBalance, getFuelBalance, updateFuelBalance } from "./fuelBalance.service";
+import config, { get } from "config";
 import axios from "axios";
 import { log } from "console";
+import { fuelBalanceDocument } from "../model/fuelBalance.model";
 
 const limitNo = config.get<number>("page_limit");
 
@@ -255,3 +256,67 @@ export const updateAtgFuelIn = async (body: any) => {
     console.log(error);
   }
 };
+
+export const calculateFuelBalance = async (
+  body: any,
+) => {
+  try {
+    const checkDate = await getFuelBalance({
+      stationId: body.stationId,
+      createAt: body.createAt
+    });
+
+    if(checkDate.length == 0) {
+      let prevResult = await getFuelBalance(
+        {
+          stationId: body.stationId,
+        },
+        body.tankCount
+      );
+
+      await Promise.all(
+        prevResult
+          .reverse()
+          // .slice(0, tankCount)
+          .map(async (ea) => {
+            // console.log('fuelBalance', ea);
+            let obj: fuelBalanceDocument;
+            if (ea.balance == 0) {
+              obj = {
+                stationId: ea.stationId,
+                fuelType: ea.fuelType,
+                capacity: ea.capacity,
+                opening: ea.todayTank != 0 ? ea.todayTank : ea.balance,
+                tankNo: ea.tankNo,
+                createAt: body.createAt,
+                nozzles: ea.nozzles,
+                balance: ea.todayTank != 0 ? ea.todayTank : ea.balance,
+              } as fuelBalanceDocument;
+            } else {
+              obj = {
+                stationId: ea.stationId,
+                fuelType: ea.fuelType,
+                capacity: ea.capacity,
+                opening: ea.todayTank != 0 ? ea.todayTank : ea.balance,
+                tankNo: ea.tankNo,
+                createAt: body.createAt,
+                nozzles: ea.nozzles,
+                balance: ea.todayTank != 0 ? ea.todayTank : ea.balance,
+              } as fuelBalanceDocument;
+            }
+
+            await addFuelBalance(obj);
+          })
+      );
+
+      return await getFuelBalance({
+        stationId: body.stationId,
+        createAt: body.createAt
+      });
+    } else {
+      return 'Today fuel balance already calculated'
+    }
+  } catch (error) {
+    return error;
+  }
+}

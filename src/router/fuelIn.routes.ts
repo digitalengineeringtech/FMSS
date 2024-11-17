@@ -1,6 +1,7 @@
 import {
   addAtgFuelInHandler,
   addFuelInHandler,
+  calculateFuelBalanceHandler,
   deleteFuelInHandler,
   getFuelInByDateHandler,
   getFuelInHandler,
@@ -68,5 +69,12 @@ fuelInRoute.post(
   hasAnyPermit(["edit"]),
   updateAtgFuelInHandler
 );
+
+fuelInRoute.post(
+  "/check/fuel-balance", 
+  validateToken,
+  roleValidator(["manager"]),
+  calculateFuelBalanceHandler
+)
 
 export default fuelInRoute;
