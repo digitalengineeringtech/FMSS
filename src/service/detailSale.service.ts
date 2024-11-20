@@ -1561,6 +1561,7 @@ export const creditDetailSaleOnlyPaginate = async(
     }
 
     const data = await detailSaleModel.find(filter)
+                .populate('customer')
                 .skip(skipCount)
                 .limit(limitNo)
                 .select("-__v");
