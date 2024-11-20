@@ -359,7 +359,7 @@ export const getCreditDetailSaleOnlyPagiHandler = async (
 ) => {
   try {
     let pageNo = Number(req.params.page);
-    let { data, count } = await creditDetailSaleOnlyPaginate(pageNo);
+    let { data, count } = await creditDetailSaleOnlyPaginate(pageNo, req.query);
     fMsg(res, "DetailSale are here", data, count);
   } catch (e) {
     next(e);
