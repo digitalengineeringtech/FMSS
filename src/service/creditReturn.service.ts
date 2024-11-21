@@ -98,3 +98,61 @@ export const updateCreditReturn = async (body: creditReturnDocument) => {
         throw new Error('An error occurred while updating credit return records.');
     }
 };
+
+export const updateSingleCreditReturn = async (id: string, body: creditReturnDocument) => {
+    const query = {
+        isPaid: false,
+        _id: id
+    }
+
+    const creditReturn = await creditReturnModel.findOne(query);
+    
+    if (!creditReturn) {
+        throw new Error('Credit return not found.');
+    }
+
+    const check = checkCreditReturn(creditReturn.creditAmount, body.returnAmount);
+
+    if(check.status == false) {
+        throw new Error(check.message);
+    }
+
+    const customerCredit = await customerCreditModel.findById(creditReturn.customerCredit);
+
+    if (customerCredit) {
+        customerCredit.limitAmount += body.returnAmount; // Increase limit amount by returnAmount
+        await customerCredit.save(); // Save the updated customer credit document
+    }
+
+    const updatedCreditReturn = await creditReturnModel.findByIdAndUpdate(id, {
+        isPaid: true,
+        returnAmount: body.returnAmount,
+        returnDate: body.returnDate,
+        creditAmount: 0,
+    }, { new: true })
+    .select('-__v')
+    .lean();
+
+    return updatedCreditReturn;
+}
+
+const checkCreditReturn = (creditAmount, returnAmount) => {
+    if(creditAmount < returnAmount) {
+        return {
+            status: false,
+            message: 'You can not pay more than credit amount...'
+        }
+    }
+
+    if(creditAmount > returnAmount) {
+       return {
+           status: false,
+           message: 'You can not pay less than credit amount...'
+       }
+    }
+
+    return {
+        status: true,
+        message: 'Success'
+    }
+}

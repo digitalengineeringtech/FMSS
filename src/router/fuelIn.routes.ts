@@ -62,7 +62,7 @@ fuelInRoute.post(
   addAtgFuelInHandler
 );
 
-fuelInRoute.post(
+fuelInRoute.put(
   "/atg/update",
   validateToken,
   roleValidator(["manager"]),

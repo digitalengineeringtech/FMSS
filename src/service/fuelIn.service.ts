@@ -50,9 +50,13 @@ export const addFuelIn = async (body: any) => {
 
     const updatedBody = {
       ...body,
-      stationId: body.user.stationId,
+      stationDetailId: body.user.stationId,
       fuel_in_code: no + 1,
+      terminal: body.terminal,
       tank_balance: tankCondition[0].balance + Number(body.receive_balance),
+      current_balance: tankCondition[0].balance,
+      send_balance: body.send_balance,
+      receive_balance: body.receive_balance,
     };
 
     let result = await new fuelInModel(updatedBody).save();
@@ -179,7 +183,10 @@ export const addAtgFuelIn = async (body: any) => {
       tankNo: body.tankNo,
       fuel_type: fuel_type,
       fuel_in_code: no + 1,
+      terminal: body.terminal,
+      send_balance: body.send_balance,
       opening: opening,
+      current_balance: opening,
       tank_balance: 0,
       receive_balance: 0,
       receive_date: new Date("YYYY-MM-DD"),
@@ -216,6 +223,7 @@ export const updateAtgFuelIn = async (body: any) => {
     await fuelInModel.findByIdAndUpdate(body.id, {
       tank_balance: closing,
       receive_balance: closing - opening,
+      current_balance: closing,
     });
 
     const result = await fuelInModel.findById(body.id);
@@ -231,7 +239,10 @@ export const updateAtgFuelIn = async (body: any) => {
         tankNo: result?.tankNo,
         fuel_type: result?.fuel_type,
         fuel_in_code: result?.fuel_in_code,
+        terminal: result?.terminal,
         opening: result?.opening,
+        current_balance: result?.current_balance,
+        send_balance: result?.send_balance,
         tank_balance: result?.tank_balance,
         receive_balance: result?.receive_balance.toString(),
         receive_date: result?.receive_date,

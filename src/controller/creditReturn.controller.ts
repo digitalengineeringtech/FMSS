@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { getCreditReturn, updateCreditReturn } from "../service/creditReturn.service";
+import { getCreditReturn, updateCreditReturn, updateSingleCreditReturn } from '../service/creditReturn.service';
 import fMsg from "../utils/helper";
 
 
@@ -16,6 +16,15 @@ export const updateCreditReturnHandler = async (req: Request, res: Response, nex
     try {
         let result = await updateCreditReturn(req.body);
         fMsg(res, "update credit return", result);
+      } catch (e) {
+        next(e);
+      }
+}
+
+export const updateSingleCreditReturnHandler = async (req: Request, res: Response, next: NextFunction) => {
+    try {    
+        let result = await updateSingleCreditReturn(req.params.id, req.body);
+        fMsg(res, "update single credit return", result);
       } catch (e) {
         next(e);
       }
