@@ -9,6 +9,7 @@ export interface creditReturnDocument extends mongoose.Document {
     isPaid: boolean;
     createdAt: Date;
     customerCredit: string;
+    detailSale: string;
 }
 
 const creditReturnSchema = new Schema({
@@ -20,6 +21,7 @@ const creditReturnSchema = new Schema({
     isPaid: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
     customerCredit: { type: Schema.Types.ObjectId, ref: 'customerCredit' },
+    detailSale: { type: Schema.Types.ObjectId, ref: 'detailSale' },
 });
 
 const creditReturnModel = mongoose.model<creditReturnDocument>(

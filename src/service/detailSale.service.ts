@@ -550,6 +550,7 @@ export const detailSaleUpdateByDevice = async (
             await customerCredit.save();
 
             await creditReturnModel.create({
+                detailSale: result._id,
                 customerCredit: customerCredit._id,
                 vocono: result.vocono,
                 creditAmount: result.totalPrice,

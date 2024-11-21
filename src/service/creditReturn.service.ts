@@ -4,6 +4,7 @@ import customerCreditModel from "../model/customerCredit.model";
 
 export const getCreditReturn = async (query: FilterQuery<creditReturnDocument>) => {
     return await creditReturnModel.find(query)
+                    .populate("detailSale", "-__v")
                     .populate("customerCredit", "-__v")
                     .select("-__v")
                     .lean();
@@ -91,7 +92,11 @@ export const updateCreditReturn = async (body: creditReturnDocument) => {
                 await customerCredit.save(); // Save the updated customer credit document
             }
         
-            return await creditReturnModel.find({}).select('-__v').lean();
+            return await creditReturnModel.find({})
+                            .populate("detailSale", "-__v")
+                            .populate("customerCredit", "-__v")
+                            .select('-__v')
+                            .lean();
         }
     } catch (error) {
         console.error('Error during updating credit return records:', error);
@@ -130,6 +135,8 @@ export const updateSingleCreditReturn = async (id: string, body: creditReturnDoc
         returnDate: body.returnDate,
         creditAmount: 0,
     }, { new: true })
+    .populate("detailSale", "-__v")
+    .populate("customerCredit", "-__v")
     .select('-__v')
     .lean();
 
