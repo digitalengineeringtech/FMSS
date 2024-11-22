@@ -89,7 +89,12 @@ export const updateExistingTankData = async (body) => {
     try {
       let url = config.get<string>("tankDataCloudUrl");
 
-      await axios.post(url, uploadData[0]);
+      const cloudTank = {
+        ...uploadData[0],
+        dailyReportDate: uploadData[0].dateOfDay,
+      }
+
+      await axios.post(url, cloudTank);
     } catch (e) {
       console.log(e.response, "from add tank data");
     }
