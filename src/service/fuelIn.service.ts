@@ -41,7 +41,7 @@ export const addFuelIn = async (body: any) => {
     let no = await fuelInModel.count();
     let tankCondition = await getFuelBalance({
       stationId: body.user.stationId,
-      fuelType: body.fuel_type,
+      fuel_type: body.fuelType,
       tankNo: body.tankNo,
       createAt: body.receive_date,
     });
