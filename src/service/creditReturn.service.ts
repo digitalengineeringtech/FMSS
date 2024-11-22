@@ -5,7 +5,13 @@ import customerCreditModel from "../model/customerCredit.model";
 export const getCreditReturn = async (query: FilterQuery<creditReturnDocument>) => {
     return await creditReturnModel.find(query)
                     .populate("detailSale", "-__v")
-                    .populate("customerCredit", "-__v")
+                    .populate({
+                        path: 'customerCredit',
+                        populate: {
+                            path: 'customer',
+                            select: '-__v'
+                        }
+                    })
                     .select("-__v")
                     .lean();
 }
@@ -94,7 +100,13 @@ export const updateCreditReturn = async (body: creditReturnDocument) => {
         
             return await creditReturnModel.find({})
                             .populate("detailSale", "-__v")
-                            .populate("customerCredit", "-__v")
+                            .populate({
+                                path: 'customerCredit',
+                                populate: {
+                                    path: 'customer',
+                                    select: '-__v'
+                                }
+                            })
                             .select('-__v')
                             .lean();
         }
@@ -136,7 +148,13 @@ export const updateSingleCreditReturn = async (id: string, body: creditReturnDoc
         creditAmount: 0,
     }, { new: true })
     .populate("detailSale", "-__v")
-    .populate("customerCredit", "-__v")
+    .populate({
+        path: 'customerCredit',
+        populate: {
+            path: 'customer',
+            select: '-__v'
+        }
+    })
     .select('-__v')
     .lean();
 
