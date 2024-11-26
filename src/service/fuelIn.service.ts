@@ -76,7 +76,24 @@ export const addFuelIn = async (body: any) => {
     // console.log("===up=================================");
 
     try {
-      let response = await axios.post(url, updatedBody);
+      const cloudObject = {
+         stationId: result?.stationDetailId,
+         driver: result?.driver,
+         bowser: result?.bowser,
+         tankNo: result?.tankNo,
+         fuel_type: result?.fuel_type,
+         fuel_in_code: result?.fuel_in_code,
+         tank_balance: result?.tank_balance,
+         opening: result?.opening,
+         terminal: result?.terminal,
+         current_balance: result?.current_balance,
+         send_balance: result?.send_balance,
+         receive_balance: result?.receive_balance,
+         receive_date: result?.receive_date,
+         createAt: result?.receive_date
+      }
+
+      let response = await axios.post(url, cloudObject);
 
       if (response.status == 200) {
         await fuelInModel.findByIdAndUpdate(result._id, {
@@ -231,22 +248,22 @@ export const updateAtgFuelIn = async (body: any) => {
     try {
       const url = config.get<string>("atgFuelInCloud");
 
-      let cloudObject = {
-        stationDetailId: result?.stationDetailId,
+      const cloudObject = {
         stationId: result?.stationDetailId,
         driver: result?.driver,
         bowser: result?.bowser,
         tankNo: result?.tankNo,
         fuel_type: result?.fuel_type,
         fuel_in_code: result?.fuel_in_code,
-        terminal: result?.terminal,
+        tank_balance: result?.tank_balance,
         opening: result?.opening,
+        terminal: result?.terminal,
         current_balance: result?.current_balance,
         send_balance: result?.send_balance,
-        tank_balance: result?.tank_balance,
-        receive_balance: result?.receive_balance.toString(),
+        receive_balance: result?.receive_balance,
         receive_date: result?.receive_date,
-      };
+        createAt: result?.receive_date
+     }
 
       const response = await axios.post(url, cloudObject);
 
