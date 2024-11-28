@@ -3,7 +3,10 @@ import customerModel, { customerDocument } from "../model/customer.model";
 import customerCreditModel from '../model/customerCredit.model';
 
 export const getCustomer = async (query: FilterQuery<customerDocument>) => {
-  return await customerModel.find(query);
+  return await customerModel.find({
+    _id: query.customer,
+    cusCardId: query.cusCardId,
+  });
 };
 
 export const addCustomer = async (body) => {

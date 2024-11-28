@@ -1,5 +1,5 @@
 import { response } from "express";
-import { FilterQuery, UpdateQuery } from "mongoose";
+import mongoose, { FilterQuery, UpdateQuery } from "mongoose";
 import detailSaleModel, { detailSaleDocument } from "../model/detailSale.model";
 import config from "config";
 import { UserDocument } from "../model/user.model";
@@ -39,6 +39,7 @@ import { getCustomerByCardId } from "./customer.service";
 import { checkCreditLimit } from "./customerCredit.service";
 import customerCreditModel from '../model/customerCredit.model';
 import creditReturnModel from '../model/creditReturn.model';
+import c from "config";
 
 interface Data {
   cusCardId: string;
@@ -1555,10 +1556,23 @@ export const creditDetailSaleOnlyPaginate = async(
   try {
     const reqPage = pageNo == 1 ? 0 : pageNo - 1;
     const skipCount = limitNo * reqPage;
+    let sDate;
+    let eDate;
 
     const filter = {
-      ...query,
-      cashType: "Credit"
+      createAt: {},
+      cashType: "Credit",
+      customer: query.customer,
+    }
+
+    if(query.sDate && query.eDate) {
+      sDate = query.sDate;
+      eDate = query.eDate;
+
+      filter.createAt = {
+        $gt: sDate,
+        $lt: eDate
+      }
     }
 
     const data = await detailSaleModel.find(filter)

@@ -4,7 +4,16 @@ import creditReturnModel from '../model/creditReturn.model';
 
 
 export const getCreditCustomer = async (query: FilterQuery<customerCreditDocument>) => {
-    return await customerCreditModel.find(query).populate("customer", "-__v").select("-__v");
+    const filter = {
+        ...query,
+        customer: query.customer,
+        limitAmount: query.limitAmount,
+        cusCardId: query.cusCardId
+    }
+    
+    return await customerCreditModel.find(filter)
+                .populate("customer")
+                .select("-__v");
 };
 export const addCreditCustomer = async (body: customerCreditDocument) => {
     return await new customerCreditModel(body).save();
