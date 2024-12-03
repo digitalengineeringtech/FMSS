@@ -40,6 +40,7 @@ import { checkCreditLimit } from "./customerCredit.service";
 import customerCreditModel from '../model/customerCredit.model';
 import creditReturnModel from '../model/creditReturn.model';
 import c from "config";
+import discountModel from '../model/discount.model';
 
 interface Data {
   cusCardId: string;
@@ -513,13 +514,19 @@ export const detailSaleUpdateByDevice = async (
           Number(data[2]) || 0;
     }
 
-    // console.log(
-    //   fuelBalances?.find((e) => e.tankNo == tankNo),
-    //   "sale volume"
-    // );
+    let grandTotal = 0;
 
-    //end update
+    const getDiscount = await discountModel.findOne({ isActive: true });
 
+    if(getDiscount != null && getDiscount.type == 'amount') {
+       grandTotal = Number(data[3]) - Number(getDiscount.amount)
+    } else if(getDiscount != null && getDiscount.type == 'percent') {
+       grandTotal = (Number(data[3]) * Number(getDiscount.amount)) / 100;
+    } else {
+       grandTotal = data[3];
+    }
+
+    
     let updateBody: UpdateQuery<detailSaleDocument> = {
       nozzleNo: data[0],
       salePrice: data[1],
@@ -527,12 +534,13 @@ export const detailSaleUpdateByDevice = async (
       depNo: topic,
       // saleLiter: data[2],
       // totalPrice: totalPrice ? totalPrice : 0,
-      totalPrice: data[3],
+      totalPrice: grandTotal,
+      discount: getDiscount?.type == 'amount' ? getDiscount.amount : getDiscount?.type == 'percent' ? `${getDiscount.amount}%` : 0,
       asyncAlready: lastData[0].asyncAlready == "a0" ? "a" : "1",
       totalizer_liter:
         lastData[1].totalizer_liter + Number(data[2] ? data[2] : 0),
       totalizer_amount:
-        lastData[1].totalizer_amount + Number(data[3] ? data[3] : 0),
+        lastData[1].totalizer_amount + Number(grandTotal ? grandTotal : 0),
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[1] == "" ? data[4] * 1 : data[4] * data[1],
       tankNo: tankNo,

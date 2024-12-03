@@ -3,13 +3,13 @@ import mongoose, { Schema } from "mongoose";
 export interface discountDocument extends mongoose.Document {
     type: string; // amount or percentage
     amount: number;
-    percent: number;
+    isActive: boolean;
 }
 
 const discountSchema = new Schema({
     type: { type: String, required: true }, // amount or percentage
-    amount: { type: Number, default: 0 }, 
-    percent: { type: Number, default: 0 }, // 5% or 10%
+    amount: { type: Number, required: true }, // if type == amount then amount else percentage number
+    isActive: { type: Boolean, default: false },
 });
 
 const discountModel = mongoose.model<discountDocument>(
