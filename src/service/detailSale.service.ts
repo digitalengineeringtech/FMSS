@@ -525,6 +525,14 @@ export const detailSaleUpdateByDevice = async (
 
     let result = await detailSaleModel.findById(lastData[0]._id);
 
+    logger.info(`
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: ${JSON.stringify(result)}
+      ========== ended ==========
+     `, { file: 'detailsale.log' });
+
     if (!result) {
       throw new Error("Final send in error");
     }
@@ -663,7 +671,7 @@ export const detailSaleUpdateByDevice = async (
             function: Response Logger
             Response: ${JSON.stringify(response.data)}
             ========== ended ==========
-           `, { file: 'detailsale.log' });
+           `, { file: 'combined.log' });
           if (response.status == 200) {
             await detailSaleModel.findByIdAndUpdate(ea._id, {
               asyncAlready: "2",
@@ -690,7 +698,7 @@ export const detailSaleUpdateByDevice = async (
           function: Response Logger
           Response: ${JSON.stringify(response.data)}
           ========== ended ==========
-        `, { file: 'detailsale.log' });
+        `, { file: 'combined.log' });
         if (response.status == 200) {
           await detailSaleModel.findByIdAndUpdate(ea._id, {
             asyncAlready: "2",

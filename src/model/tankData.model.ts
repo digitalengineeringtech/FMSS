@@ -26,6 +26,7 @@ import mongoose, { Schema } from "mongoose";
 // })
 
 export interface tankDataDocument extends mongoose.Document {
+  dateOfDay: string;
   vocono: string;
   nozzleNo: string;
   asyncAlready: string;
