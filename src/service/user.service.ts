@@ -46,22 +46,32 @@ export const loginUser = async ({
   userObj["hasAtg"] = hasAtg;
   
   delete userObj.password;
+
   set(user._id, userObj);
+  set("user", userObj);
   set("stationNo", userObj.stationNo);
   set("stationId", userObj.stationId);
   set('tankCount', userObj.tankCount);
+
   return userObj;
 };
 
 export const cardAuth = async (cardId: string): Promise<{ token: string }> => {
   let user = await userModel.findOne({ cardId });
+
   if (!user) throw new Error("Not a valid card");
+
   let userObj: Partial<UserDocument> = user.toObject();
+
   delete userObj.password;
+
+  set(user._id, userObj);
+  set("user", userObj);
   set("stationNo", userObj.stationNo);
   set("stationId", userObj.stationId);
-  set(user._id, userObj);
+
   const userToken = createToken(userObj);
+
   return { token: userToken };
 };
 

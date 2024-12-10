@@ -22,7 +22,7 @@ export const addMptaHandler = async (
 ) => {
   try {
     const mpta = await addMpta(req.body);
-    fMsg(res, "mpta created", mpta);
+    fMsg(res, mpta.result?.error ?? 'Car number by card create successfully...', mpta);
   } catch (e) {
     next(new Error(e));
   }
