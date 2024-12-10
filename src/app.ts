@@ -147,7 +147,7 @@ app.use("/api/tank-data", tankDataRoute);
 
 app.use("/api/station", stationRoute);
 
-app.use('/api/mpta', mptaRoute);
+app.use('/api/car-number-by-card', mptaRoute);
 
 // error handling and response
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
