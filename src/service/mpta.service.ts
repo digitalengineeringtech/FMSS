@@ -17,7 +17,7 @@ export const addMpta = async (body: any) => {
             vehicleTypeId: vehicle.id,
             vehicleType: vehicle.name,
             shopCode: body.shop_code,
-            liter: body.total_litre,
+            litre: body.total_litre,
             amount: body.total_amount,
         }
 

@@ -16,7 +16,7 @@ const mptaSchema = new Schema({
    depNo: { type: String, required: true },
    carNo: { type: String },
    shopCode: { type: String, required: true },
-   liter: { type: Number, required: true },
+   litre: { type: Number, required: true },
    amount: { type: Number, required: true },
    vehicleTypeId: { type: String },
    vehicleType: { type: String },
