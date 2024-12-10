@@ -34,6 +34,7 @@ import stationRoute from "./router/station.routes";
 import creditReturnRoute from "./router/creditReturn.routes";
 import customerCreditRoute from "./router/customerCredit.routes";
 import discountRoute from "./router/discount.routes";
+import mptaRoute from "./router/mpta.routes";
 
 const app = express();
 app.use(express.json());
@@ -145,6 +146,8 @@ app.use("/api/fuel-balance", fuelBalanceRoute);
 app.use("/api/tank-data", tankDataRoute);
 
 app.use("/api/station", stationRoute);
+
+app.use('/api/mpta', mptaRoute);
 
 // error handling and response
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
