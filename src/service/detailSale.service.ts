@@ -80,7 +80,7 @@ export const preSetDetailSale = async (
 
   let customerId;
   
-  if(body.cashType == 'Credit') {
+  if(body.cashType == 'Credit Card') {
     const customer = await getCustomerByCardId(body.cusCardId);
 
     if(customer) {
@@ -231,7 +231,7 @@ export const addDetailSale = async (
   try {
     let customerId;
   
-    if(body.cashType == 'Credit') {
+    if(body.cashType == 'Credit Card') {
       const customer = await getCustomerByCardId(body.cusCardId);
   
       if(customer) {
@@ -552,7 +552,7 @@ export const detailSaleUpdateByDevice = async (
 
     let result = await detailSaleModel.findById(lastData[0]._id);
 
-    if(result && result.cashType == 'Credit') {
+    if(result && result.cashType == 'Credit Card') {
         const customerCredit = await customerCreditModel.findOne({ customer: result.customer });
         if(customerCredit) {
             customerCredit.limitAmount = Number(customerCredit.limitAmount) - Number(result.totalPrice);
@@ -1612,7 +1612,7 @@ export const creditDetailSaleByDateAndPagi = async (
         $gt: d1,
         $lt: d2,
       },
-      cashType: 'Credit'
+      cashType: 'Credit Card'
     };
 
     const dataQuery = detailSaleModel

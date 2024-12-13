@@ -18,7 +18,7 @@ export const addCustomer = async (body) => {
      cusDebLiter: body.cusDebLiter
   });
 
-  if(body.cusType === 'credit') {
+  if(body.cusType === 'Credit Card') {
     await customerCreditModel.create({
       customer: customer._id,
       creditType: body.creditType,
