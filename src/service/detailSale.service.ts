@@ -542,7 +542,7 @@ export const detailSaleUpdateByDevice = async (
       totalizer_amount:
         lastData[1].totalizer_amount + Number(grandTotal ? grandTotal : 0),
       devTotalizar_liter: data[4],
-      devTotalizar_amount: data[1] == "" ? data[4] * 1 : data[4] * data[1],
+      devTotalizar_amount: data[5] != "" ? data[5] : data[4] * data[1],
       tankNo: tankNo,
       tankBalance: volume || 0,
       isError: "A",
@@ -567,6 +567,14 @@ export const detailSaleUpdateByDevice = async (
             }); 
         }
     }
+
+    logger.info(`
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: ${JSON.stringify(result)}
+      ========== ended ==========
+     `, { file: 'detailsale.log' });
 
     if (!result) {
       throw new Error("Final send in error");
@@ -669,7 +677,7 @@ export const detailSaleUpdateByDevice = async (
             stationDetailId: result.stationDetailId,
             vocono: lastData[0].vocono,
             nozzleNo: lastData[0].nozzleNo,
-            dateOfDate: moment(lastData[0].dailyReportDate).tz("Asia/Yangon").format("YYYY-MM-DD"),
+            dateOfDay: moment(lastData[0].dailyReportDate).tz("Asia/Yangon").format("YYYY-MM-DD"),
           });
         } else {
           await updateExistingTankData({
@@ -701,6 +709,12 @@ export const detailSaleUpdateByDevice = async (
         try {
           let url = config.get<string>("detailsaleCloudUrl");
           let response = await axios.post(url, ea);
+          logger.info(`
+            ========== start ==========
+            function: Response Logger
+            Response: ${JSON.stringify(response.data)}
+            ========== ended ==========
+           `, { file: 'combined.log' });
 
           logger.info(`
             ========== start ==========
@@ -735,7 +749,7 @@ export const detailSaleUpdateByDevice = async (
           function: Response Logger
           Response: ${JSON.stringify(response.data)}
           ========== ended ==========
-        `, { file: 'detailsale.log' });
+        `, { file: 'combined.log' });
         if (response.status == 200) {
           await detailSaleModel.findByIdAndUpdate(ea._id, {
             asyncAlready: "2",
@@ -1434,7 +1448,7 @@ export const detailSaleSummaryDetail = async (
     let salesForNozzle = detailsales
       ?.filter((sale) => sale.nozzleNo === device.nozzle_no)
       ?.filter((ea) => ea.asyncAlready != "0")
-      ?.filter((e) => e.devTotalizar_liter != 0);
+      ?.filter((e) => e.devTotalizar_liter != 0 && e.devTotalizar_liter != null);
 
     let beforeStartDate = beforeDetailSales?.filter(
       (sale) => sale.nozzleNo === device.nozzle_no

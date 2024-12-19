@@ -26,17 +26,11 @@ export const addTankData = async (body) => {
     let url = config.get<string>("tankDataUrl");
     let tankRealTimeData = await axios.post(url);
 
-    // console.log(
-    //   tankRealTimeData,
-    //   ".........this is tank realtime data................"
-    // );
-
-
-
     let saveData = {
       ...body,
       asyncAlready: "0",
       data: tankRealTimeData.data.data,
+      dateOfDay: moment().format("YYYY-MM-DD"),
       // data: fakedata,
     };
 
@@ -52,13 +46,18 @@ export const addTankData = async (body) => {
     try {
       let url = config.get<string>("tankDataCloudUrl");
 
-      let response = await axios.post(url, uploadData[0]);
+      const cloudTank = {
+        ...uploadData[0],
+        dailyReportDate: uploadData[0].dateOfDay,
+      }
 
-      // if (response.status == 200) {
-      //   await tankDataModel.findByIdAndUpdate(uploadData[0]._id, {
-      //     asyncAlready: "2",
-      //   });
-      // }
+      let response = await axios.post(url, cloudTank);
+      
+      if (response.status == 200) {
+        await tankDataModel.findByIdAndUpdate(cloudTank._id, {
+          asyncAlready: "2",
+        });
+      }
     } catch (e) {
       console.log(e.message, "error from add tank data");
     }
@@ -75,6 +74,7 @@ export const updateExistingTankData = async (body) => {
       ...body,
       //  syncAlready: "0",
       data: tankRealTimeData.data.data,
+      dateOfDay: moment().format("YYYY-MM-DD"),
     };
 
     await tankDataModel.findByIdAndUpdate(body.id, updateData);
@@ -89,7 +89,12 @@ export const updateExistingTankData = async (body) => {
     try {
       let url = config.get<string>("tankDataCloudUrl");
 
-      await axios.post(url, uploadData[0]);
+      const cloudTank = {
+        ...uploadData[0],
+        dailyReportDate: uploadData[0].dateOfDay,
+      }
+
+      await axios.post(url, cloudTank);
     } catch (e) {
       console.log(e.response, "from add tank data");
     }
