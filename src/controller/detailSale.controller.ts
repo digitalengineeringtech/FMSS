@@ -17,6 +17,9 @@ import {
   detailSaleSummaryDetail,
   detailSaleSummary,
   detailSaleWithoutPagiByDate,
+  creditDetailSaleByDateAndPagi,
+  creditDetailSalePaginate,
+  creditDetailSaleOnlyPaginate,
   // detailSaleByDate,
 } from "../service/detailSale.service";
 
@@ -335,6 +338,73 @@ export const getDetailSaleDatePagiHandler = async (
     next(e);
   }
 };
+
+export const getCreditDetailSalePagiHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let pageNo = Number(req.params.page);
+    let { data, count } = await creditDetailSalePaginate(pageNo, req.query);
+    fMsg(res, "DetailSale are here", data, count);
+  } catch (e) {
+    next(e);
+  }
+}
+
+export const getCreditDetailSaleOnlyPagiHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let pageNo = Number(req.params.page);
+    let { data, count } = await creditDetailSaleOnlyPaginate(pageNo, req.query);
+    fMsg(res, "DetailSale are here", data, count);
+  } catch (e) {
+    next(e);
+  }
+}
+
+export const getCreditDetailSaleDatePagiHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let sDate: any = req.query.sDate;
+    let eDate: any = req.query.eDate;
+    let pageNo: number = Number(req.params.page);
+
+    delete req.query.sDate;
+    delete req.query.eDate;
+
+    let query = req.query;
+
+    if (!sDate) {
+      throw new Error("you need date");
+    }
+    if (!eDate) {
+      eDate = new Date();
+    }
+    //if date error ? you should use split with T or be sure detail Id
+    const startDate: Date = new Date(sDate);
+    const endDate: Date = new Date(eDate);
+    let { data, count } = await creditDetailSaleByDateAndPagi(
+      query,
+      startDate,
+      endDate,
+      pageNo
+    );
+
+    fMsg(res, "detail sale between two date", data, count);
+  } catch (e) {
+    next(e);
+  }
+};
+
+
 
  export const getDetailSaleWithoutPagiHandler = async (
   req: Request,

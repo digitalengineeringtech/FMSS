@@ -1,5 +1,5 @@
 import { response } from "express";
-import { FilterQuery, UpdateQuery } from "mongoose";
+import mongoose, { FilterQuery, UpdateQuery } from "mongoose";
 import detailSaleModel, { detailSaleDocument } from "../model/detailSale.model";
 import config from "config";
 import { UserDocument } from "../model/user.model";
@@ -34,8 +34,16 @@ import { log } from "console";
 import { create } from "domain";
 import logger from "../utils/logger";
 import deviceModel from "../model/device.model";
+import customerModel from "../model/customer.model";
+import { getCustomerByCardId } from "./customer.service";
+import { checkCreditLimit } from "./customerCredit.service";
+import customerCreditModel from '../model/customerCredit.model';
+import creditReturnModel from '../model/creditReturn.model';
+import c from "config";
+import discountModel from '../model/discount.model';
 
 interface Data {
+  cusCardId: string;
   depNo: string;
   nozzleNo: string;
   fuelType: string;
@@ -43,6 +51,7 @@ interface Data {
   casherCode: string;
   asyncAlready: string;
   stationDetailId: string;
+  customer: string | undefined;
   cashType: string;
   couObjId: string;
   totalizer_liter: number | undefined;
@@ -68,6 +77,23 @@ export const preSetDetailSale = async (
   type: string,
   body
 ) => {
+
+  let customerId;
+  
+  if(body.cashType == 'Credit Card') {
+    const customer = await getCustomerByCardId(body.cusCardId);
+
+    if(customer) {
+      const checkLimit = await checkCreditLimit(customer._id);
+  
+      if(checkLimit == false) {
+        throw new Error('Credit Limit Exceeded');
+      } 
+
+      customerId = customer._id;
+    }
+  }
+
   const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
   const cuurentDateForVocono = moment().tz("Asia/Yangon").format("DDMMYYYY");
 
@@ -82,22 +108,10 @@ export const preSetDetailSale = async (
   }
 
   let iso: Date = new Date(`${currentDate}T${currentDateTime}.000Z`);
-  //hk
-  // let rdsCount: number = await get(currentDate);
-  // if (!rdsCount) {
-  //   rdsCount = await detailSaleModel.countDocuments({
-  //     dailyReportDate: currentDate,
-  //   });
-  //   if (rdsCount == 0) await autoAddTotalBalance(currentDate);
-  // }
-
-  // let newCount = rdsCount + 1;
-
+ 
   const count = await detailSaleModel.countDocuments({
     dailyReportDate: currentDate,
   });
-
-  // console.log(count, count + 1, "............");
 
   await set(currentDate, count + 1);
 
@@ -114,22 +128,12 @@ export const preSetDetailSale = async (
     .findOne({ nozzleNo: body.nozzleNo })
     .sort({ _id: -1, createAt: -1 });
 
-  // body = {
-  //   ...body,
-  //   vocono: `${stationNo}/${body.user.name}/${cuurentDateForVocono}/${newCount}`,
-  //   stationDetailId: stationId,
-  //   casherCode: body.user.name,
-  //   asyncAlready: "0",
-  //   totalizer_liter: lastDocument?.totalizer_liter,
-  //   totalizer_amount: lastDocument?.totalizer_amount,၇
-  //   preset: `${preset} ${type}`,
-  //   createAt: iso,
-  // };
   body = {
     ...body,
     vocono: `${body.user.stationNo}/${body.user.name}/${cuurentDateForVocono}/${
       count + 1
     }`,
+    customer: customerId,
     stationDetailId: body.user.stationId,
     casherCode: body.user.name,
     asyncAlready: "0",
@@ -225,6 +229,21 @@ export const addDetailSale = async (
   body: Data
 ) => {
   try {
+    let customerId;
+  
+    if(body.cashType == 'Credit Card') {
+      const customer = await getCustomerByCardId(body.cusCardId);
+  
+      if(customer) {
+        const checkLimit = await checkCreditLimit(customer._id);
+    
+        if(checkLimit == false) {
+          throw new Error('Credit Limit Exceeded');
+        } 
+  
+        customerId = customer._id;
+      }
+    }
     //for time
     const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
     const cuurentDateForVocono = moment().tz("Asia/Yangon").format("DDMMYYYY");
@@ -268,6 +287,7 @@ export const addDetailSale = async (
         body.user.name
       }/${cuurentDateForVocono}/${count + 1}`,
       stationDetailId: body.user.stationId,
+      customer: customerId,
       casherCode: body.user.name,
       asyncAlready: "0",
       depNo: depNo,
@@ -494,13 +514,19 @@ export const detailSaleUpdateByDevice = async (
           Number(data[2]) || 0;
     }
 
-    // console.log(
-    //   fuelBalances?.find((e) => e.tankNo == tankNo),
-    //   "sale volume"
-    // );
+    let grandTotal = 0;
 
-    //end update
+    const getDiscount = await discountModel.findOne({ isActive: true });
 
+    if(getDiscount != null && getDiscount.type == 'amount') {
+       grandTotal = Number(data[3]) - Number(getDiscount.amount)
+    } else if(getDiscount != null && getDiscount.type == 'percent') {
+       grandTotal = (Number(data[3]) * Number(getDiscount.amount)) / 100;
+    } else {
+       grandTotal = data[3];
+    }
+
+    
     let updateBody: UpdateQuery<detailSaleDocument> = {
       nozzleNo: data[0],
       salePrice: data[1],
@@ -508,12 +534,13 @@ export const detailSaleUpdateByDevice = async (
       depNo: topic,
       // saleLiter: data[2],
       // totalPrice: totalPrice ? totalPrice : 0,
-      totalPrice: data[3],
+      totalPrice: grandTotal,
+      discount: getDiscount?.type == 'amount' ? getDiscount.amount : getDiscount?.type == 'percent' ? `${getDiscount.amount}%` : 0,
       asyncAlready: lastData[0].asyncAlready == "a0" ? "a" : "1",
       totalizer_liter:
         lastData[1].totalizer_liter + Number(data[2] ? data[2] : 0),
       totalizer_amount:
-        lastData[1].totalizer_amount + Number(data[3] ? data[3] : 0),
+        lastData[1].totalizer_amount + Number(grandTotal ? grandTotal : 0),
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[5] != "" ? data[5] : data[4] * data[1],
       tankNo: tankNo,
@@ -524,6 +551,22 @@ export const detailSaleUpdateByDevice = async (
     await detailSaleModel.findByIdAndUpdate(lastData[0]._id, updateBody);
 
     let result = await detailSaleModel.findById(lastData[0]._id);
+
+    if(result && result.cashType == 'Credit Card') {
+        const customerCredit = await customerCreditModel.findOne({ customer: result.customer });
+        if(customerCredit) {
+            customerCredit.limitAmount = Number(customerCredit.limitAmount) - Number(result.totalPrice);
+            await customerCredit.save();
+
+            await creditReturnModel.create({
+                detailSale: result._id,
+                customerCredit: customerCredit._id,
+                vocono: result.vocono,
+                creditAmount: result.totalPrice,
+                creditDueDate: customerCredit.creditDueDate
+            }); 
+        }
+    }
 
     logger.info(`
       ========== start ==========
@@ -672,6 +715,14 @@ export const detailSaleUpdateByDevice = async (
             Response: ${JSON.stringify(response.data)}
             ========== ended ==========
            `, { file: 'combined.log' });
+
+          logger.info(`
+            ========== start ==========
+            function: Response Logger
+            Response: ${JSON.stringify(response.data)}
+            ========== ended ==========
+            `, { file: 'detailsale.log' });
+
           if (response.status == 200) {
             await detailSaleModel.findByIdAndUpdate(ea._id, {
               asyncAlready: "2",
@@ -1467,6 +1518,115 @@ export const detailSaleByDateAndPagi = async (
         $gt: d1,
         $lt: d2,
       },
+    };
+
+    const dataQuery = detailSaleModel
+      .find(filter)
+      .sort({ createAt: -1 })
+      .skip(skipCount)
+      .limit(limitNo)
+      // .populate("stationDetailId")
+      .select("-__v");
+
+    const countQuery = detailSaleModel.countDocuments(filter);
+
+    const [data, count] = await Promise.all([dataQuery, countQuery]);
+
+    return { data, count };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const creditDetailSalePaginate = async (
+  pageNo: number,
+  query: FilterQuery<detailSaleDocument>
+) => {
+  try {
+    const reqPage = pageNo == 1 ? 0 : pageNo - 1;
+    const skipCount = limitNo * reqPage;
+
+    let customerId = null;
+    if (query.cusCardId) {
+      const customer = await customerModel.findOne({ cusCardId: query.cusCardId }).select('_id');
+      if (customer) {
+        customerId = customer._id; // Store the customer ID if found
+      }
+    }
+
+    delete query.cusCardId;
+
+    const filter = customerId ? { ...query, customer: customerId } : query;
+
+    const data = await detailSaleModel.find(filter)
+                .skip(skipCount)
+                .limit(limitNo)
+                .select("-__v");
+
+    const count = await detailSaleModel.countDocuments(filter);
+
+    return { data, count };
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const creditDetailSaleOnlyPaginate = async(
+  pageNo: number,
+  query: FilterQuery<detailSaleDocument>
+) => {
+  try {
+    const reqPage = pageNo == 1 ? 0 : pageNo - 1;
+    const skipCount = limitNo * reqPage;
+    let sDate;
+    let eDate;
+
+    const filter = {
+      createAt: {},
+      cashType: "Credit",
+      customer: query.customer,
+    }
+
+    if(query.sDate && query.eDate) {
+      sDate = query.sDate;
+      eDate = query.eDate;
+
+      filter.createAt = {
+        $gt: sDate,
+        $lt: eDate
+      }
+    }
+
+    const data = await detailSaleModel.find(filter)
+                .populate('customer')
+                .skip(skipCount)
+                .limit(limitNo)
+                .select("-__v");
+
+  const count = await detailSaleModel.countDocuments(filter);
+
+  return { data, count };
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const creditDetailSaleByDateAndPagi = async (
+  query: FilterQuery<detailSaleDocument>,
+  d1: Date,
+  d2: Date,
+  pageNo: number
+): Promise<{ count: number; data: detailSaleDocument[] }> => {
+  try {
+    const reqPage = pageNo == 1 ? 0 : pageNo - 1;
+    const skipCount = limitNo * reqPage;
+    const filter: FilterQuery<detailSaleDocument> = {
+      ...query,
+      createAt: {
+        $gt: d1,
+        $lt: d2,
+      },
+      cashType: 'Credit Card'
     };
 
     const dataQuery = detailSaleModel

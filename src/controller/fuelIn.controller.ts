@@ -9,6 +9,7 @@ import {
   fuelInByDate,
   addAtgFuelIn,
   updateAtgFuelIn,
+  calculateFuelBalance,
 } from "../service/fuelIn.service";
 
 export const getFuelInHandler = async (
@@ -123,5 +124,18 @@ export const updateAtgFuelInHandler = async (
     fMsg(res, "FuelIn data was updated", result);
   } catch (e) {
     console.log(e, "this is err");
+  }
+};
+
+export const calculateFuelBalanceHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let result = await calculateFuelBalance(req.body);
+    fMsg(res, "FuelIn are here", result);
+  } catch (e) {
+    next(new Error(e));
   }
 };

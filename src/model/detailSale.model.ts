@@ -17,6 +17,7 @@ export interface detailSaleDocument extends mongoose.Document {
   salePrice: number;
   saleLiter: number;
   totalPrice: number;
+  discount: string;
   totalizer_liter: number;
   totalizer_amount: number;
   devTotalizar_liter: number;
@@ -28,6 +29,7 @@ export interface detailSaleDocument extends mongoose.Document {
   device: string;
   isReload: number;
   createAt: Date;
+  customer: string;
 }
 
 const detailSaleSchema = new Schema({
@@ -42,7 +44,6 @@ const detailSaleSchema = new Schema({
   depNo: { type: String, default: '0' },
   nozzleNo: { type: String, required: true },
   fuelType: { type: String, required: true },
-
   cashType: {
     type: String,
     default: "paided",
@@ -55,10 +56,10 @@ const detailSaleSchema = new Schema({
     default: "0",
     enum: ["0", "1", "a0", "a", "2"],
   },
-
   salePrice: { type: Number, default: 0 },
   saleLiter: { type: Number, default: 0 },
   totalPrice: { type: Number, default: 0 },
+  discount: { type: String},
   totalizer_liter: { type: Number, default: 0 },
   totalizer_amount: { type: Number, default: 0 },
   devTotalizar_liter: { type: Number, default: 0 },
@@ -79,6 +80,7 @@ const detailSaleSchema = new Schema({
   preset: { type: String, default: null },
   device: { type: String, required: true },
   createAt: { type: Date, default: Date.now },
+  customer: { type: Schema.Types.ObjectId, ref: "customer", default: null },
 });
 
 detailSaleSchema.pre("save", function (next) {

@@ -31,8 +31,10 @@ import fuelInRoute from "./router/fuelIn.routes";
 import fuelBalanceRoute from "./router/fuelBalance.routes";
 import tankDataRoute from "./router/tankData.routes";
 import stationRoute from "./router/station.routes";
-import logger from "./utils/logger";
-import moment from "moment";
+import creditReturnRoute from "./router/creditReturn.routes";
+import customerCreditRoute from "./router/customerCredit.routes";
+import discountRoute from "./router/discount.routes";
+import mptaRoute from "./router/mpta.routes";
 
 const app = express();
 app.use(express.json());
@@ -133,6 +135,9 @@ app.use("/api/daily-price", dailyPriceRoute); // daily price route
 
 // update route
 app.use("/api/customer", customerRoute);
+app.use("/api/customer-credit", customerCreditRoute);
+app.use("/api/credit-return", creditReturnRoute);
+app.use('/api/discount', discountRoute);
 app.use("/api/total-statement", totalStatementRoute);
 app.use("/api/balance-statement", balanceStatementRoute);
 app.use("/api/fuelIn", fuelInRoute);
@@ -141,6 +146,8 @@ app.use("/api/fuel-balance", fuelBalanceRoute);
 app.use("/api/tank-data", tankDataRoute);
 
 app.use("/api/station", stationRoute);
+
+app.use('/api/car-number-by-card', mptaRoute);
 
 // error handling and response
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
