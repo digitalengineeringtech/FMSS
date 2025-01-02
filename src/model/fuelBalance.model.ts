@@ -5,6 +5,7 @@ export interface fuelBalanceDocument extends mongoose.Document {
   stationId: string;
   fuelType: string;
   capacity: string;
+  terminal: number;
   opening: number;
   fuelIn: number;
   tankNo: number;
@@ -24,6 +25,7 @@ const fuelBalanceSchema = new Schema({
   },
   fuelType: { type: String, required: true },
   capacity: { type: String, required: true },
+  terminal: { type: Number, default: 0 },
   opening: { type: Number, default: 0 },
   tankNo: { type: Number, require: true },
   fuelIn: { type: Number, default: 0 },
