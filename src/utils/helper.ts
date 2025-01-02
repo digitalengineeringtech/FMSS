@@ -86,4 +86,14 @@ export const presetFormat = (preset) => {
     }
 }
 
+export const formatDecimal = (value: string | number): string => {
+  // decimal value with 3 decimal points
+  return value != 'undefined' ? parseFloat(value.toString()).toFixed(3) : '0.000';
+}
+
+export const formatPrice = (value: string | number): string => {
+  // only comma separated value 
+  return value != 'undefined' ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '0';
+}
+
 export default fMsg;
