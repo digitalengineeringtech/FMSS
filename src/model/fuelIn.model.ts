@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
-import moment, { MomentTimezone } from "moment-timezone";
+import moment from "moment-timezone";
+import { formatDecimal, virtualFormat } from '../utils/helper';
+import mongooseLeanVirtuals from "mongoose-lean-virtuals";
 
 const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
 
@@ -42,6 +44,16 @@ const fuelInSchema = new Schema({
   createAt: { type: Date, default: new Date() },
   asyncAlready: { type: String, required: true },
 });
+
+// Add virtual formatting for specific fields
+virtualFormat(fuelInSchema, [
+  "tank_balance",
+  "opening",
+  "current_balance",
+  "send_balance",
+  "receive_balance",
+]);
+
 
 fuelInSchema.pre("save", function (next) {
   const options = { timeZone: "Asia/Yangon", hour12: false };

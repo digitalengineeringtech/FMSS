@@ -11,14 +11,7 @@ export const createDiscount = async (data: any) => {
 };
 
 export const updateDiscount = async (id, body) => {
-    try {
-      if (body.isActive) {
-          await discountModel.updateMany(
-              { _id: { $ne: id }, isActive: true },
-              { $set: { isActive: false, amount: body.amount } }
-          );
-      }
-      
+    try {  
       // Update the targeted discount regardless of isActive status
       const updatedDiscount = await discountModel.findByIdAndUpdate(id, body, { new: true });
       return updatedDiscount;

@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import moment from "moment-timezone";
+import { virtualFormat } from '../utils/helper';
 
 export interface detailSaleDocument extends mongoose.Document {
   stationDetailId: string;
@@ -82,6 +83,14 @@ const detailSaleSchema = new Schema({
   createAt: { type: Date, default: Date.now },
   customer: { type: Schema.Types.ObjectId, ref: "customer", default: null },
 });
+
+virtualFormat(detailSaleSchema, [
+   'saleLiter',
+   'totalizer_liter',
+   'devTotalizar_liter',
+   'devTotalizar_amount',
+   'tankBalance',
+]);
 
 detailSaleSchema.pre("save", function (next) {
   if (this.vehicleType == "Cycle" && this.carNo == null) {

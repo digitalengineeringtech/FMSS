@@ -64,7 +64,7 @@ const limitNo = config.get<number>("page_limit");
 
 export const getDetailSale = async (query: FilterQuery<detailSaleDocument>) => {
   try {
-    return await detailSaleModel.find(query);
+    return await detailSaleModel.find(query).lean({virtuals: true});
   } catch (e) {
     throw new Error(e);
   }
@@ -126,6 +126,7 @@ export const preSetDetailSale = async (
 
   const lastDocument = await detailSaleModel
     .findOne({ nozzleNo: body.nozzleNo })
+    .lean({ virtuals: true })
     .sort({ _id: -1, createAt: -1 });
 
   body = {
@@ -397,6 +398,7 @@ export const detailSaleUpdateError = async (
     const lastData: any = await detailSaleModel
       .find({ nozzleNo: data.nozzleNo })
       .sort({ _id: -1, createAt: -1 })
+      .lean({ virtuals: true })
       .limit(2);
 
     body = {
@@ -409,7 +411,7 @@ export const detailSaleUpdateError = async (
 
     let updateData = await detailSaleModel.findOneAndUpdate(query, body);
 
-    let result = await detailSaleModel.findOne({ _id: updateData?._id });
+    let result = await detailSaleModel.findOne({ _id: updateData?._id }).lean({ virtuals: true });
 
     if (!result) {
       throw new Error("Final send in error");
@@ -550,7 +552,7 @@ export const detailSaleUpdateByDevice = async (
 
     await detailSaleModel.findByIdAndUpdate(lastData[0]._id, updateBody);
 
-    let result = await detailSaleModel.findById(lastData[0]._id);
+    let result = await detailSaleModel.findById(lastData[0]._id).lean({ virtuals: true });
 
     if(result && result.cashType == 'Credit Card') {
         const customerCredit = await customerCreditModel.findOne({ customer: result.customer });
@@ -768,7 +770,7 @@ export const detailSaleUpdateByDevice = async (
     let checkErrorFuelInData = await fuelInModel.find({
       asyncAlready: 1,
       // dailyReportDate: prevDate,
-    });
+    }).lean({ virtuals: true });
 
     if (checkErrorFuelInData.length > 0) {
       for (const ea of checkErrorFuelInData) {
@@ -1316,6 +1318,7 @@ export const detailSalePaginate = async (
     .sort({ createAt: -1 })
     .skip(skipCount)
     .limit(limitNo)
+    .lean({ virtuals: true })
     .select("-__v");
   const count = await detailSaleModel.countDocuments(query);
 
@@ -1338,6 +1341,7 @@ export const detailSaleByDate = async (
   let result = await detailSaleModel
     .find(filter)
     .sort({ createAt: -1 })
+    .lean({ virtuals: true })
     .select("-__v");
 
   return result;
@@ -1368,11 +1372,13 @@ export const detailSaleSummary = async (
       devTotalizar_liter: { $ne: 0 },
     })
     .sort({ createAt: -1 })
+    .lean({ virtuals: true })
     .select("-__v");
 
   let detailsales = await detailSaleModel
     .find(filter)
     .sort({ createAt: -1 })
+    .lean({ virtuals: true })
     .select("-__v");
 
   let nozzleNos = detailsales.map((sale) => sale.nozzleNo);
@@ -1437,11 +1443,13 @@ export const detailSaleSummaryDetail = async (
       devTotalizar_liter: { $ne: 0 },
     })
     .sort({ createAt: -1 })
+    .lean({ virtuals: true })
     .select("-__v");
 
   let detailsales = await detailSaleModel
     .find(filter)
     .sort({ createAt: -1 })
+    .lean({ virtuals: true })
     .select("-__v");
 
   let result = devices.map((device) => {
@@ -1525,7 +1533,7 @@ export const detailSaleByDateAndPagi = async (
       .sort({ createAt: -1 })
       .skip(skipCount)
       .limit(limitNo)
-      // .populate("stationDetailId")
+      .lean({ virtuals: true })
       .select("-__v");
 
     const countQuery = detailSaleModel.countDocuments(filter);
@@ -1561,6 +1569,7 @@ export const creditDetailSalePaginate = async (
     const data = await detailSaleModel.find(filter)
                 .skip(skipCount)
                 .limit(limitNo)
+                .lean({ virtuals: true })
                 .select("-__v");
 
     const count = await detailSaleModel.countDocuments(filter);
@@ -1601,6 +1610,7 @@ export const creditDetailSaleOnlyPaginate = async(
                 .populate('customer')
                 .skip(skipCount)
                 .limit(limitNo)
+                .lean({ virtuals: true })
                 .select("-__v");
 
   const count = await detailSaleModel.countDocuments(filter);
@@ -1634,7 +1644,7 @@ export const creditDetailSaleByDateAndPagi = async (
       .sort({ createAt: -1 })
       .skip(skipCount)
       .limit(limitNo)
-      // .populate("stationDetailId")
+      .lean({ virtuals: true })
       .select("-__v");
 
     const countQuery = detailSaleModel.countDocuments(filter);
@@ -1665,6 +1675,7 @@ export const detailSaleWithoutPagiByDate = async (
     const dataQuery = detailSaleModel
       .find(filter)
       .sort({ createAt: -1 })
+      .lean({ virtuals: true })
       .select("-__v");
 
     const countQuery = detailSaleModel.countDocuments(filter);
@@ -1781,7 +1792,7 @@ export const updateDetailSaleByAp = async (
 
   await detailSaleModel.findByIdAndUpdate(id, updateBody);
 
-  let result = await detailSaleModel.findById(id);
+  let result = await detailSaleModel.findById(id).lean({ virtuals: true });
 
   if (!result) throw new Error("error in update");
 
@@ -1839,7 +1850,8 @@ export const getLastDetailSaleData = async (
 ): Promise<detailSaleDocument | null> => {
   return await detailSaleModel
     .findOne({ nozzleNo })
-    .sort({ _id: -1, createAt: -1 });
+    .sort({ _id: -1, createAt: -1 })
+    .lean({ virtuals: true });
 };
 
 export const detailSaleStatement = async (reqDate: string) => {

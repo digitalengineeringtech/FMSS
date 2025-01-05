@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import moment, { MomentTimezone } from "moment-timezone";
+import { virtualFormat } from "../utils/helper";
 
 export interface fuelBalanceDocument extends mongoose.Document {
   stationId: string;
@@ -36,6 +37,14 @@ const fuelBalanceSchema = new Schema({
   realTime: { type: Date, default: new Date() },
   createAt: { type: String, default: new Date().toLocaleDateString(`fr-CA`) },
 });
+
+virtualFormat(fuelBalanceSchema, [
+  'terminal',
+  'opening',
+  'fuelIn',
+  'balance',
+  'todayTank'
+]);
 
 fuelBalanceSchema.pre("save", function (next) {
   const options = { timeZone: "Asia/Yangon", hour12: false };

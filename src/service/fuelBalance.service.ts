@@ -15,7 +15,7 @@ export const getFuelBalance = async (
       .find(query)
       .sort({ $natural: -1 })
       .limit(Number(tankCount))
-      .lean()
+      .lean({ virtuals: true})
       .select("-__v");
   } catch (e) {
     throw new Error(e);
@@ -116,7 +116,7 @@ export const deleteFuelBalance = async (
 
 export const calcFuelBalance = async (query, body, payload: string) => {
   try {
-    let result = await fuelBalanceModel.find(query);
+    let result = await fuelBalanceModel.find(query).lean({ virtuals: true});
     if (result.length === 0) {
       throw new Error("No fuel balance data found for the given query.");
     }
@@ -141,7 +141,7 @@ export const calcFuelBalance = async (query, body, payload: string) => {
     };
 
     await fuelBalanceModel.updateMany({ _id: gg?._id }, obj);
-    return await fuelBalanceModel.find({ _id: gg?._id }).lean();
+    return await fuelBalanceModel.find({ _id: gg?._id }).lean({ virtuals: true });
   } catch (e) {
     return e; // Rethrow the error with the actual error message
   }
@@ -160,7 +160,7 @@ export const fuelBalancePaginate = async (
     .sort({ realTime: -1 })
     .skip(skipCount)
     .limit(limitNo)
-    .lean()
+    .lean({ virtuals: true})
     // .populate("stationId")
     .select("-__v");
 
@@ -190,6 +190,7 @@ export const fuelBalanceByDate = async (
     .find(filter)
     .sort({ realTime: -1 })
     .populate("stationId")
+    .lean({ virtuals: true})
     .select("-__v");
 
   return result;
@@ -211,7 +212,7 @@ export const fuelBalanceByOneDate = async (
   let result = await fuelBalanceModel
     .find(filter)
     .sort({ realTime: -1 })
-    // .populate("stationId")
+    .lean({ virtuals: true})
     .select("-__v");
 
   return result;

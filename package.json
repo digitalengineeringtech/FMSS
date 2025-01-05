@@ -31,6 +31,7 @@
     "lodash": "^4.17.21",
     "moment-timezone": "^0.5.43",
     "mongoose": "^7.0.4",
+    "mongoose-lean-virtuals": "^1.1.0",
     "mqtt": "^4.3.7",
     "node-cron": "^3.0.2",
     "socket.io": "^4.7.0",

@@ -3,6 +3,8 @@ import config from "config";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { client } from "./connect";
+import { Schema } from "mongoose";
+import mongooseLeanVirtuals from "mongoose-lean-virtuals";
 
 const Redis = require("async-redis").createClient({
   host: "localhost",
@@ -86,14 +88,36 @@ export const presetFormat = (preset) => {
     }
 }
 
-export const formatDecimal = (value: string | number): string => {
+export const formatDecimal = (value: string | number | undefined): string => {
   // decimal value with 3 decimal points
-  return value != 'undefined' ? parseFloat(value.toString()).toFixed(3) : '0.000';
+  return value ? parseFloat(value.toString()).toFixed(3) : '0.000';
 }
 
-export const formatPrice = (value: string | number): string => {
+export const formatPrice = (value: string | number | undefined): string => {
   // only comma separated value 
-  return value != 'undefined' ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '0';
+  return value ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '0';
 }
+
+// helpers function for all model format decimal 
+export const virtualFormat = (model: Schema, fields: string[]) => {
+  model.virtual("formatted").get(function () {
+    const formattedFields: Record<string, string> = {};
+
+    fields.map((field) => {
+      if (this[field] !== undefined) {
+        formattedFields[field] = formatDecimal(this[field]);
+      }
+    });
+
+    return formattedFields;
+  });
+
+  // Ensure virtuals are included in JSON and Object outputs
+  model.set("toJSON", { virtuals: true });
+  model.set("toObject", { virtuals: true });
+
+  // Add lean virtuals plugin for performance
+  model.plugin(mongooseLeanVirtuals);
+};
 
 export default fMsg;
