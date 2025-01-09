@@ -4,7 +4,7 @@ import detailSaleModel, { detailSaleDocument } from "../model/detailSale.model";
 import config from "config";
 import { UserDocument } from "../model/user.model";
 import moment from "moment-timezone";
-import { get, mqttEmitter, presetFormat, previous, set } from "../utils/helper";
+import { calculateDiscount, get, mqttEmitter, presetFormat, previous, set } from "../utils/helper";
 import axios from "axios";
 import {
   addTankData,
@@ -379,12 +379,28 @@ export const updateDetailSale = async (
   query: FilterQuery<detailSaleDocument>,
   body: UpdateQuery<detailSaleDocument>
 ) => {
-  let data = await detailSaleModel.findOne(query);
+  const data = await detailSaleModel.findOne(query);
   if (!data) throw new Error("no data with that id");
 
-  await detailSaleModel.updateMany(query, body);
+  const grantTotal = calculateDiscount(
+    data.totalPrice,
+    body.discountType,
+    body.discountAmount
+  )
 
-  return await detailSaleModel.findById(data._id).lean();
+  console.log(grantTotal);
+
+  const updateBody = {
+     ...body,
+     discount: body.discountType,
+     discountAmount: body.discountAmount,
+     subTotal: data.totalPrice,
+     grandTotal: grantTotal,
+  }
+
+  await detailSaleModel.updateOne(query, updateBody);
+
+  return await detailSaleModel.findById(data._id).select("-__v");
 };
 
 export const detailSaleUpdateError = async (
@@ -516,19 +532,6 @@ export const detailSaleUpdateByDevice = async (
           Number(data[2]) || 0;
     }
 
-    let grandTotal = 0;
-
-    const getDiscount = await discountModel.findOne({ isActive: true });
-
-    if(getDiscount != null && getDiscount.type == 'amount') {
-       grandTotal = Number(data[3]) - Number(getDiscount.amount)
-    } else if(getDiscount != null && getDiscount.type == 'percent') {
-       grandTotal = (Number(data[3]) * Number(getDiscount.amount)) / 100;
-    } else {
-       grandTotal = data[3];
-    }
-
-    
     let updateBody: UpdateQuery<detailSaleDocument> = {
       nozzleNo: data[0],
       salePrice: data[1],
@@ -536,13 +539,12 @@ export const detailSaleUpdateByDevice = async (
       depNo: topic,
       // saleLiter: data[2],
       // totalPrice: totalPrice ? totalPrice : 0,
-      totalPrice: grandTotal,
-      discount: getDiscount?.type == 'amount' ? getDiscount.amount : getDiscount?.type == 'percent' ? `${getDiscount.amount}%` : 0,
+      totalPrice: data[3],
       asyncAlready: lastData[0].asyncAlready == "a0" ? "a" : "1",
       totalizer_liter:
         lastData[1].totalizer_liter + Number(data[2] ? data[2] : 0),
       totalizer_amount:
-        lastData[1].totalizer_amount + Number(grandTotal ? grandTotal : 0),
+        lastData[1].totalizer_amount + Number(data[3] ? data[3] : 0),
       devTotalizar_liter: data[4],
       devTotalizar_amount: data[5] != "" ? data[5] : data[4] * data[1],
       tankNo: tankNo,

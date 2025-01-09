@@ -120,4 +120,12 @@ export const virtualFormat = (model: Schema, fields: string[]) => {
   model.plugin(mongooseLeanVirtuals);
 };
 
+export const calculateDiscount = (subTotal, type, amount) => {
+  if (type === "amount") {
+    return subTotal - amount;
+  } else {
+    return subTotal - (subTotal * amount) / 100;
+  }
+}
+
 export default fMsg;

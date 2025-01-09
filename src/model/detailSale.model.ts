@@ -2,6 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import moment from "moment-timezone";
 import { virtualFormat } from '../utils/helper';
 
+
 export interface detailSaleDocument extends mongoose.Document {
   stationDetailId: string;
   dailyReportDate: string;
@@ -17,8 +18,11 @@ export interface detailSaleDocument extends mongoose.Document {
   asyncAlready: string;
   salePrice: number;
   saleLiter: number;
-  totalPrice: number;
   discount: string;
+  discountAmount: number;
+  subTotal: number;
+  grandTotal: number;
+  totalPrice: number;
   totalizer_liter: number;
   totalizer_amount: number;
   devTotalizar_liter: number;
@@ -61,6 +65,9 @@ const detailSaleSchema = new Schema({
   saleLiter: { type: Number, default: 0 },
   totalPrice: { type: Number, default: 0 },
   discount: { type: String},
+  discountAmount: { type: Number, default: 0 },
+  subTotal: { type: Number, default: 0 },
+  grandTotal: { type: Number, default: 0 },
   totalizer_liter: { type: Number, default: 0 },
   totalizer_amount: { type: Number, default: 0 },
   devTotalizar_liter: { type: Number, default: 0 },

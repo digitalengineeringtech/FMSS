@@ -9,7 +9,7 @@ export interface discountDocument extends mongoose.Document {
 const discountSchema = new Schema({
     type: { type: String, required: true }, // amount or percentage
     amount: { type: Number, required: true }, // if type == amount then amount else percentage number
-    isActive: { type: Boolean, default: false },
+    isActive: { type: Boolean, default: true },
 });
 
 const discountModel = mongoose.model<discountDocument>(
