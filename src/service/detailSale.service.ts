@@ -387,9 +387,7 @@ export const updateDetailSale = async (
     body.discountType,
     body.discountAmount
   )
-
-  console.log(grantTotal);
-
+  
   const updateBody = {
      ...body,
      discount: body.discountType,

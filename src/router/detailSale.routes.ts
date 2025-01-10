@@ -18,6 +18,7 @@ import { managerValidator } from "../middleware/managerValidator";
 import { hasAnyPermit } from "../middleware/permitValidator";
 import { roleValidator } from "../middleware/roleValidator";
 import {
+  checkExpire,
   validateAll,
   validateToken,
   validateToken2,
@@ -115,6 +116,7 @@ detailSaleRoute.post(
 detailSaleRoute.patch(
   "/",
   validateToken,
+  checkExpire,
   validateAll(allSchemaId),
   updateDetailSaleHandler
 );

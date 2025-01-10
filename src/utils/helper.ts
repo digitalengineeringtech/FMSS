@@ -54,7 +54,6 @@ const fMsg = (
       totalLiter 
     });
   } else {
-    console.log("wk6");
     res.status(200).json({ con: true, msg, result });
   }
 };
