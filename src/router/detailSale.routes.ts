@@ -102,6 +102,7 @@ detailSaleRoute.get(
 detailSaleRoute.post(
   "/",
   validateToken,
+  checkExpire,
   validateAll(detailSaleSchema),
   addDetailSaleHandler
 );
@@ -109,6 +110,7 @@ detailSaleRoute.post(
 detailSaleRoute.post(
   "/preset",
   validateToken,
+  checkExpire,
   validateAll(detailSaleSchema),
   preSetDetailSaleHandler
 );
