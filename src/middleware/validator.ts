@@ -80,7 +80,7 @@ export const checkExpire = async (
     const expireDate = new Date(station.result.expireDate);
     const today = new Date();
 
-    if(expireDate <= today) {
+    if(expireDate < today) {
         return next(new Error("Your are out of service"));
     }
     

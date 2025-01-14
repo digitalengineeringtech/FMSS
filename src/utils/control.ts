@@ -13,9 +13,5 @@ export const checkStationExpire = async (stationId: string) => {
         return null;
     }
 
-    return {
-        result: {
-            expireDate: '2023-08-28T14:51:38.885+00:00'
-        }
-    }
+    return response.data;
 }
