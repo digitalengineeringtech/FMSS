@@ -20,6 +20,7 @@ import {
   creditDetailSaleByDateAndPagi,
   creditDetailSalePaginate,
   creditDetailSaleOnlyPaginate,
+  getTotalizerDifference,
   // detailSaleByDate,
 } from "../service/detailSale.service";
 
@@ -707,4 +708,33 @@ export const detailSaleStatementHandler = async (
   let result = await detailSaleStatement(reqDate);
 
   fMsg(res, "statement report", result);
+};
+
+export const getTotalizerDifferenceHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+      let sDate: any = req.query.sDate;
+      let eDate: any = req.query.eDate;
+
+      delete req.query.sDate;
+      delete req.query.eDate;
+
+      let query = req.query;
+
+      if (!sDate) {
+        throw new Error("you need date");
+      }
+      if (!eDate) {
+        eDate = new Date();
+      }
+
+      let result = await getTotalizerDifference(query, sDate, eDate);
+
+      fMsg(res, "totalizer difference", result);
+  } catch (e) {
+      next(e);
+  }
 };

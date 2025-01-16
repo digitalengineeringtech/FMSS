@@ -1,4 +1,4 @@
-import { getCreditDetailSaleDatePagiHandler, getCreditDetailSaleOnlyPagiHandler, getCreditDetailSalePagiHandler, getDetailSaleSummaryDetailHandler, getDetailSaleSummaryHandler, getDetailSaleWithoutPagiHandler, statementReportHandler } from './../controller/detailSale.controller';
+import { getCreditDetailSaleDatePagiHandler, getCreditDetailSaleOnlyPagiHandler, getCreditDetailSalePagiHandler, getDetailSaleSummaryDetailHandler, getDetailSaleSummaryHandler, getDetailSaleWithoutPagiHandler, getTotalizerDifferenceHandler, statementReportHandler } from './../controller/detailSale.controller';
 import {
   addDetailSaleHandler,
   deleteDetailSaleHandler,
@@ -169,5 +169,14 @@ detailSaleRoute.get(
   detailSaleStatementHandler
 );
 detailSaleRoute.patch("/customer_card", validateToken, detailSaleUpdateByCard);
+
+// totalizer difference route
+detailSaleRoute.get(
+  "/totalizer-difference/by-date",
+  validateToken,
+  roleValidator(["manager"]),
+  hasAnyPermit(["view"]),
+  getTotalizerDifferenceHandler
+);
 
 export default detailSaleRoute;

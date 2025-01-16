@@ -1887,3 +1887,67 @@ export const detailSaleStatement = async (reqDate: string) => {
 
   return fuelTypeTotalArray.flat();
 };
+
+
+// get totalizer difference for all nozzle
+// if one or more nozzle does not have sales then find last sales data or nozzles
+export const getTotalizerDifference = async ( 
+  query: FilterQuery<detailSaleDocument>,
+  d1: Date,
+  d2: Date
+) => {
+    try {
+      const filter: FilterQuery<detailSaleDocument> = {
+        ...query,
+        createAt: {
+          $gt: d1,
+          $lt: d2,
+        },
+      };
+
+      // Step 1: Get all nozzles from device model
+      const devices = await deviceModel.find({}).select("nozzle_no");
+
+      // Step 2: Get sales data within the date range
+      const salesWithinDateRange = await detailSaleModel
+        .find(filter)
+        .sort({ createAt: -1 })
+        .lean({ virtuals: true })
+        .select("-__v");
+
+      // Step 3: Extract nozzles that have sales data
+      const nozzlesWithSales = new Set(salesWithinDateRange.map((sale) => sale.nozzleNo));
+
+      // Step 4: Identify missing nozzles
+      const nozzlesWithoutSalesInRange = devices.filter((device) => !nozzlesWithSales.has(device.nozzle_no));
+
+      // Step 5: Query the last available sale data for missing nozzles
+      const lastSalesForMissingNozzles = await detailSaleModel
+            .find({ nozzle: { $in: nozzlesWithoutSalesInRange } })
+            .sort({ nozzle: 1, createAt: -1 }) // Sort to get the latest sale for each nozzle
+            .lean({ virtuals: true })
+            .select("-__v");
+  
+      // Step 6: Identify nozzles with no sales data at all
+      const nozzlesWithNoData = nozzlesWithoutSalesInRange.filter(
+        (nozzle) => !lastSalesForMissingNozzles.some((sale) => sale.nozzleNo == nozzle.nozzle_no)
+      );
+
+      // Step 7: Create placeholders for nozzles with no sales data
+      const placeholders = nozzlesWithNoData.map((nozzle) => ({
+        nozzleNo: nozzle.nozzle_no,
+        message: "No sales data found for nozzle: " + nozzle.nozzle_no,
+      }));
+
+      const finalResult = [
+        ...salesWithinDateRange,
+        ...lastSalesForMissingNozzles,
+        ...placeholders,
+      ];
+
+      return finalResult;
+      
+    } catch (e) {
+      throw new Error(e);
+    } 
+}
