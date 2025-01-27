@@ -10,6 +10,14 @@ export const getDevice = async (query: FilterQuery<deviceDocument>) => {
   }
 };
 
+export const getDeviceByNozzle = async (query: FilterQuery<deviceDocument>) => {
+  try {
+    return await deviceModel.findOne(query).lean();
+  } catch (e) {
+    throw new Error(e);
+  }
+}
+
 export const getDeviceCount = async () => {
   try {
     return await deviceModel.countDocuments();
@@ -39,8 +47,23 @@ export const updateDevice = async (
   body: UpdateQuery<deviceDocument>
 ) => {
   try {
-    await deviceModel.updateMany(query, body);
-    return await deviceModel.find(query).lean();
+    const device = await deviceModel.findOne(query).lean();
+
+    if(!device) throw new Error("No device found with that id");
+
+    // Check if device.autoApprove is true and body.semiApprove is being set to true
+    if (device.autoApprove && body.semiApprove === true) {
+      throw new Error("You cannot set autoApprove and semiApprove at the same time");
+    }
+
+    // Check if device.semiApprove is true and body.autoApprove is being set to true
+    if (device.semiApprove && body.autoApprove === true) {
+      throw new Error("You cannot set autoApprove and semiApprove at the same time");
+    }
+    
+    await deviceModel.updateOne(query, body);
+
+    return await deviceModel.findById(device._id).lean();
   } catch (e) {
     throw new Error(e);
   }

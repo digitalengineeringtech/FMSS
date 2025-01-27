@@ -11,15 +11,16 @@ import deviceRoute from "./router/device.routes";
 import dailyReportRoute from "./router/dailyReport.routes";
 import { liveDataChangeHandler } from "./connection/liveTimeData";
 import {
+  addDetailSale,
   detailSaleUpdateByDevice,
+  prepareAutoPermit,
   zeroDetailSaleUpdateByDevice,
 } from "./service/detailSale.service";
 import dailyPriceRoute from "./router/dailyPrice.routes";
 import dbConnect, { client, connect } from "./utils/connect";
-import blinkLed, { lowLed } from "./connection/ledBlink";
 import { rp, stationIdSet } from "./migrations/migrator";
 import { getLastPrice } from "./service/dailyPrice.service";
-import { cleanAll, get, mqttEmitter, set } from "./utils/helper";
+import { cleanAll, get, set } from "./utils/helper";
 import {
   systemStatusAdd,
   systemStatusUpdate,
@@ -50,7 +51,11 @@ client.on("connect", connect);
 client.on("message", async (topic, message) => {
   let data = topic.split("/"); // data spliting from mqtt
 
-  console.log(data, message.toString());
+  if(data[2] == 'permit') {
+    const result = await prepareAutoPermit(data[3], message.toString());
+
+    await addDetailSale(result.depNo, result.nozzleNo, result);
+  }
 
   if (data[2] == "active") {
     // when active topic come

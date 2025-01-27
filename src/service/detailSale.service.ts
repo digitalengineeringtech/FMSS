@@ -4,7 +4,7 @@ import detailSaleModel, { detailSaleDocument } from "../model/detailSale.model";
 import config from "config";
 import { UserDocument } from "../model/user.model";
 import moment from "moment-timezone";
-import { calculateDiscount, get, mqttEmitter, presetFormat, previous, set } from "../utils/helper";
+import { calculateDiscount, get, mqttEmitter, presetFormat, previous, set, splitMessage } from "../utils/helper";
 import axios from "axios";
 import {
   addTankData,
@@ -41,6 +41,7 @@ import customerCreditModel from '../model/customerCredit.model';
 import creditReturnModel from '../model/creditReturn.model';
 import c from "config";
 import discountModel from '../model/discount.model';
+import { getDeviceByNozzle } from "./device.service";
 
 interface Data {
   cusCardId: string;
@@ -382,6 +383,8 @@ export const updateDetailSale = async (
   const data = await detailSaleModel.findOne(query);
   if (!data) throw new Error("no data with that id");
 
+  const device = await getDeviceByNozzle({ nozzle_no: data.nozzleNo });
+
   const grantTotal = calculateDiscount(
     data.totalPrice,
     body.discountType,
@@ -394,6 +397,7 @@ export const updateDetailSale = async (
      discountAmount: body.discountAmount,
      subTotal: data.totalPrice,
      grandTotal: grantTotal,
+     isSemiUpdated: device?.semiApprove == true ? true : false,
   }
 
   await detailSaleModel.updateOne(query, updateBody);
@@ -700,13 +704,11 @@ export const detailSaleUpdateByDevice = async (
 
     let checkErrorData = await detailSaleModel.find({
       asyncAlready: 0,
-      dailyReportDate: prevDate,
+      dailyReportDate: prevDate
     });
 
+    // cloud upload 0 condition
     if (checkErrorData.length > 0) {
-      // console.log(checkErrorData, "this is error");
-
-      // cloud upload 0 condition
       for (const ea of checkErrorData) {
         try {
           let url = config.get<string>("detailsaleCloudUrl");
@@ -740,32 +742,40 @@ export const detailSaleUpdateByDevice = async (
       }
     }
 
-    //cloud upload 1 conditon
-    let finalData = await detailSaleModel.find({ asyncAlready: 1 });
-    for (const ea of finalData) {
-      try {
-        let url = config.get<string>("detailsaleCloudUrl");
-        let response = await axios.post(url, ea);
-        logger.info(`
-          ========== start ==========
-          function: Response Logger
-          Response: ${JSON.stringify(response.data)}
-          ========== ended ==========
-        `, { file: 'combined.log' });
-        if (response.status == 200) {
-          await detailSaleModel.findByIdAndUpdate(ea._id, {
-            asyncAlready: "2",
-          });
-        } else {
-          break;
-        }
-      } catch (error) {
-        // console.log(error);
-        if (error.response && error.response.status === 409) {
-        } else {
+     // get device with nozzleNo for semi approve feature
+    const device = await getDeviceByNozzle({ nozzle_no: result.nozzleNo });
+    // get final data with asyncAlready = 1
+    let finalData = await detailSaleModel.find({ asyncAlready: 1, isSemiUpdated: false });
+    // cloud upload 1 conditon
+    // add device semi approve condition check
+    // if device nozzle semi approve is equal to false then upload to cloud for each sales.
+    if (device?.semiApprove == false) {
+      for (const ea of finalData) {
+        try {
+          let url = config.get<string>("detailsaleCloudUrl");
+          let response = await axios.post(url, ea);
+          logger.info(`
+            ========== start ==========
+            function: Response Logger
+            Response: ${JSON.stringify(response.data)}
+            ========== ended ==========
+          `, { file: 'combined.log' });
+          if (response.status == 200) {
+            await detailSaleModel.findByIdAndUpdate(ea._id, {
+              asyncAlready: "2",
+            });
+          } else {
+            break;
+          }
+        } catch (error) {
+          // console.log(error);
+          if (error.response && error.response.status === 409) {
+          } else {
+          }
         }
       }
     }
+    
 
     let checkErrorFuelInData = await fuelInModel.find({
       asyncAlready: 1,
@@ -1950,4 +1960,79 @@ export const getTotalizerDifference = async (
     } catch (e) {
       throw new Error(e);
     } 
+}
+
+
+
+// Auto Permit Approve Feature and Semi Approve Feature by device nozzleNo
+
+// Auto Approve is true then prepare detailsale object and return it for creating voucher
+// Semi Approve is true then count yesterday sales if yesterday sales is > 0 then throw error
+// Semi Approve is true and yesterday sales is 0 then prepare detailsale object and return it to for creating voucher
+// Semi Approve is true and yesterday sales with isSemiUpdated == true and asyncAlready == 1 then upload yesterday sales to cloud
+
+export const prepareAutoPermit = async (depNo, message: string) => {
+  const result = splitMessage(message.toString());
+
+  const device = await getDeviceByNozzle({ nozzle_no: result[0] });
+
+  if(!device) {
+    throw new Error("Device not found");
+  }
+
+  if(device.semiApprove == true) {
+      const yesterday = moment().subtract(1, "days").format("YYYY-MM-DD");
+
+      const yesterdaySales = await detailSaleModel.find({
+        nozzleNo: result[0],
+        dailyReportDate: yesterday,
+        isSemiUpdated: false
+      }).count();
+     
+      if(yesterdaySales > 0) {
+          throw new Error("Please update yesterday sales first");
+      }
+
+      const uploadYesterdaySales = await detailSaleModel.find({
+        nozzleNo: result[0],
+        dailyReportDate: yesterday,
+        isSemiUpdated: true,
+        asyncAlready: "1",
+      });
+
+      for(const uploadYesterdaySale of uploadYesterdaySales) {
+        try {
+          let url = config.get<string>("detailsaleCloudUrl");
+          let response = await axios.post(url, uploadYesterdaySale);
+          if (response.status == 200) {
+            await detailSaleModel.findByIdAndUpdate(uploadYesterdaySale._id, {
+              asyncAlready: "2",
+            });
+          } else {
+            break;
+          }
+        } catch (error) {
+          if (error.response && error.response.status === 409) {
+            throw new Error(error.response.data.message);
+          } else {
+            throw new Error(error.message);
+          }
+        }
+      }
+  }
+
+  const user = await get('user');
+  
+  const detailSale: any = {
+    depNo: depNo,
+    nozzleNo: device?.nozzle_no,
+    device: 'web',
+    fuelType: device?.fuel_type,
+    vehicleType: 'Cycle',
+    carNo: '-',
+    cashType: 'Cash',
+    user: user
+  }
+
+  return detailSale;
 }

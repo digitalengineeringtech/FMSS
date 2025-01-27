@@ -6,6 +6,8 @@ export interface deviceDocument extends mongoose.Document {
   nozzle_no: string;
   fuel_type: string;
   daily_price: number;
+  autoApprove: boolean;
+  semiApprove: boolean;
 }
 
 const deviceSchema = new Schema(
@@ -16,6 +18,8 @@ const deviceSchema = new Schema(
     fuel_type: { type: String, required: true },
     daily_price: { type: Number, default: 0 },
     status: { type: String, default: "enable", enum: ["enable", "disable"] },
+    autoApprove: { type: Boolean, default: false },
+    semiApprove: { type: Boolean, default: false },
   },
   {
     timestamps: true,

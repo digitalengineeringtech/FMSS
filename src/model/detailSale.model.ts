@@ -33,6 +33,7 @@ export interface detailSaleDocument extends mongoose.Document {
   preset: string;
   device: string;
   isReload: number;
+  isSemiUpdated: Boolean;
   createAt: Date;
   customer: string;
 }
@@ -85,6 +86,7 @@ const detailSaleSchema = new Schema({
   // R = reload error
   // "E" = Error cash update
   isReload: { type: Number, default: 0 },
+  isSemiUpdated: { type: Boolean, default: false },
   preset: { type: String, default: null },
   device: { type: String, required: true },
   createAt: { type: Date, default: Date.now },

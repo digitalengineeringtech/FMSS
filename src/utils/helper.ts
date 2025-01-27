@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { client } from "./connect";
 import { Schema } from "mongoose";
 import mongooseLeanVirtuals from "mongoose-lean-virtuals";
+import { getDeviceByNozzle } from "../service/device.service";
 
 const Redis = require("async-redis").createClient({
   host: "localhost",
@@ -117,6 +118,12 @@ export const virtualFormat = (model: Schema, fields: string[]) => {
 
   // Add lean virtuals plugin for performance
   model.plugin(mongooseLeanVirtuals);
+};
+
+export const splitMessage = (message: string) => {
+  const result = message.match(/[0-9]+/g);
+
+  return result ? result : [];
 };
 
 export const calculateDiscount = (subTotal, type, amount) => {
