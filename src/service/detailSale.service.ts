@@ -12,7 +12,7 @@ import {
   updateExistingTankData,
 } from "./tankData.service";
 
-import { deviceLiveData } from "../connection/liveTimeData";
+import { deviceLiveData, pendingVouchers } from "../connection/liveTimeData";
 
 import { getUser } from "./user.service";
 import {
@@ -135,6 +135,7 @@ export const preSetDetailSale = async (
     vocono: `${body.user.stationNo}/${body.user.name}/${cuurentDateForVocono}/${
       count + 1
     }`,
+    depNo: depNo,
     customer: customerId,
     stationDetailId: body.user.stationId,
     casherCode: body.user.name,
@@ -554,9 +555,12 @@ export const detailSaleUpdateByDevice = async (
       isError: "A",
     };
 
-    await detailSaleModel.findByIdAndUpdate(lastData[0]._id, updateBody);
+    const result = await detailSaleModel.findByIdAndUpdate(lastData[0]._id, updateBody, { new: true})
+                  .lean({ virtuals: true });
 
-    let result = await detailSaleModel.findById(lastData[0]._id).lean({ virtuals: true });
+    if(result) {
+       await detailSaleModel.updateOne({ _id: result._id }, { $set: { isFinal: true } });
+    }
 
     if(result && result.cashType == 'Credit Card') {
         const customerCredit = await customerCreditModel.findOne({ customer: result.customer });
@@ -964,7 +968,6 @@ export const zeroDetailSaleUpdateByDevice = async (
         devTotalizar_amount: data[4] * prevSalePrice,
         tankNo: tankNo,
         tankBalance: volume || 0,
-        isReload: 1,
         isError: "A",
       };
 
@@ -1167,7 +1170,6 @@ export const zeroDetailSaleUpdateByDevice = async (
         devTotalizar_amount: data[4] * data[1],
         tankNo: tankNo,
         tankBalance: volume || 0,
-        isReload: 1,
         isError: "A",
       };
       await detailSaleModel.findByIdAndUpdate(lastData[1]._id, updateBody);
@@ -2036,3 +2038,238 @@ export const prepareAutoPermit = async (depNo, message: string) => {
 
   return detailSale;
 }
+
+export const handleMissingFinalData = async (nozzleNo) => {
+  try {
+    if(!pendingVouchers.has(nozzleNo)) { 
+      return;
+    }
+
+    // get pending vouchers from cache
+    let [id, saleLiter, salePrice] = pendingVouchers.get(nozzleNo);
+
+    const currentVoucher = await detailSaleModel.findById(id).lean({ virtuals: true });
+    
+    if(!currentVoucher) {
+      return;
+    }
+
+    // get previous voucher with same nozzleno and before current voucher id
+    const previousVoucher = await detailSaleModel.findOne({
+      nozzleNo: currentVoucher.nozzleNo,
+      createAt: { $lt: currentVoucher.createAt },
+    }).sort({ createAt: -1 }).lean({ virtuals: true });
+  
+    if(!previousVoucher) {
+      return;
+    }
+    
+    let tankCount = await get("tankCount");
+
+    let fuelBalances = await getFuelBalance(
+      {
+        stationId: currentVoucher.stationDetailId,
+      },
+      tankCount
+    );
+
+    let tankNo;
+
+    fuelBalances.map(async (fuelBalance) => {
+      if(fuelBalance.nozzles.includes(nozzleNo as never)) {
+        tankNo = fuelBalance.tankNo;
+      }
+    })
+
+    let volume: number;
+
+    let tankUrl = config.get<string>("tankDataUrl");
+
+    if (tankUrl != "") {
+      try {
+        let tankRealTimeData;
+        tankRealTimeData = await axios.post(tankUrl);
+
+        if (tankRealTimeData.status !== 200) {
+          throw new Error(
+            `Unexpected response status: ${tankRealTimeData.status}`
+          );
+        }
+
+        volume =
+          tankRealTimeData.data.data.find((ea) => ea.id === tankNo)?.volume ||
+          0;
+
+        if (volume === undefined) {
+          volume = Number(previousVoucher.tankBalance) + Number(saleLiter) || 0;
+        }
+      } catch (e: any) {
+        console.log(`Failed to fetch tank data: ${e.message}`);
+        volume = Number(previousVoucher.tankBalance) + Number(saleLiter) || 0;
+      }
+    } else {
+      volume =
+        Number(fuelBalances?.find((e) => e.tankNo == tankNo)?.balance) +
+          Number(saleLiter) || 0;
+    }
+
+    let updateBody: UpdateQuery<detailSaleDocument> = {
+      nozzleNo: nozzleNo,
+      salePrice: Number(salePrice),
+      saleLiter: Number(saleLiter),
+      depNo: currentVoucher.depNo,
+      // saleLiter: data[2],
+      // totalPrice: totalPrice ? totalPrice : 0,
+      totalPrice: Number(salePrice) * Number(saleLiter),
+      asyncAlready: currentVoucher.asyncAlready == "a0" ? "a" : "1",
+      totalizer_liter:
+        previousVoucher.totalizer_liter + Number(saleLiter ? saleLiter : 0),
+      totalizer_amount:
+        previousVoucher.totalizer_amount + Number(salePrice ? salePrice : 0),
+      devTotalizar_liter: previousVoucher.devTotalizar_liter + Number(saleLiter ? saleLiter : 0),
+      devTotalizar_amount: previousVoucher.devTotalizar_amount + Number(salePrice ? salePrice : 0),
+      tankNo: tankNo,
+      tankBalance: volume || 0,
+      isError: "A"
+    };
+
+    const result = await detailSaleModel.findByIdAndUpdate(currentVoucher._id, updateBody, { new: true})
+                  .lean({ virtuals: true });
+
+    if(result && result.cashType == 'Credit Card') {
+        const customerCredit = await customerCreditModel.findOne({ customer: result.customer });
+        if(customerCredit) {
+            customerCredit.limitAmount = Number(customerCredit.limitAmount) - Number(result.totalPrice);
+            await customerCredit.save();
+
+            await creditReturnModel.create({
+                detailSale: result._id,
+                customerCredit: customerCredit._id,
+                vocono: result.vocono,
+                creditAmount: result.totalPrice,
+                creditDueDate: customerCredit.creditDueDate
+            }); 
+        }
+    }
+
+    if (!result) {
+      throw new Error("Final send in error");
+    }
+
+    let checkRpDate = await getDailyReport({
+      stationId: result.stationDetailId,
+      dateOfDay: result.dailyReportDate,
+    });
+
+    // console.log(checkDate, "this is check data", checkDate.length);
+
+    if (checkRpDate.length == 0) {
+      await addDailyReport({
+        stationId: result.stationDetailId,
+        dateOfDay: result.dailyReportDate,
+      });
+    }
+
+    // console.log(tankUrl, "this is tank url");
+
+    if (tankUrl == "") {
+      // console.log("00000000");
+      let checkDate = await getFuelBalance({
+        stationId: result.stationDetailId,
+        createAt: result.dailyReportDate,
+      });
+
+      if (checkDate.length == 0) {
+        let prevResult = await getFuelBalance(
+          {
+            stationId: result.stationDetailId,
+          },
+          tankCount
+        );
+
+        await Promise.all(
+          prevResult
+            .reverse()
+            // .slice(0, tankCount)
+            .map(async (ea) => {
+              // console.log('fuelBalance', ea);
+              let obj: fuelBalanceDocument;
+              if (ea.balance == 0) {
+                obj = {
+                  stationId: ea.stationId,
+                  fuelType: ea.fuelType,
+                  capacity: ea.capacity,
+                  opening: ea.todayTank != 0 ? ea.todayTank : ea.balance,
+                  tankNo: ea.tankNo,
+                  createAt: result?.dailyReportDate,
+                  nozzles: ea.nozzles,
+                  balance: ea.todayTank != 0 ? ea.todayTank : ea.balance,
+                } as fuelBalanceDocument;
+              } else {
+                obj = {
+                  stationId: ea.stationId,
+                  fuelType: ea.fuelType,
+                  capacity: ea.capacity,
+                  opening: ea.todayTank != 0 ? ea.todayTank : ea.balance,
+                  tankNo: ea.tankNo,
+                  createAt: result?.dailyReportDate,
+                  nozzles: ea.nozzles,
+                  balance: ea.todayTank != 0 ? ea.todayTank : ea.balance,
+                } as fuelBalanceDocument;
+              }
+
+              await addFuelBalance(obj);
+            })
+        );
+      }
+      // console.log("1111111");
+
+      await calcFuelBalance(
+        {
+          stationId: result.stationDetailId,
+          fuelType: result.fuelType,
+          createAt: result.dailyReportDate,
+        },
+        { liter: result.saleLiter },
+        result.nozzleNo
+      );
+      // console.log("22222222222222222");
+    }
+
+    if (tankUrl != "") {
+      const tankData = await getTankData({
+        stationDetailId: result.stationDetailId,
+        dateOfDay:  moment().tz("Asia/Yangon").format("YYYY-MM-DD"),
+      });
+
+      // check if tank data exists
+      try {
+        if (tankData.length == 0) {
+          
+          await addTankData({
+            stationDetailId: result.stationDetailId,
+            vocono: currentVoucher.vocono,
+            nozzleNo: currentVoucher.nozzleNo,
+            dateOfDay: moment(currentVoucher.dailyReportDate).tz("Asia/Yangon").format("YYYY-MM-DD"),
+          });
+        } else {
+          await updateExistingTankData({
+            id: tankData[0]._id,
+            vocono: currentVoucher.vocono,
+            nozzleNo: currentVoucher.nozzleNo,
+            stationDetailId: result.stationDetailId,
+            dateOfDay: moment(currentVoucher.dailyReportDate).tz("Asia/Yangon").format("YYYY-MM-DD"),
+          });
+        }
+      } catch (error) {
+        console.error("Error handling tank data:", error);
+      }
+    }
+
+    console.log(result, "this is result");
+
+    return result;
+  } catch (error) {
+    console.error("Error handling missing final data:", error);
+  }
+};

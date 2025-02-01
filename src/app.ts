@@ -9,7 +9,7 @@ import detailSaleRoute from "./router/detailSale.routes";
 import localToDeviceRoute from "./router/localToDevice.routes";
 import deviceRoute from "./router/device.routes";
 import dailyReportRoute from "./router/dailyReport.routes";
-import { liveDataChangeHandler } from "./connection/liveTimeData";
+import { clearVoucher, deviceLiveData, liveDataChangeHandler } from "./connection/liveTimeData";
 import {
   addDetailSale,
   detailSaleUpdateByDevice,
@@ -51,6 +51,7 @@ client.on("connect", connect);
 client.on("message", async (topic, message) => {
   let data = topic.split("/"); // data spliting from mqtt
 
+  // Auto Permit Approve Feature and Semi Approve Feature by device nozzleNo
   if(data[2] == 'permit') {
     const result = await prepareAutoPermit(data[3], message.toString());
 
@@ -75,6 +76,7 @@ client.on("message", async (topic, message) => {
     // when final topic come]
     const lane = topic;
     detailSaleUpdateByDevice(data[3], message.toString(), lane); // add final data to detail sale vocono
+    clearVoucher(data[3]); // Remove from memory when Final is processed
   }
 
   if (data[2] == "livedata") {

@@ -1,42 +1,82 @@
-import { UpdateQuery } from "mongoose";
-import detailSaleModel, { detailSaleDocument } from "../model/detailSale.model";
+import mongoose from 'mongoose';
+import detailSaleModel from '../model/detailSale.model';
+import { handleMissingFinalData } from '../service/detailSale.service';
+import { set } from 'lodash';
 
-export const deviceLiveData = new Map();
+export const deviceLiveData = new Map();  // Stores real-time fueling data
+export const pendingVouchers = new Map(); // Stores fueling vouchers waiting for Final
+export const timers = new Map(); // Stores timeout references
 
-export const liveDataChangeHandler = (data) => {
+
+export const liveDataChangeHandler = async (data) => {
   try {
     const regex = /[A-Z]/g;
 
     let liveData: number[] = data.split(regex);
 
-    const value1 = liveData[1] || 0;
-    const value2 = liveData[2] || 0;
+    const nozzleNo = liveData[0] || '';
+    const saleLiter = liveData[1] || 0;
+    const salePrice = liveData[2] || 0;
 
-    deviceLiveData.set(liveData[0], [value1, value2]);
+    if(!nozzleNo || saleLiter <= 0 || salePrice <= 0) {
+      return;
+    }
+
+    deviceLiveData.set(nozzleNo, [saleLiter, salePrice]);
+
+    // Check if fueling is stopped by previous saleLiter == current saleLiter 5 seconds
+    setTimeout(async () => {
+      const [lastSale, lastPrice] = deviceLiveData.get(nozzleNo) || [0, 0];
+
+      if(lastSale == saleLiter && lastPrice == salePrice) {
+          console.log('Fueling stopped for nozzle:', nozzleNo);
+          await handleFuelingStop(nozzleNo);
+          return;
+      }
+    }, 5000);
+
+    if (timers.has(nozzleNo)) {
+      clearTimeout(timers.get(nozzleNo));
+      timers.delete(nozzleNo);
+    }
+
   } catch (e) {
     throw new Error(e);
   }
-
-  // console.log(deviceLiveData.get(liveData[0]));
 };
 
-// export const deviceLiveData = new Map();
+const handleFuelingStop = async (nozzleNo) => {
+   if(!deviceLiveData.has(nozzleNo)) {
+      return;
+   }
 
-// export const liveDataChangeHandler = (data) => {
-//   try {
-//     const regex = /[A-Z]/g;
-//     let liveData = data.split(regex);
+   const [saleLiter, salePrice] = deviceLiveData.get(nozzleNo);
 
-//     if (liveData && typeof liveData[Symbol.iterator] === "function") {
-//       const value1 = liveData[1] || 0;
-//       const value2 = liveData[2] || 0;
+   await detailSaleModel
+        .findOne({ nozzleNo })
+        .sort({ _id: -1, createAt: -1 })
+        .lean()
+        .then((sale) => {
+            if(!sale || sale.isFinal == true) {
+                console.log('No previous voucher found for nozzle:', nozzleNo);
+                return;
+            }
+            pendingVouchers.set(nozzleNo, [new mongoose.Types.ObjectId(sale._id), saleLiter, salePrice]);
 
-//       deviceLiveData.set(liveData[0], [value1, value2]);
-//       console.log(deviceLiveData.get(liveData[0]));
-//     } else {
-//       throw new Error("Invalid liveData");
-//     }
-//   } catch (e) {
-//     throw new Error(e);
-//   }
-// };
+            const timeout = setTimeout(async () => {
+              await handleMissingFinalData(nozzleNo);
+            }, 10000);
+      
+            timers.set(nozzleNo, timeout);
+        });
+}
+
+export const clearVoucher = async (nozzleNo) => {
+    deviceLiveData.delete(nozzleNo);
+    pendingVouchers.delete(nozzleNo);
+  
+    if (timers.has(nozzleNo)) {
+      clearTimeout(timers.get(nozzleNo));
+      timers.delete(nozzleNo);
+    }
+}
