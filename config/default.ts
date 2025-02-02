@@ -14,6 +14,8 @@ export default {
   mqttUserName: "detpos",
   mqttPassword: "asdffdsa",
   wsServerUrl: "http://13.251.206.31:9000/api/change-mode",
+  liveDataTimeout: 5000, // 5 secs
+  finalDataTimeout: 10000, // 10 secs
 
   //--------
 

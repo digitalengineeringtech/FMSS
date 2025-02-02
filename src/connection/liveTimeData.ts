@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import detailSaleModel from '../model/detailSale.model';
 import { handleMissingFinalData } from '../service/detailSale.service';
-import { set } from 'lodash';
+import config  from 'config';
 
 export const deviceLiveData = new Map();  // Stores real-time fueling data
 export const pendingVouchers = new Map(); // Stores fueling vouchers waiting for Final
@@ -25,6 +25,8 @@ export const liveDataChangeHandler = async (data) => {
     deviceLiveData.set(nozzleNo, [saleLiter, salePrice]);
 
     // Check if fueling is stopped by previous saleLiter == current saleLiter 5 seconds
+    const livetimeout = config.get<number>("liveDataTimeout");
+
     setTimeout(async () => {
       const [lastSale, lastPrice] = deviceLiveData.get(nozzleNo) || [0, 0];
 
@@ -33,7 +35,7 @@ export const liveDataChangeHandler = async (data) => {
           await handleFuelingStop(nozzleNo);
           return;
       }
-    }, 5000);
+    }, livetimeout);
 
     if (timers.has(nozzleNo)) {
       clearTimeout(timers.get(nozzleNo));
@@ -63,9 +65,11 @@ const handleFuelingStop = async (nozzleNo) => {
             }
             pendingVouchers.set(nozzleNo, [new mongoose.Types.ObjectId(sale._id), saleLiter, salePrice]);
 
+            const finalTimeout = config.get<number>("finalDataTimeout");
+
             const timeout = setTimeout(async () => {
               await handleMissingFinalData(nozzleNo);
-            }, 10000);
+            }, finalTimeout);
       
             timers.set(nozzleNo, timeout);
         });
