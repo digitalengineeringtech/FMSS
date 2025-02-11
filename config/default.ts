@@ -40,6 +40,7 @@ export default {
   detailsaleCloudUrl: "https://detfsmm.com/api/detail-sale",
   // detailsaleCloudUrl: "http://127.0.01:8000/api/detail-sale",
 
+  // --- user cloud url for check station expire data -------------------------------//
   userCloudUrl: "https://detfsmm.com/api/user/station",
   // userCloudUrl: "http://127.0.0.1:8000/api/user/station",
 
