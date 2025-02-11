@@ -299,8 +299,15 @@ export const addDetailSale = async (
       createAt: iso,
     };
 
-    let result = await new detailSaleModel(body).save();
+    let result;
 
+    const device = await getDeviceByNozzle({ nozzle_no: body.nozzleNo });
+
+    if(device?.autoApprove == true) {
+       result = await detailSaleModel.findOneAndUpdate(lastDocument?._id, body);
+    } else {
+      result = await new detailSaleModel(body).save();
+    }
     // if (lastDocument?.devTotalizar_liter === 0) {
     //   mqttEmitter(`detpos/local_server/reload/${depNo}`, nozzleNo);
     //   return;
