@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import detailSaleModel from '../model/detailSale.model';
 import { handleMissingFinalData } from '../service/detailSale.service';
 import config  from 'config';
+import { permitNozzles, storeInCache } from '../utils/helper';
 
 export const deviceLiveData = new Map();  // Stores real-time fueling data
 export const pendingVouchers = new Map(); // Stores fueling vouchers waiting for Final
@@ -19,6 +20,13 @@ export const liveDataChangeHandler = async (data) => {
     const salePrice = liveData[2] || 0;
 
     if(!nozzleNo || saleLiter <= 0 || salePrice <= 0) {
+      return;
+    }
+
+    const checkPermit = storeInCache(nozzleNo);
+
+    if(checkPermit == false) {
+      permitNozzles.delete(nozzleNo);
       return;
     }
 

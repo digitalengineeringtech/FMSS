@@ -20,7 +20,7 @@ import dailyPriceRoute from "./router/dailyPrice.routes";
 import dbConnect, { client, connect } from "./utils/connect";
 import { rp, stationIdSet } from "./migrations/migrator";
 import { getLastPrice } from "./service/dailyPrice.service";
-import { cleanAll, get, set } from "./utils/helper";
+import { cleanAll, get, permitNozzles, set, storeInCache } from "./utils/helper";
 import {
   systemStatusAdd,
   systemStatusUpdate,
@@ -53,9 +53,20 @@ client.on("message", async (topic, message) => {
 
   // Auto Permit Approve Feature and Semi Approve Feature by device nozzleNo
   if(data[2] == 'permit') {
+    const checkNozzle = storeInCache(data[3]);
+
+    if(checkNozzle == false) {
+      return;
+    }
+
     const result = await prepareAutoPermit(data[3], message.toString());
 
     await addDetailSale(result.depNo, result.nozzleNo, result);
+  }
+
+  if (data[2] == "livedata") {
+    // pp data come
+    liveDataChangeHandler(message.toString()); // store in cache
   }
 
   if (data[2] == "active") {
@@ -79,10 +90,7 @@ client.on("message", async (topic, message) => {
     clearVoucher(data[3]); // Remove from memory when Final is processed
   }
 
-  if (data[2] == "livedata") {
-    // pp data come
-    liveDataChangeHandler(message.toString()); // store in cache
-  }
+  
 
   if (data[2] == "pricereq") {
     getLastPrice(message.toString());

@@ -17,6 +17,10 @@ const saltWorkFactor = config.get<number>("saltWorkFactor");
 const secretKey = config.get<string>("secretKey");
 const salt = bcrypt.genSaltSync(saltWorkFactor);
 
+// check permit nozzle exist or not 
+// if exist delete that nozzle number from cache or else set in cache
+export const permitNozzles = new Map();
+
 //password checking and converting
 export const encode = (payload: string) => bcrypt.hashSync(payload, salt);
 export const compass = (payload: string, dbPass: string) =>
@@ -132,6 +136,22 @@ export const calculateDiscount = (subTotal, type, amount) => {
   } else {
     return subTotal - (subTotal * amount) / 100;
   }
+}
+
+
+// helpers function for store permit nozzles
+export const storeInCache = (key) => {
+    if(permitNozzles.has(key)) {
+        console.log(`Nozzle ${key} is already permitted and waiting for live data.`);
+
+        return false;
+    } else {
+      permitNozzles.set(key, true);
+
+      console.log(`Nozzle ${key} is permitted.`);
+  
+      return true;
+    }   
 }
 
 export default fMsg;
