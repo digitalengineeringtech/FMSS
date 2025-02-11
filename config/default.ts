@@ -21,9 +21,9 @@ export default {
 
   //--- tank data ( local atg ) -------------------------------------------------------
   //if atg => " tankDataUrl actual link " : " "
-  // tankDataUrl: "",
+  tankDataUrl: "",
   // tankDataUrl: "https://e688ad90-86cd-43c9-a524-2aaccb212b97.mock.pstmn.io/data",
-  tankDataUrl: "http://192.168.0.105:8080/baseOilcan",
+  //tankDataUrl: "http://192.168.0.105:8080/baseOilcan",
 
   //--- tank data ( tank data cloud ) -------------------------------------------------------
   tankDataCloudUrl: "https://detfsmm.com/api/tank-data",
