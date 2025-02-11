@@ -2266,8 +2266,6 @@ export const handleMissingFinalData = async (nozzleNo) => {
       }
     }
 
-    console.log(result, "this is result");
-
     return result;
   } catch (error) {
     console.error("Error handling missing final data:", error);
