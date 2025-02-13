@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import detailSaleModel from '../model/detailSale.model';
 import { handleMissingFinalData } from '../service/detailSale.service';
 import config  from 'config';
-import { permitNozzles, storeInCache } from '../utils/helper';
+import { permitNozzles, splitMessage, storeInCache } from '../utils/helper';
 
 export const deviceLiveData = new Map();  // Stores real-time fueling data
 export const pendingVouchers = new Map(); // Stores fueling vouchers waiting for Final
@@ -83,13 +83,15 @@ const handleFuelingStop = async (nozzleNo) => {
         });
 }
 
-export const clearVoucher = async (nozzleNo) => {
-    deviceLiveData.delete(nozzleNo);
-    pendingVouchers.delete(nozzleNo);
-    permitNozzles.delete(nozzleNo);
+export const clearVoucher = async (message) => {
+    const nozzleNo = splitMessage(message);
+    
+    deviceLiveData.delete(nozzleNo[0]);
+    pendingVouchers.delete(nozzleNo[0]);
+    permitNozzles.delete(nozzleNo[0]);
   
-    if (timers.has(nozzleNo)) {
-      clearTimeout(timers.get(nozzleNo));
-      timers.delete(nozzleNo);
+    if (timers.has(nozzleNo[0])) {
+      clearTimeout(timers.get(nozzleNo[0]));
+      timers.delete(nozzleNo[0]);
     }
 }
