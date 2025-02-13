@@ -86,6 +86,7 @@ const handleFuelingStop = async (nozzleNo) => {
 export const clearVoucher = async (nozzleNo) => {
     deviceLiveData.delete(nozzleNo);
     pendingVouchers.delete(nozzleNo);
+    permitNozzles.delete(nozzleNo);
   
     if (timers.has(nozzleNo)) {
       clearTimeout(timers.get(nozzleNo));
