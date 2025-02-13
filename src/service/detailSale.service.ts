@@ -1986,6 +1986,8 @@ export const prepareAutoPermit = async (depNo, message: string) => {
 
   const device = await getDeviceByNozzle({ nozzle_no: result[0] });
 
+  const user = await get('user');
+
   if(!device) {
     throw new Error("Device not found");
   }
@@ -2029,22 +2031,31 @@ export const prepareAutoPermit = async (depNo, message: string) => {
           }
         }
       }
-  }
 
-  const user = await get('user');
+      return {
+        depNo: depNo,
+        nozzleNo: device?.nozzle_no,
+        device: 'web',
+        fuelType: device?.fuel_type,
+        vehicleType: 'Cycle',
+        carNo: '-',
+        cashType: 'Cash',
+        user: user
+      }
+  } else if(device.autoApprove == true) { 
+    const detailSale: any = {
+      depNo: depNo,
+      nozzleNo: device?.nozzle_no,
+      device: 'web',
+      fuelType: device?.fuel_type,
+      vehicleType: 'Cycle',
+      carNo: '-',
+      cashType: 'Cash',
+      user: user
+    }
   
-  const detailSale: any = {
-    depNo: depNo,
-    nozzleNo: device?.nozzle_no,
-    device: 'web',
-    fuelType: device?.fuel_type,
-    vehicleType: 'Cycle',
-    carNo: '-',
-    cashType: 'Cash',
-    user: user
+    return detailSale;
   }
-
-  return detailSale;
 }
 
 export const handleMissingFinalData = async (nozzleNo) => {

@@ -20,7 +20,7 @@ import dailyPriceRoute from "./router/dailyPrice.routes";
 import dbConnect, { client, connect } from "./utils/connect";
 import { rp, stationIdSet } from "./migrations/migrator";
 import { getLastPrice } from "./service/dailyPrice.service";
-import { cleanAll, get, permitNozzles, set, storeInCache } from "./utils/helper";
+import { cleanAll, get, permitNozzles, set, splitMessage, storeInCache } from "./utils/helper";
 import {
   systemStatusAdd,
   systemStatusUpdate,
@@ -36,6 +36,7 @@ import creditReturnRoute from "./router/creditReturn.routes";
 import customerCreditRoute from "./router/customerCredit.routes";
 import discountRoute from "./router/discount.routes";
 import mptaRoute from "./router/mpta.routes";
+import { getDeviceByNozzle } from "./service/device.service";
 
 const app = express();
 app.use(express.json());
@@ -52,16 +53,23 @@ client.on("message", async (topic, message) => {
   let data = topic.split("/"); // data spliting from mqtt
 
   // Auto Permit Approve Feature and Semi Approve Feature by device nozzleNo
-  if(data[2] == 'permit') {
-    const checkNozzle = storeInCache(data[3]);
 
-    if(checkNozzle == false) {
-      return;
+  const result = splitMessage(message.toString());
+  
+  const device = await getDeviceByNozzle({ nozzle_no: result[0] });
+
+  if(device?.autoApprove == true || device?.semiApprove == true) {
+    if(data[2] == 'permit') {
+      const checkNozzle = storeInCache(data[3]);
+  
+      if(checkNozzle == false) {
+        return;
+      }
+  
+      const result = await prepareAutoPermit(data[3], message.toString());
+  
+      await addDetailSale(result.depNo, result.nozzleNo, result);
     }
-
-    const result = await prepareAutoPermit(data[3], message.toString());
-
-    await addDetailSale(result.depNo, result.nozzleNo, result);
   }
 
   if (data[2] == "livedata") {
