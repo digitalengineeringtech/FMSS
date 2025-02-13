@@ -61,15 +61,9 @@ client.on("message", async (topic, message) => {
       return;
     }
 
-    const split = splitMessage(message.toString());
-  
-    const device = await getDeviceByNozzle({ nozzle_no: split[0] });
+    const result = await prepareAutoPermit(data[3], message.toString());
 
-    if(device?.autoApprove == true || device?.semiApprove == true) {
-      const result = await prepareAutoPermit(data[3], message.toString());
-
-      await addDetailSale(result.depNo, result.nozzleNo, result);
-    }
+    await addDetailSale(result.depNo, result.nozzleNo, result);
   }
 
   if (data[2] == "livedata") {
