@@ -58,6 +58,7 @@ client.on("message", async (topic, message) => {
     const checkNozzle = storeInCache(message.toString());
 
     if(checkNozzle == false) {
+      permitNozzles.delete(message.toString());
       return;
     }
 
