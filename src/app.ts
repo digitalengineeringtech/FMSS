@@ -54,20 +54,20 @@ client.on("message", async (topic, message) => {
 
   // Auto Permit Approve Feature and Semi Approve Feature by device nozzleNo
 
-  const result = splitMessage(message.toString());
-  
-  const device = await getDeviceByNozzle({ nozzle_no: result[0] });
+  if(data[2] == 'permit') {
+    const checkNozzle = storeInCache(data[3]);
 
-  if(device?.autoApprove == true || device?.semiApprove == true) {
-    if(data[2] == 'permit') {
-      const checkNozzle = storeInCache(data[3]);
+    if(checkNozzle == false) {
+      return;
+    }
+
+    const split = splitMessage(message.toString());
   
-      if(checkNozzle == false) {
-        return;
-      }
-  
+    const device = await getDeviceByNozzle({ nozzle_no: split[0] });
+
+    if(device?.autoApprove == true || device?.semiApprove == true) {
       const result = await prepareAutoPermit(data[3], message.toString());
-  
+
       await addDetailSale(result.depNo, result.nozzleNo, result);
     }
   }
