@@ -85,9 +85,10 @@ client.on("message", async (topic, message) => {
   if (data[2] == "Final") {
     // console.log("final is here");
     // when final topic come]
+    clearVoucher(message.toString());
     const lane = topic;
     detailSaleUpdateByDevice(data[3], message.toString(), lane); // add final data to detail sale vocono
-    clearVoucher(message.toString()); // Remove from memory when Final is processed
+     // Remove from memory when Final is processed
   }
 
   
