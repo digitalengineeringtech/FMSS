@@ -61,9 +61,7 @@ client.on("message", async (topic, message) => {
       return;
     }
 
-    const result = await prepareAutoPermit(data[3], message.toString());
-
-    await addDetailSale(result.depNo, result.nozzleNo, result);
+    await prepareAutoPermit(data[3], message.toString());
   }
 
   if (data[2] == "livedata") {

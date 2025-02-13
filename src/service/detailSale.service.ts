@@ -1988,8 +1988,27 @@ export const prepareAutoPermit = async (depNo, message: string) => {
 
   const user = await get('user');
 
+  const detailSale: any = {
+    depNo: depNo,
+    nozzleNo: device?.nozzle_no,
+    device: 'web',
+    fuelType: device?.fuel_type,
+    vehicleType: 'Cycle',
+    carNo: '-',
+    cashType: 'Cash',
+    user: user
+  }
+
   if(!device) {
     throw new Error("Device not found");
+  }
+
+  if(device.autoApprove == false || device.semiApprove == false) {
+      return detailSale;
+  }
+
+  if(device.autoApprove == true) {
+      await addDetailSale(depNo, result[0], detailSale);
   }
 
   if(device.semiApprove == true) {
@@ -2032,29 +2051,7 @@ export const prepareAutoPermit = async (depNo, message: string) => {
         }
       }
 
-      return {
-        depNo: depNo,
-        nozzleNo: device?.nozzle_no,
-        device: 'web',
-        fuelType: device?.fuel_type,
-        vehicleType: 'Cycle',
-        carNo: '-',
-        cashType: 'Cash',
-        user: user
-      }
-  } else if(device.autoApprove == true) { 
-    const detailSale: any = {
-      depNo: depNo,
-      nozzleNo: device?.nozzle_no,
-      device: 'web',
-      fuelType: device?.fuel_type,
-      vehicleType: 'Cycle',
-      carNo: '-',
-      cashType: 'Cash',
-      user: user
-    }
-  
-    return detailSale;
+      await addDetailSale(depNo, result[0], detailSale);
   }
 }
 
