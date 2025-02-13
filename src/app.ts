@@ -66,7 +66,7 @@ client.on("message", async (topic, message) => {
 
   if (data[2] == "livedata") {
     // pp data come
-    liveDataChangeHandler(message.toString()); // store in cache
+    await liveDataChangeHandler(message.toString()); // store in cache
   }
 
   if (data[2] == "active") {
@@ -87,7 +87,7 @@ client.on("message", async (topic, message) => {
     // when final topic come]
     clearVoucher(message.toString());
     const lane = topic;
-    detailSaleUpdateByDevice(data[3], message.toString(), lane); // add final data to detail sale vocono
+    await detailSaleUpdateByDevice(data[3], message.toString(), lane); // add final data to detail sale vocono
      // Remove from memory when Final is processed
   }
 
