@@ -394,13 +394,22 @@ export const updateDetailSale = async (
 
   const device = await getDeviceByNozzle({ nozzle_no: data.nozzleNo });
 
+  let updateBody = {};
+
+  if(body.discountAmount == 0) {
+    updateBody = {
+      ...body,
+      isSemiUpdated: device?.semiApprove == true ? true : false,
+    }
+  }
+
   const grantTotal = calculateDiscount(
     data.totalPrice,
     body.discountType,
     body.discountAmount
   )
   
-  const updateBody = {
+  updateBody = {
      ...body,
      discount: body.discountType,
      discountAmount: body.discountAmount,

@@ -142,7 +142,7 @@ export const calculateDiscount = (subTotal, type, amount) => {
 // helpers function for store permit nozzles
 export const storeInCache = (key) => {
     if(permitNozzles.has(key)) {
-        console.log(`Nozzle ${key} is already permitted and waiting for live data.`);
+        console.log(`Nozzle ${key} is already permitted and fueling....`);
 
         return false;
     } else {
