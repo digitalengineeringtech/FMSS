@@ -144,14 +144,11 @@ export const storeInCache = (key) => {
     const result = splitMessage(key);
 
     if(permitNozzles.has(result[0])) {
-        console.log(`Nozzle ${result[0]} is already permitted and fueling....`);
+        console.log(`Nozzle ${result[0]} is already approved and fueling....`);
 
         return false;
     } else {
       permitNozzles.set(result[0], true);
-
-      console.log(`Nozzle ${result[0]} is permitted.`);
-  
       return true;
     }   
 }
