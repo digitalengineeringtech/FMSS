@@ -55,7 +55,7 @@ client.on("message", async (topic, message) => {
   // Auto Permit Approve Feature and Semi Approve Feature by device nozzleNo
 
   if(data[2] == 'permit') {
-    const checkNozzle = storeInCache(data[3]);
+    const checkNozzle = storeInCache(message.toString());
 
     if(checkNozzle == false) {
       return;

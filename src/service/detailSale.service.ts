@@ -2012,8 +2012,8 @@ export const prepareAutoPermit = async (depNo, message: string) => {
     throw new Error("Device not found");
   }
 
-  if(device.autoApprove == false || device.semiApprove == false) {
-      return detailSale;
+  if(device.autoApprove == false && device.semiApprove == false) {
+      return;
   }
 
   if(device.autoApprove == true) {
