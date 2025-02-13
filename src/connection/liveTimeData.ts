@@ -40,6 +40,8 @@ export const liveDataChangeHandler = async (data) => {
 
       if(lastSale == saleLiter && lastPrice == salePrice) {
           console.log('Fueling stopped for nozzle:', nozzleNo);
+          permitNozzles.delete(nozzleNo);
+          console.log('Clear nozzle:', nozzleNo);
           await handleFuelingStop(nozzleNo);
           return;
       }
