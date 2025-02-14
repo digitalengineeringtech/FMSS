@@ -389,7 +389,8 @@ export const updateDetailSale = async (
   query: FilterQuery<detailSaleDocument>,
   body: UpdateQuery<detailSaleDocument>
 ) => {
-  const data = await detailSaleModel.findOne(query);
+  const data = await detailSaleModel.findOne({ _id: query._id });
+
   if (!data) throw new Error("no data with that id");
 
   const device = await getDeviceByNozzle({ nozzle_no: data.nozzleNo });

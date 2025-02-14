@@ -116,7 +116,7 @@ detailSaleRoute.post(
 );
 
 detailSaleRoute.patch(
-  "/",
+  "/update",
   validateToken,
   checkExpire,
   validateAll(allSchemaId),
