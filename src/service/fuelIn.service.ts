@@ -47,14 +47,8 @@ export const addFuelIn = async (body: any) => {
       stationId: body.user.stationId,
       fuel_type: body.fuelType,
       tankNo: body.tankNo,
-      createAt: body.receive_date
+      createAt: moment().format("YYYY-MM-DD"),
     });
-
-    if(tankCondition.length == 0) {
-      console.log('fuel balance not found');
-
-      throw new Error("No fuel balance data found for the given query.");
-    }
 
     const updatedBody = {
       ...body,
