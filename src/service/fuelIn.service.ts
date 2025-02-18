@@ -64,11 +64,11 @@ export const addFuelIn = async (body: any) => {
     let result = await new fuelInModel(updatedBody).save();
 
     await updateFuelBalance(
-      { _id: tankCondition[0]._id },
+      { _id: tankCondition[0]?._id },
       { 
           fuelIn: Number(body.receive_balance ?? 0),
           terminal: body.terminal, 
-        balance: Number(tankCondition[0]?.balance != undefined ? tankCondition[0]?.balance : 0)  + Number(body.receive_balance ?? 0)
+          balance: Number(tankCondition[0]?.balance != undefined ? tankCondition[0]?.balance : 0)  + Number(body.receive_balance ?? 0)
       }
     );
 
