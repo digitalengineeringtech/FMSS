@@ -53,10 +53,10 @@ export const addFuelIn = async (body: any) => {
       stationDetailId: body.user.stationId,
       fuel_in_code: no + 1,
       terminal: body.terminal,
-      tank_balance: tankCondition[0]?.balance,
+      tank_balance: Number(tankCondition[0]?.balance ?? 0),
       current_balance: Number(tankCondition[0]?.balance ?? 0) + Number(body.receive_balance ?? 0),
-      send_balance: body.send_balance,
-      receive_balance: body.receive_balance,
+      send_balance: Number(body.send_balance ?? 0),
+      receive_balance: Number(body.receive_balance ?? 0),
     };
 
     let result = await new fuelInModel(updatedBody).save();
@@ -64,7 +64,7 @@ export const addFuelIn = async (body: any) => {
     await updateFuelBalance(
       { _id: tankCondition[0]._id },
       { 
-          fuelIn: body.receive_balance,
+          fuelIn: Number(body.receive_balance ?? 0),
           terminal: body.terminal, 
           balance: Number(tankCondition[0]?.balance ?? 0) + Number(body.receive_balance ?? 0)
       }
