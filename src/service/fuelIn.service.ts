@@ -54,7 +54,7 @@ export const addFuelIn = async (body: any) => {
       fuel_in_code: no + 1,
       terminal: body.terminal,
       tank_balance: tankCondition[0]?.balance,
-      current_balance: tankCondition[0]?.balance + Number(body.receive_balance),
+      current_balance: Number(tankCondition[0]?.balance ?? 0) + Number(body.receive_balance ?? 0),
       send_balance: body.send_balance,
       receive_balance: body.receive_balance,
     };
@@ -65,8 +65,8 @@ export const addFuelIn = async (body: any) => {
       { _id: tankCondition[0]._id },
       { 
           fuelIn: body.receive_balance,
-          terminal: body.send_balance, 
-          balance: tankCondition[0]?.balance + Number(body.receive_balance)
+          terminal: body.terminal, 
+          balance: Number(tankCondition[0]?.balance ?? 0) + Number(body.receive_balance ?? 0)
       }
     );
 
