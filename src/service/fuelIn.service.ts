@@ -1,10 +1,10 @@
 import { FilterQuery, UpdateQuery } from "mongoose";
 import fuelInModel, { fuelInDocument } from "../model/fuelIn.model";
 import { addFuelBalance, getFuelBalance, updateFuelBalance } from "./fuelBalance.service";
-import config, { get } from "config";
+import config from "config";
 import axios from "axios";
-import { log } from "console";
 import { fuelBalanceDocument } from "../model/fuelBalance.model";
+import moment from "moment";
 
 const limitNo = config.get<number>("page_limit");
 
@@ -40,12 +40,14 @@ export const fuelInPaginate = async (
 
 export const addFuelIn = async (body: any) => {
   try {
+
     let no = await fuelInModel.count();
+
     let tankCondition = await getFuelBalance({
       stationId: body.user.stationId,
       fuel_type: body.fuelType,
       tankNo: body.tankNo,
-      createAt: body.receive_date,
+      createAt: body.receive_date
     });
 
     if(tankCondition.length == 0) {
@@ -59,8 +61,8 @@ export const addFuelIn = async (body: any) => {
       stationDetailId: body.user.stationId,
       fuel_in_code: no + 1,
       terminal: body.terminal,
-      tank_balance: Number(tankCondition[0]?.balance ?? 0),
-      current_balance: Number(tankCondition[0]?.balance ?? 0) + Number(body.receive_balance ?? 0),
+      tank_balance: Number(tankCondition[0]?.balance != undefined ? tankCondition[0]?.balance : 0) ,
+      current_balance: Number(tankCondition[0]?.balance != undefined ? tankCondition[0]?.balance : 0)  + Number(body.receive_balance ?? 0),
       send_balance: Number(body.send_balance ?? 0),
       receive_balance: Number(body.receive_balance ?? 0),
     };
@@ -72,7 +74,7 @@ export const addFuelIn = async (body: any) => {
       { 
           fuelIn: Number(body.receive_balance ?? 0),
           terminal: body.terminal, 
-          balance: Number(tankCondition[0]?.balance ?? 0) + Number(body.receive_balance ?? 0)
+        balance: Number(tankCondition[0]?.balance != undefined ? tankCondition[0]?.balance : 0)  + Number(body.receive_balance ?? 0)
       }
     );
 
