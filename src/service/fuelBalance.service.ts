@@ -64,7 +64,7 @@ export const updateFuelBalance = async (
   body: UpdateQuery<fuelBalanceDocument>
 ) => {
   try {
-    await fuelBalanceModel.updateMany(query, body);
+    await fuelBalanceModel.updateOne(query, body);
     return await fuelBalanceModel.find(query).lean();
   } catch (e) {
     throw new Error(e);
