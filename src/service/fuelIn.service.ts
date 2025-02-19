@@ -3,7 +3,7 @@ import fuelInModel, { fuelInDocument } from "../model/fuelIn.model";
 import { addFuelBalance, getFuelBalance, updateFuelBalance } from "./fuelBalance.service";
 import config from "config";
 import axios from "axios";
-import { fuelBalanceDocument } from "../model/fuelBalance.model";
+import fuelBalanceModel, { fuelBalanceDocument } from "../model/fuelBalance.model";
 import moment from "moment";
 
 const limitNo = config.get<number>("page_limit");
@@ -248,6 +248,16 @@ export const updateAtgFuelIn = async (body: any) => {
     });
 
     const result = await fuelInModel.findById(body.id);
+
+    const query = {
+      tankNo: body.tankNo,
+      createAt: result?.receive_date,
+      fuelType: result?.fuel_type,
+    }
+
+    await fuelBalanceModel.findOneAndUpdate(query, {
+       fuelIn: result?.receive_balance
+    });
 
     try {
       const url = config.get<string>("atgFuelInCloud");

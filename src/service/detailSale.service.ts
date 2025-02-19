@@ -622,10 +622,6 @@ export const detailSaleUpdateByDevice = async (
       });
     }
 
-    // console.log(tankUrl, "this is tank url");
-
-    if (tankUrl == "") {
-      // console.log("00000000");
       let checkDate = await getFuelBalance({
         stationId: result.stationDetailId,
         createAt: result.dailyReportDate,
@@ -685,13 +681,10 @@ export const detailSaleUpdateByDevice = async (
         { liter: result.saleLiter },
         result.nozzleNo
       );
-      // console.log("22222222222222222");
-    }
 
     mqttEmitter("detpos/local_server", `${result?.nozzleNo}/D1S1`);
 
     // get tank data by today date
-    if (tankUrl != "") {
       const tankData = await getTankData({
         stationDetailId: result.stationDetailId,
         dateOfDay:  moment().tz("Asia/Yangon").format("YYYY-MM-DD"),
@@ -719,7 +712,6 @@ export const detailSaleUpdateByDevice = async (
       } catch (error) {
         console.error("Error handling tank data:", error);
       }
-    }
 
     let prevDate = previous(new Date(result.dailyReportDate));
     // console.log(prevDate, "this is prev date");
