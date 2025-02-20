@@ -37,6 +37,7 @@ import customerCreditRoute from "./router/customerCredit.routes";
 import discountRoute from "./router/discount.routes";
 import mptaRoute from "./router/mpta.routes";
 import { getDeviceByNozzle } from "./service/device.service";
+import { simulateFueling } from "./test/fueling";
 
 const app = express();
 app.use(express.json());
@@ -137,6 +138,17 @@ socket.on("disconnect", () => {
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
   res.send("ok");
 });
+
+// Simulate a fueling process and sending final start
+app.get('/simulate', (req,res) => {
+ client.publish('detpos/device/permit/1', '01permit');  
+
+ // Start a fueling process after 2 seconds
+ setTimeout(() => {
+    simulateFueling(client);
+ }, 2000);
+});
+// Simulate a fueling process and sending final end
 
 //user route
 app.use("/api/user", userRoute);
