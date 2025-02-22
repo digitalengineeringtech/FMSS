@@ -2131,14 +2131,16 @@ export const handleMissingFinalData = async (nozzleNo) => {
           Number(saleLiter) || 0;
     }
 
+    const pricePerLiter = Number(salePrice) / Number(saleLiter);
+
     let updateBody: UpdateQuery<detailSaleDocument> = {
       nozzleNo: nozzleNo,
-      salePrice: Number(salePrice),
+      salePrice: Math.round(pricePerLiter),
       saleLiter: Number(saleLiter),
       depNo: currentVoucher.depNo,
       // saleLiter: data[2],
       // totalPrice: totalPrice ? totalPrice : 0,
-      totalPrice: Number(salePrice) * Number(saleLiter),
+      totalPrice: Number(salePrice),
       asyncAlready: currentVoucher.asyncAlready == "a0" ? "a" : "1",
       totalizer_liter:
         previousVoucher.totalizer_liter + Number(saleLiter ? saleLiter : 0),
