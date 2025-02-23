@@ -47,21 +47,17 @@ export const updateDevice = async (
   body: UpdateQuery<deviceDocument>
 ) => {
   try {
-    const device = await deviceModel.findOne(query).lean();
+    const device = await deviceModel.find(query).lean();
 
-    if(!device) throw new Error("No device found with that id");
-
-    // Check if device.autoApprove is true and body.semiApprove is being set to true
-    if (device.autoApprove && body.semiApprove === true) {
-      throw new Error("You cannot set autoApprove and semiApprove at the same time");
+    if(!device) {
+       throw new Error("Device not found");  
     }
 
-    // Check if device.semiApprove is true and body.autoApprove is being set to true
-    if (device.semiApprove && body.autoApprove === true) {
-      throw new Error("You cannot set autoApprove and semiApprove at the same time");
+    if(device[0].autoApprove == true || device[0].semiApprove == true) {
+        throw new Error("Device can't be updated both auto approve and semi approve is true");
     }
-    
-    await deviceModel.updateOne(query, body);
+
+    await deviceModel.updateMany(query, body);
 
     return await deviceModel.find().lean();
   } catch (e) {
