@@ -63,7 +63,7 @@ export const updateDevice = async (
     
     await deviceModel.updateOne(query, body);
 
-    return await deviceModel.findById(device._id).lean();
+    return await deviceModel.find().lean();
   } catch (e) {
     throw new Error(e);
   }
