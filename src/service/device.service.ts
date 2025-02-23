@@ -47,16 +47,6 @@ export const updateDevice = async (
   body: UpdateQuery<deviceDocument>
 ) => {
   try {
-    const device = await deviceModel.find(query).lean();
-
-    if(!device) {
-       throw new Error("Device not found");  
-    }
-
-    if(device[0].autoApprove == true || device[0].semiApprove == true) {
-        throw new Error("Device can't be updated both auto approve and semi approve is true");
-    }
-
     await deviceModel.updateMany(query, body);
 
     return await deviceModel.find().lean();

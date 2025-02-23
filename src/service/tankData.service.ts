@@ -23,10 +23,22 @@ export const getTankDataCount = async () => {
 
 export const addTankData = async (body) => {
   try {
+    let saveData = {};
+
     let url = config.get<string>("tankDataUrl");
+
+    if(url == "") {
+        saveData = {
+            ...body,
+            asyncAlready: "0",
+            data: [],
+            dateOfDay: moment().format("YYYY-MM-DD"),
+        }
+    }
+
     let tankRealTimeData = await axios.post(url);
 
-    let saveData = {
+    saveData = {
       ...body,
       asyncAlready: "0",
       data: tankRealTimeData.data.data,
