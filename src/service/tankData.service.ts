@@ -81,8 +81,19 @@ export const updateExistingTankData = async (body) => {
   try {
     let url = config.get<string>("tankDataUrl");
     let tankRealTimeData = await axios.post(url);
+
+    let updateData = {};
+
+    if(url == "") {
+        updateData = {
+            ...body,
+            //  syncAlready: "0",
+            data: [],
+            dateOfDay: moment().format("YYYY-MM-DD"),
+        }
+    }
     
-    const updateData = {
+    updateData = {
       ...body,
       //  syncAlready: "0",
       data: tankRealTimeData.data.data,
