@@ -35,7 +35,8 @@ export const getFuelBalanceHandler = async (
 ) => {
   try {
     let pageNo = Number(req.params.page);
-    let sDate = req.query.sDate?.toString();
+    let sDate: any = req.query.sDate;
+    let eDate: any = req.query.eDate;
 
     delete req.query.sDate;
     delete req.query.eDate;
@@ -46,9 +47,15 @@ export const getFuelBalanceHandler = async (
       throw new Error("you need date");
     }
 
+    const startDate = new Date(sDate);
+    const endDate = new Date(eDate);
+
     let { count, data } = await fuelBalancePaginate(pageNo, {
       ...query,
-      createAt: sDate,
+      realTime: {
+        $gt: startDate,
+        $lt: endDate,
+      },
     });
 
     fMsg(res, "fuelBalance find", data, count);
