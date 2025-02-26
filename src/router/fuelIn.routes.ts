@@ -3,6 +3,7 @@ import {
   addFuelInHandler,
   calculateFuelBalanceHandler,
   deleteFuelInHandler,
+  getAllFuelInHandler,
   getFuelInByDateHandler,
   getFuelInHandler,
   updateAtgFuelInHandler,
@@ -13,6 +14,12 @@ import { roleValidator } from "../middleware/roleValidator";
 import { validateAll, validateToken } from "../middleware/validator";
 import { allSchemaId, fuelInSchema } from "../schema/schema";
 const fuelInRoute = require("express").Router();
+
+fuelInRoute.get('/all',
+  validateToken, 
+  hasAnyPermit(["view"]), 
+  getAllFuelInHandler
+);
 
 fuelInRoute.get(
   "/pagi/:page",

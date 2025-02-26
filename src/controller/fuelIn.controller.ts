@@ -12,6 +12,36 @@ import {
   calculateFuelBalance,
 } from "../service/fuelIn.service";
 
+export const getAllFuelInHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+   try {
+     let sDate: any = req.query.sDate;
+     let eDate: any = req.query.eDate;
+
+     delete req.query.sDate;
+     delete req.query.eDate;
+
+     let filter = req.query;
+     
+     const query = {
+       ...filter,
+       createAt: {
+         $gt: new Date(sDate),
+         $lt: new Date(eDate),
+       },
+     }
+
+     let { data, count } = await getFuelIn(query);
+
+     fMsg(res, "FuelIn are here", data, count); 
+   } catch(e) {
+      next(new Error(e));
+   }
+} 
+
 export const getFuelInHandler = async (
   req: Request,
   res: Response,

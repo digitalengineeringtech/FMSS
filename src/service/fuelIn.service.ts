@@ -12,7 +12,9 @@ export const getFuelIn = async (query: FilterQuery<fuelInDocument>) => {
   try {
     const fuelins = await fuelInModel.find(query).lean({ virtuals: true});
 
-    return fuelins;
+    const count = await fuelInModel.countDocuments(query);
+
+    return { data: fuelins, count };
   } catch (e) {
     throw new Error(e);
   }
