@@ -96,7 +96,7 @@ export const preSetDetailSale = async (
   }
 
   const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
-  const cuurentDateForVocono = moment().tz("Asia/Yangon").format("DDMMYYYY");
+  const cuurentDateForVocono = moment().tz("Asia/Yangon").format("DDMMYYYYHHMMSS");
 
   const options = { timeZone: "Asia/Yangon", hour12: false };
 
@@ -249,7 +249,7 @@ export const addDetailSale = async (
     }
     //for time
     const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
-    const cuurentDateForVocono = moment().tz("Asia/Yangon").format("DDMMYYYY");
+    const cuurentDateForVocono = moment().tz("Asia/Yangon").format("DDMMYYYYHHMMSS");
 
     const options = { timeZone: "Asia/Yangon", hour12: false };
 
