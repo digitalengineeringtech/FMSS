@@ -35,7 +35,8 @@ export const getFuelBalanceHandler = async (
 ) => {
   try {
     let pageNo = Number(req.params.page);
-    let sDate = req.query.sDate?.toString();
+    let sDate: any = req.query.sDate;
+    let eDate: any = req.query.eDate;
 
     delete req.query.sDate;
     delete req.query.eDate;
@@ -46,9 +47,15 @@ export const getFuelBalanceHandler = async (
       throw new Error("you need date");
     }
 
+    const startDate = new Date(sDate);
+    const endDate = new Date(eDate);
+
     let { count, data } = await fuelBalancePaginate(pageNo, {
       ...query,
-      createAt: sDate,
+      realTime: {
+        $gt: startDate,
+        $lt: endDate,
+      },
     });
 
     fMsg(res, "fuelBalance find", data, count);
@@ -137,9 +144,7 @@ export const getFuelBalanceByDateHandler = async (
     }
     const startDate: Date = new Date(sDate);
     const endDate: Date = new Date(eDate);
-    console.log(".......ee");
     let result = await fuelBalanceByDate(query, startDate, endDate);
-    console.log(query, startDate, endDate);
     fMsg(res, "fuel balance between two date", result);
   } catch (e) {
     next(new Error(e));
@@ -172,10 +177,8 @@ export const getFuelBalanceByOneDateHandler = async (
       return `${year}-${month}-${day}`;
     };
 
-    console.log(sDate, "1");
     let startDate: Date = new Date(sDate);
     // startDate.setDate(startDate.getDate() - 1);
-    console.log(startDate, "2");
     let result = await fuelBalanceByOneDate(query, startDate);
     fMsg(res, "fuel balance between two date", result);
   } catch (e) {

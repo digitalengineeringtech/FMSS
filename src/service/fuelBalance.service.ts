@@ -182,10 +182,6 @@ export const fuelBalanceByDate = async (
     },
   };
 
-  console.log("====================================");
-  console.log(filter);
-  console.log("====================================");
-
   let result = await fuelBalanceModel
     .find(filter)
     .sort({ realTime: -1 })
@@ -204,10 +200,6 @@ export const fuelBalanceByOneDate = async (
     ...query,
     createAt: d1.toLocaleDateString("fr-CA"),
   };
-
-  console.log("====sfdsf================================");
-  console.log(d1.toLocaleDateString("fr-CA"), query);
-  console.log("=====sff===============================");
 
   let result = await fuelBalanceModel
     .find(filter)

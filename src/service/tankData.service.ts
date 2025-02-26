@@ -28,23 +28,26 @@ export const addTankData = async (body) => {
     let url = config.get<string>("tankDataUrl");
 
     if(url == "") {
-        saveData = {
-            ...body,
-            asyncAlready: "0",
-            data: [],
-            dateOfDay: moment().format("YYYY-MM-DD"),
-        }
+
+      saveData = {
+          ...body,
+          asyncAlready: "0",
+          dateOfDay: moment().format("YYYY-MM-DD"),
+      }
+
+    } else {
+
+      let tankRealTimeData = await axios.post(url);
+
+      saveData = {
+        ...body,
+        asyncAlready: "0",
+        data: tankRealTimeData.data.data,
+        dateOfDay: moment().format("YYYY-MM-DD"),
+        // data: fakedata,
+      };
+
     }
-
-    let tankRealTimeData = await axios.post(url);
-
-    saveData = {
-      ...body,
-      asyncAlready: "0",
-      data: tankRealTimeData.data.data,
-      dateOfDay: moment().format("YYYY-MM-DD"),
-      // data: fakedata,
-    };
 
     await new tankDataModel(saveData).save();
 
@@ -80,26 +83,31 @@ export const addTankData = async (body) => {
 export const updateExistingTankData = async (body) => {
   try {
     let url = config.get<string>("tankDataUrl");
-    let tankRealTimeData = await axios.post(url);
 
     let updateData = {};
 
     if(url == "") {
+
         updateData = {
             ...body,
             //  syncAlready: "0",
             data: [],
             dateOfDay: moment().format("YYYY-MM-DD"),
         }
+
+    } else {
+
+        let tankRealTimeData = await axios.post(url);
+
+        updateData = {
+          ...body,
+          //  syncAlready: "0",
+          data: tankRealTimeData.data.data,
+          dateOfDay: moment().format("YYYY-MM-DD"),
+        };
+  
     }
     
-    updateData = {
-      ...body,
-      //  syncAlready: "0",
-      data: tankRealTimeData.data.data,
-      dateOfDay: moment().format("YYYY-MM-DD"),
-    };
-
     await tankDataModel.findByIdAndUpdate(body.id, updateData);
 
     const uploadData = await getTankData({
@@ -117,7 +125,13 @@ export const updateExistingTankData = async (body) => {
         dailyReportDate: uploadData[0].dateOfDay,
       }
 
-      await axios.post(url, cloudTank);
+      const response = await axios.post(url, cloudTank);
+
+      if (response.status == 200) {
+        await tankDataModel.findByIdAndUpdate(cloudTank._id, {
+          asyncAlready: "2",
+        });
+      }
     } catch (e) {
       console.log(e.response, "from add tank data");
     }

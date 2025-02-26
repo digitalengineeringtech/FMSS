@@ -234,7 +234,6 @@ export const getDetailSaleByDateHandler = async (
     const startDate: Date = new Date(sDate);
     const endDate: Date = new Date(eDate);
     let result = await detailSaleByDate(query, startDate, endDate);
-    console.log(result, 'this is from by date')
     fMsg(res, "detail sale between two date", result);
   } catch (e) {
     next(e);

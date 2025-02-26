@@ -12,7 +12,9 @@ export const getFuelIn = async (query: FilterQuery<fuelInDocument>) => {
   try {
     const fuelins = await fuelInModel.find(query).lean({ virtuals: true});
 
-    return fuelins;
+    const count = await fuelInModel.countDocuments(query);
+
+    return { data: fuelins, count };
   } catch (e) {
     throw new Error(e);
   }
@@ -80,7 +82,7 @@ export const addFuelIn = async (body: any) => {
 
     try {
       const cloudObject = {
-         stationId: result?.stationDetailId,
+         stationDetailId: result?.stationDetailId,
          driver: result?.driver,
          bowser: result?.bowser,
          tankNo: result?.tankNo,
@@ -95,6 +97,8 @@ export const addFuelIn = async (body: any) => {
          receive_date: result?.receive_date,
          createAt: result?.receive_date
       }
+
+      console.log("cloudObject", cloudObject);
 
       let response = await axios.post(url, cloudObject);
 

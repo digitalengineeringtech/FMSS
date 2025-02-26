@@ -9,7 +9,7 @@ export const simulateFueling = (client) => {
   isFueling = true;
 
   let interval = setInterval(() => {
-      let litersDispensed = 0.5; // Simulating 0.5 liters per interval
+      let litersDispensed = 0.9; // Simulating 0.5 liters per interval
       let priceIncrement = litersDispensed * pricePerLiter;
 
       if (totalPrice + priceIncrement > totalPriceLimit) {
