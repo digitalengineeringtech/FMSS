@@ -82,7 +82,7 @@ export const addFuelIn = async (body: any) => {
 
     try {
       const cloudObject = {
-         stationId: result?.stationDetailId,
+         stationDetailId: result?.stationDetailId,
          driver: result?.driver,
          bowser: result?.bowser,
          tankNo: result?.tankNo,
@@ -97,6 +97,8 @@ export const addFuelIn = async (body: any) => {
          receive_date: result?.receive_date,
          createAt: result?.receive_date
       }
+
+      console.log("cloudObject", cloudObject);
 
       let response = await axios.post(url, cloudObject);
 

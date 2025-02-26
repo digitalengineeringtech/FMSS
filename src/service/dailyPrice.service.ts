@@ -68,7 +68,6 @@ export const deleteDailyPrice = async (
 export const getLastPrice = async (nozzleNo) => {
   try {
     let device = await getDevice({ nozzle_no: nozzleNo });
-    console.log(device[0].daily_price);
     mqttEmitter(
       `detpos/local_server/price`,
       `${nozzleNo}${device[0].daily_price.toString().padStart(4, "0")}`

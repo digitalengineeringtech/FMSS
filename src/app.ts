@@ -147,6 +147,8 @@ app.get('/simulate', (req,res) => {
  setTimeout(() => {
     simulateFueling(client);
  }, 2000);
+
+ res.json({ status: 201, message: 'Fueling start...'});
 });
 // Simulate a fueling process and sending final end
 

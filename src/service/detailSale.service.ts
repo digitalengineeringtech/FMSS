@@ -727,20 +727,6 @@ export const detailSaleUpdateByDevice = async (
         try {
           let url = config.get<string>("detailsaleCloudUrl");
           let response = await axios.post(url, ea);
-          logger.info(`
-            ========== start ==========
-            function: Response Logger
-            Response: ${JSON.stringify(response.data)}
-            ========== ended ==========
-           `, { file: 'combined.log' });
-
-          logger.info(`
-            ========== start ==========
-            function: Response Logger
-            Response: ${JSON.stringify(response.data)}
-            ========== ended ==========
-            `, { file: 'detailsale.log' });
-
           if (response.status == 200) {
             await detailSaleModel.findByIdAndUpdate(ea._id, {
               asyncAlready: "2",
@@ -768,12 +754,6 @@ export const detailSaleUpdateByDevice = async (
         try {
           let url = config.get<string>("detailsaleCloudUrl");
           let response = await axios.post(url, ea);
-          logger.info(`
-            ========== start ==========
-            function: Response Logger
-            Response: ${JSON.stringify(response.data)}
-            ========== ended ==========
-          `, { file: 'combined.log' });
           if (response.status == 200) {
             await detailSaleModel.findByIdAndUpdate(ea._id, {
               asyncAlready: "2",
@@ -812,7 +792,7 @@ export const detailSaleUpdateByDevice = async (
             bowser: ea.bowser,
             tankNo: ea.tankNo,
             fuel_type: ea.fuel_type,
-            receive_balance: ea.receive_balance.toString(),
+            receive_balance: ea.receive_balance,
             receive_date: ea.receive_date,
             asyncAlready: ea.asyncAlready,
             stationId: ea.stationDetailId,
