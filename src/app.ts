@@ -136,7 +136,7 @@ socket.on("disconnect", () => {
 
 //headcheck route
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
-  res.send("ok");
+  res.send(`<h1>Load balancer is sending request to ${host}:${process.env.PORT}</h1>`);
 });
 
 // Simulate a fueling process and sending final start
@@ -199,5 +199,7 @@ const defaultData = async () => {
 };
 
 // defaultData();
+
+const PORT = process.env.PORT || port;
  
-server.listen(port, () => console.log(`erver is running in  http://${host}:${port}`));
+server.listen(PORT, () => console.log(`erver is running in  http://${host}:${PORT}`));
