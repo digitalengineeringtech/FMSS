@@ -200,5 +200,4 @@ const defaultData = async () => {
 
 // defaultData();
  
-server.listen(port, () =>
-  console.log(`Server is running in  http://${host}:${port}`));
+server.listen(port, () => console.log(`erver is running in  http://${host}:${port}`));
