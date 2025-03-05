@@ -7,7 +7,7 @@
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
     "start": "node index.js",
-    "start:port": "ts-node server.ts --port",
+    "start:port": "ts-node-dev --respawn --transpile-only src/app.ts --port",
     "start:all": "pm2 start npm --name fms1 -- run start:port 9002 && pm2 start npm --name fms2 -- run start:port 9003 && pm2 start npm --name fms3 -- run start:port 9004"
   },
   "keywords": [],
