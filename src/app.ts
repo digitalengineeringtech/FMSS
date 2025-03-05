@@ -199,11 +199,6 @@ const defaultData = async () => {
 };
 
 // defaultData();
-
-const args = process.argv.slice(2);
-const portArg = args.find(arg => arg.startsWith("--port="));
-const PORT = portArg ? parseInt(portArg.split("=")[1], 10) : 9000; 
-
-server.listen(PORT, () =>
-  console.log(`server is running in  http://${host}:${PORT}`)
-);
+ 
+server.listen(port, () =>
+  console.log(`Server is running in  http://${host}:${port}`));
