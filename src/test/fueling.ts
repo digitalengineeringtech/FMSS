@@ -1,6 +1,6 @@
 let isFueling = false;
-export const simulateFueling = (client) => {
-  let topic = 'detpos/device/livedata/1';
+export const simulateFueling = (dispenser, nozzle, client) => {
+  let topic = `detpos/device/livedata/${dispenser}`;
   let pricePerLiter = 3320;
   let totalPriceLimit = 10000;
   let totalLiters = 0;
@@ -20,7 +20,7 @@ export const simulateFueling = (client) => {
       }
 
       totalLiters += litersDispensed;
-      const message = `01L${totalLiters.toFixed(3)}P${totalPrice.toFixed(3)}`;
+      const message = `${nozzle}L${totalLiters.toFixed(3)}P${totalPrice.toFixed(3)}`;
 
       client.publish(topic, message);
 
@@ -31,8 +31,8 @@ export const simulateFueling = (client) => {
           console.log('Fueling stopped and sending final message...');
           
           // 01S5000L6.25P2000T1234.567A12345
-          let finalTopic = 'detpos/device/Final/1';
-          let finalMessage = `01S${totalPrice.toFixed(3)}L${totalLiters.toFixed(3)}P${pricePerLiter.toFixed(3)}T1234.567A12345`;
+          let finalTopic = `detpos/device/Final/${dispenser}`;
+          let finalMessage = `${nozzle}S${totalPrice.toFixed(3)}L${totalLiters.toFixed(3)}P${pricePerLiter.toFixed(3)}T1234.567A12345`;
           client.publish(finalTopic, finalMessage);
 
           console.log('Final data message sent...');

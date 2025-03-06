@@ -10,7 +10,7 @@ export const checkStationExpire = async (stationId: string) => {
     const response = await axios.get(url);
 
     if (response.status != 200) {
-        return null;
+        return { status: false, msg: "Station not found", result: null };
     }
 
     return response.data;

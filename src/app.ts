@@ -36,8 +36,8 @@ import creditReturnRoute from "./router/creditReturn.routes";
 import customerCreditRoute from "./router/customerCredit.routes";
 import discountRoute from "./router/discount.routes";
 import mptaRoute from "./router/mpta.routes";
-import { getDeviceByNozzle } from "./service/device.service";
 import { simulateFueling } from "./test/fueling";
+import { checkStationExpire } from "./utils/control";
 
 const app = express();
 app.use(express.json());
@@ -140,15 +140,17 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
 });
 
 // Simulate a fueling process and sending final start
-app.get('/simulate', (req,res) => {
- client.publish('detpos/device/permit/1', '01permit');  
+app.get('/simulate', ( req, res) => {
+ const dispenser = req.query.dispenser;
+ const nozzle = req.query.nozzle;
+ client.publish(`detpos/device/permit/${dispenser}`, `${nozzle}permit`);  
 
  // Start a fueling process after 2 seconds
  setTimeout(() => {
-    simulateFueling(client);
- }, 2000);
+    simulateFueling(dispenser, nozzle, client);
+ }, 1000);
 
- res.json({ status: 201, message: 'Fueling start...'});
+ res.send(`Fueling started...: Dispenser No: ${dispenser} Nozzle No: ${nozzle} \n`);
 });
 // Simulate a fueling process and sending final end
 
@@ -179,6 +181,27 @@ app.use("/api/tank-data", tankDataRoute);
 app.use("/api/station", stationRoute);
 
 app.use('/api/car-number-by-card', mptaRoute);
+
+app.use('/api/check-station', async function () {
+    const stationId = await get('stationId');
+
+    const response = await checkStationExpire(stationId);
+
+    if(response.status != true) {
+        return { status: response.status, msg: response.msg , result: response.result };
+    } 
+
+    const station = response.result;
+
+    const expireDate = new Date(station.expireDate);
+    const today = new Date();
+
+    if(expireDate < today) {
+        return { status: false, msg: "Your are out of service", result: null };
+    }
+
+    return { status: true, msg: "Your are in service", result: null };
+});
 
 // error handling and response
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

@@ -1,10 +1,10 @@
 export default {
   port: 9000,
   host: "localhost",
-  // dbUrl:
-    // "mongodb://detpos:asdffdsa@192.168.0.100:27017/local-pos?authSource=admin",
   dbUrl:
-    "mongodb://detpos:asdffdsa@127.0.0.1:27017/test?authSource=admin",
+    "mongodb://detpos:asdffdsa@192.168.0.100:27017/local-pos?authSource=admin",
+  // dbUrl:
+  //   "mongodb://detpos:asdffdsa@127.0.0.1:27017/test?authSource=admin",
   saltWorkFactor: 10,
   secretKey: "suuhh",
   page_limit: 50,
@@ -26,23 +26,23 @@ export default {
   // tankDataUrl: "http://192.168.0.105:8080/baseOilcan",
 
   //--- tank data ( tank data cloud ) -------------------------------------------------------
-  // tankDataCloudUrl: "https://detfsmm.com/api/tank-data",
-  tankDataCloudUrl: "http://127.0.01:8000/api/tank-data",
+  tankDataCloudUrl: "https://detfsmm.com/api/tank-data",
+  // tankDataCloudUrl: "http://127.0.01:8000/api/tank-data",
 
   //--- tank data ( fuel in data cloud ) -------------------------------------------------------
-  // fuelInCloud: "https://detfsmm.com/api/fuelIn",
-  fuelInCloud: "http://127.0.01:8000/api/fuelIn",
+  fuelInCloud: "https://detfsmm.com/api/fuelIn",
+  // fuelInCloud: "http://127.0.01:8000/api/fuelIn",
 
-  // atgFuelInCloud: 'https://detfsmm.com/api/fuelIn/cloud/atg',
-  atgFuelInCloud: 'http://127.0.01:8000/api/fuelIn/cloud/atg',
+  atgFuelInCloud: 'https://detfsmm.com/api/fuelIn/cloud/atg',
+  // atgFuelInCloud: 'http://127.0.01:8000/api/fuelIn/cloud/atg',
 
   //--- tank data ( voucher data cloud ) -------------------------------------------------------
-  // detailsaleCloudUrl: "https://detfsmm.com/api/detail-sale",
-  detailsaleCloudUrl: "http://127.0.01:8000/api/detail-sale",
+  detailsaleCloudUrl: "https://detfsmm.com/api/detail-sale",
+  // detailsaleCloudUrl: "http://127.0.01:8000/api/detail-sale",
 
   // --- user data ( user data cloud ) for check station expire date ---------------------------
-  // userCloudUrl: "https://detfsmm.com/api/user/station",
-  userCloudUrl: "http://127.0.0.1:8000/api/user/station",
+  userCloudUrl: "https://detfsmm.com/api/user/station",
+  // userCloudUrl: "http://127.0.0.1:8000/api/user/station",
 
   //coustomerCloudUrl: "http://detfsmm.com:9000/api/customer",
   // coustomerCloudUrl: "https://detfsmm.com/api/customer/local-create",
