@@ -182,13 +182,13 @@ app.use("/api/station", stationRoute);
 
 app.use('/api/car-number-by-card', mptaRoute);
 
-app.use('/api/check-station', async function () {
+app.use('/api/check-station', async function (req: Request, res: Response) {
     const stationId = await get('stationId');
 
     const response = await checkStationExpire(stationId);
 
     if(response.status != true) {
-        return { status: response.status, msg: response.msg , result: response.result };
+        res.json({ status: response.status, msg: response.msg , result: response.result });
     } 
 
     const station = response.result;
@@ -197,10 +197,10 @@ app.use('/api/check-station', async function () {
     const today = new Date();
 
     if(expireDate < today) {
-        return { status: false, msg: "Your are out of service", result: null };
+        res.json({ status: false, msg: "Your are out of service", result: null });
     }
 
-    return { status: true, msg: "Your are in service", result: null };
+    res.json({ status: true, msg: "Your are in service", result: null });
 });
 
 // error handling and response
