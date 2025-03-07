@@ -183,25 +183,26 @@ app.use("/api/station", stationRoute);
 
 app.use('/api/car-number-by-card', mptaRoute);
 
-app.use('/api/check-station', validateToken, async function (req: Request, res: Response) {
-    const stationId = await get('stationId');
+app.use('/api/check-station', async function (req: Request, res: Response, next: NextFunction) {
+    const stationId = req.query.stationId;
 
     const response = await checkStationExpire(stationId);
 
-    if(response.status != true) {
-        res.json({ status: response.status, msg: response.msg , result: response.result });
-    } 
-
+    if(response.status == false) {
+        return { status: false, msg: 'Station not found' }
+    }
+    
     const station = response.result;
 
     const expireDate = new Date(station.expireDate);
+
     const today = new Date();
 
     if(expireDate < today) {
-        res.json({ status: false, msg: "Your are out of service", result: null });
+        res.json({ status: false, msg: 'Your are out of service' })
+    } else {
+        res.json({ status: true, msg: 'Your are in service' })
     }
-
-    res.json({ status: true, msg: "Your are in service", result: null });
 });
 
 // error handling and response
