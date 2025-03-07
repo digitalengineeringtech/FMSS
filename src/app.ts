@@ -38,6 +38,7 @@ import discountRoute from "./router/discount.routes";
 import mptaRoute from "./router/mpta.routes";
 import { simulateFueling } from "./test/fueling";
 import { checkStationExpire } from "./utils/control";
+import { validateToken } from "./middleware/validator";
 
 const app = express();
 app.use(express.json());
@@ -182,7 +183,7 @@ app.use("/api/station", stationRoute);
 
 app.use('/api/car-number-by-card', mptaRoute);
 
-app.use('/api/check-station', async function (req: Request, res: Response) {
+app.use('/api/check-station', validateToken, async function (req: Request, res: Response) {
     const stationId = await get('stationId');
 
     const response = await checkStationExpire(stationId);
