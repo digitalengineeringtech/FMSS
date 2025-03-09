@@ -199,9 +199,9 @@ app.use('/api/check-station', async function (req: Request, res: Response, next:
     const today = new Date();
 
     if(expireDate < today) {
-        res.json({ status: false, msg: 'Your are out of service' })
+        res.json({ status: false, msg: 'Your are out of service', result: station })
     } else {
-        res.json({ status: true, msg: 'Your are in service' })
+        res.json({ status: true, msg: 'Your are in service', result: station })
     }
 });
 
