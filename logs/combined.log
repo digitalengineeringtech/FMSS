@@ -1,0 +1,126 @@
+2025-03-05T13:14:07.900Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c84e19f3562b65c15f492a","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025190383/2","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3337.5360000000233,"totalizer_amount":608947,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-340.356,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T19:44:01.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3337.536","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-340.356"},"id":"67c84e19f3562b65c15f492a"}
+      ========== ended ==========
+     
+2025-03-05T13:15:22.923Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c84e64f3562b65c15f493e","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025190390/3","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3340.5480000000234,"totalizer_amount":612267,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-343.368,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T19:45:16.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3340.548","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-343.368"},"id":"67c84e64f3562b65c15f493e"}
+      ========== ended ==========
+     
+2025-03-05T13:16:21.100Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c84e9ff3562b65c15f4959","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025190308/4","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3343.5600000000236,"totalizer_amount":615587,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-346.38,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T19:46:15.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3343.560","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-346.380"},"id":"67c84e9ff3562b65c15f4959"}
+      ========== ended ==========
+     
+2025-03-05T13:16:45.565Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c84eb7f3562b65c15f4975","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025190355/5","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3346.5720000000238,"totalizer_amount":618907,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-349.392,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T19:46:39.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3346.572","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-349.392"},"id":"67c84eb7f3562b65c15f4975"}
+      ========== ended ==========
+     
+2025-03-05T13:17:50.639Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c84ef8f3562b65c15f4990","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025190362/6","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3349.584000000024,"totalizer_amount":622227,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-352.404,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T19:47:44.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3349.584","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-352.404"},"id":"67c84ef8f3562b65c15f4990"}
+      ========== ended ==========
+     
+2025-03-05T13:24:31.652Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c85089f3562b65c15f49ab","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025190363/7","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3352.596000000024,"totalizer_amount":625547,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-355.416,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T19:54:25.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3352.596","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-355.416"},"id":"67c85089f3562b65c15f49ab"}
+      ========== ended ==========
+     
+2025-03-05T13:27:30.900Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c8513cf3562b65c15f49c6","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025190389/8","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3355.6080000000243,"totalizer_amount":628867,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-358.428,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T19:57:24.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3355.608","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-358.428"},"id":"67c8513cf3562b65c15f49c6"}
+      ========== ended ==========
+     
+2025-03-05T13:29:12.680Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c851a2f3562b65c15f49e1","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025190366/9","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3358.6200000000244,"totalizer_amount":632187,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-361.44,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T19:59:06.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3358.620","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-361.440"},"id":"67c851a2f3562b65c15f49e1"}
+      ========== ended ==========
+     
+2025-03-05T13:31:43.880Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c85239f3562b65c15f49fc","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025200387/10","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3361.6320000000246,"totalizer_amount":635507,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-364.452,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T20:01:37.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3361.632","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-364.452"},"id":"67c85239f3562b65c15f49fc"}
+      ========== ended ==========
+     
+2025-03-05T13:34:24.520Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c852daf3562b65c15f4a17","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025200351/11","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3364.644000000025,"totalizer_amount":638827,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-367.464,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T20:04:18.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3364.644","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-367.464"},"id":"67c852daf3562b65c15f4a17"}
+      ========== ended ==========
+     
+2025-03-05T13:35:52.989Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c85332f3562b65c15f4a32","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025200397/12","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3367.656000000025,"totalizer_amount":642147,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-370.476,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T20:05:46.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3367.656","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-370.476"},"id":"67c85332f3562b65c15f4a32"}
+      ========== ended ==========
+     
+2025-03-05T13:36:46.398Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c85368f3562b65c15f4a4d","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025200338/13","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3370.668000000025,"totalizer_amount":645467,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-373.488,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T20:06:40.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3370.668","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-373.488"},"id":"67c85368f3562b65c15f4a4d"}
+      ========== ended ==========
+     
+2025-03-05T13:38:07.215Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c853b9f3562b65c15f4a68","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025200320/14","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3373.6800000000253,"totalizer_amount":648787,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-376.5,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T20:08:01.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3373.680","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-376.500"},"id":"67c853b9f3562b65c15f4a68"}
+      ========== ended ==========
+     
+2025-03-05T13:39:03.826Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c853f1f3562b65c15f4a83","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025200381/15","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3376.6920000000255,"totalizer_amount":652107,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-379.512,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T20:08:57.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3376.692","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-379.512"},"id":"67c853f1f3562b65c15f4a83"}
+      ========== ended ==========
+     
+2025-03-05T13:41:10.355Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c85470f3562b65c15f4a9e","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025200335/16","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3379.7040000000256,"totalizer_amount":655427,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-382.524,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T20:11:04.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3379.704","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-382.524"},"id":"67c85470f3562b65c15f4a9e"}
+      ========== ended ==========
+     
+2025-03-05T13:42:07.488Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c854a9f3562b65c15f4ab9","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025200348/17","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3382.716000000026,"totalizer_amount":658747,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-385.536,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T20:12:01.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3382.716","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-385.536"},"id":"67c854a9f3562b65c15f4ab9"}
+      ========== ended ==========
+     
+2025-03-05T13:44:08.645Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c85522f3562b65c15f4ad4","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025200363/18","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3385.728000000026,"totalizer_amount":662067,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-388.548,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T20:14:02.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3385.728","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-388.548"},"id":"67c85522f3562b65c15f4ad4"}
+      ========== ended ==========
+     
+2025-03-05T13:45:39.763Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"67c8557df3562b65c15f4aef","stationDetailId":"6464e9f1c45b82216ab1db6b","vocono":"27/M1/05032025200375/19","carNo":"-","vehicleType":"Cycle","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"M1","couObjId":null,"asyncAlready":"1","salePrice":10000,"saleLiter":3.012,"totalPrice":3320,"discountAmount":0,"subTotal":0,"grandTotal":0,"totalizer_liter":3388.740000000026,"totalizer_amount":665387,"devTotalizar_liter":1234.567,"devTotalizar_amount":12345,"tankBalance":-391.56,"tankNo":1,"dailyReportDate":"2025-03-05","isError":"A","isFinal":false,"isSemiUpdated":false,"preset":null,"device":"web","createAt":"2025-03-05T20:15:33.000Z","customer":null,"__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"3388.740","devTotalizar_liter":"1234.567","devTotalizar_amount":"12345.000","tankBalance":"-391.560"},"id":"67c8557df3562b65c15f4aef"}
+      ========== ended ==========
+     

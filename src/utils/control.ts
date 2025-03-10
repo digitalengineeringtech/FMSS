@@ -2,7 +2,7 @@ import axios from "axios";
 import config from "config";
 
 // check station is already expired
-export const checkStationExpire = async (stationId: string) => {
+export const checkStationExpire = async (stationId) => {
     const userCloudUrl = config.get<string>("userCloudUrl");
 
     const url = userCloudUrl + "/" + stationId;
@@ -10,7 +10,7 @@ export const checkStationExpire = async (stationId: string) => {
     const response = await axios.get(url);
 
     if (response.status != 200) {
-        return null;
+        return { status: false, msg: "Station not found", result: null };
     }
 
     return response.data;

@@ -36,8 +36,9 @@ import creditReturnRoute from "./router/creditReturn.routes";
 import customerCreditRoute from "./router/customerCredit.routes";
 import discountRoute from "./router/discount.routes";
 import mptaRoute from "./router/mpta.routes";
-import { getDeviceByNozzle } from "./service/device.service";
 import { simulateFueling } from "./test/fueling";
+import { checkStationExpire } from "./utils/control";
+import { validateToken } from "./middleware/validator";
 
 const app = express();
 app.use(express.json());
@@ -136,19 +137,21 @@ socket.on("disconnect", () => {
 
 //headcheck route
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
-  res.send("ok");
+  res.send(`<h1>Load balancer is sending request to ${host}:${process.env.PORT}</h1>`);
 });
 
 // Simulate a fueling process and sending final start
-app.get('/simulate', (req,res) => {
- client.publish('detpos/device/permit/1', '01permit');  
+app.get('/simulate', ( req, res) => {
+ const dispenser = req.query.dispenser;
+ const nozzle = req.query.nozzle;
+ client.publish(`detpos/device/permit/${dispenser}`, `${nozzle}permit`);  
 
  // Start a fueling process after 2 seconds
  setTimeout(() => {
-    simulateFueling(client);
- }, 2000);
+    simulateFueling(dispenser, nozzle, client);
+ }, 1000);
 
- res.json({ status: 201, message: 'Fueling start...'});
+ res.send(`Fueling started...: Dispenser No: ${dispenser} Nozzle No: ${nozzle} \n`);
 });
 // Simulate a fueling process and sending final end
 
@@ -180,6 +183,28 @@ app.use("/api/station", stationRoute);
 
 app.use('/api/car-number-by-card', mptaRoute);
 
+app.use('/api/check-station', async function (req: Request, res: Response, next: NextFunction) {
+    const stationId = req.query.stationId;
+
+    const response = await checkStationExpire(stationId);
+
+    if(response.status == false) {
+        return { status: false, msg: 'Station not found' }
+    }
+    
+    const station = response.result;
+
+    const expireDate = new Date(station.expireDate);
+
+    const today = new Date();
+
+    if(expireDate < today) {
+        res.json({ status: false, msg: 'Your are out of service', result: station })
+    } else {
+        res.json({ status: true, msg: 'Your are in service', result: station })
+    }
+});
+
 // error handling and response
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   err.status = err.status || 409;
@@ -200,6 +225,6 @@ const defaultData = async () => {
 
 // defaultData();
 
-server.listen(port, () =>
-  console.log(`server is running in  http://${host}:${port}`)
-);
+const PORT = process.env.PORT || port;
+ 
+server.listen(PORT, () => console.log(`erver is running in  http://${host}:${PORT}`));
