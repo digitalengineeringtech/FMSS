@@ -185,28 +185,26 @@ export const addAtgFuelIn = async (body: any) => {
 
     const tank = tankRealTimeData.data.data.find((ea) => ea.id == body.tankNo);
 
-    const oilType = tank?.oilType;
-
     const opening = tank?.volume;
 
-    let fuel_type;
+    // let fuel_type;
 
-    if (oilType == "Petrol 92") {
-      fuel_type = "001-Octane Ron(92)";
-    } else if (oilType == "95 Octane") {
-      fuel_type = "002-Octane Ron(95)";
-    } else if (oilType == "HSD" || oilType == 'Diesel') {
-      fuel_type = "004-Diesel";
-    } else if (oilType == "PHSD" || oilType == 'Super Diesel') {
-      fuel_type = "005-Premium Diesel";
-    }
+    // if (oilType == "Petrol 92") {
+    //   fuel_type = "001-Octane Ron(92)";
+    // } else if (oilType == "95 Octane") {
+    //   fuel_type = "002-Octane Ron(95)";
+    // } else if (oilType == "HSD" || oilType == 'Diesel') {
+    //   fuel_type = "004-Diesel";
+    // } else if (oilType == "PHSD" || oilType == 'Super Diesel') {
+    //   fuel_type = "005-Premium Diesel";
+    // }
 
     const fuelInObject = {
       stationDetailId: body.stationDetailId,
       driver: body.driver,
       bowser: body.bowser,
       tankNo: body.tankNo,
-      fuel_type: fuel_type,
+      fuel_type: body.fuel_type,
       fuel_in_code: no + 1,
       terminal: body.terminal,
       send_balance: body.send_balance,
