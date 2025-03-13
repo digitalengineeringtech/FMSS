@@ -32,7 +32,7 @@ export const simulateFueling = (dispenser, nozzle, client) => {
           
           // 01S5000L6.25P2000T1234.567A12345
           let finalTopic = `detpos/device/Final/${dispenser}`;
-          let finalMessage = `${nozzle}S${totalPrice.toFixed(3)}L${totalLiters.toFixed(3)}P${pricePerLiter.toFixed(3)}T1234.567A12345`;
+          let finalMessage = `${nozzle}S${pricePerLiter.toFixed(3)}L${totalLiters.toFixed(3)}P${totalPrice.toFixed(3)}T1234.567A123456`;
           client.publish(finalTopic, finalMessage);
 
           console.log('Final data message sent...');
