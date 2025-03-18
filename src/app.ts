@@ -227,4 +227,4 @@ const defaultData = async () => {
 
 const PORT = process.env.PORT || port;
  
-server.listen(PORT, () => console.log(`erver is running in  http://${host}:${PORT}`));
+server.listen(PORT, () => console.log(`Server is running in  http://${host}:${PORT}`));
