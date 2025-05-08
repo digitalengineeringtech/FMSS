@@ -63,12 +63,26 @@ export const cardAuth = async (cardId: string): Promise<{ token: string }> => {
 
   let userObj: Partial<UserDocument> = user.toObject();
 
+  const tankDataUrl = config.get<string>("tankDataUrl");
+
+  let hasAtg: boolean;
+
+  if (tankDataUrl != '') {
+    hasAtg = true;
+  } else {
+    hasAtg = false;
+  }
+
+  userObj["hasAtg"] = hasAtg;
+
+
   delete userObj.password;
 
   set(user._id, userObj);
   set("user", userObj);
   set("stationNo", userObj.stationNo);
   set("stationId", userObj.stationId);
+  set('tankCount', userObj.tankCount);
 
   const userToken = createToken(userObj);
 
