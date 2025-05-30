@@ -4,6 +4,8 @@ import fuelBalanceModel, {
 } from "../model/fuelBalance.model";
 import config from "config";
 import moment from "moment-timezone";
+import axios from "axios";
+import { stat } from "fs";
 
 export const getFuelBalance = async (
   query: FilterQuery<fuelBalanceDocument>,
@@ -15,7 +17,7 @@ export const getFuelBalance = async (
       .find(query)
       .sort({ $natural: -1 })
       .limit(Number(tankCount))
-      .lean({ virtuals: true})
+      .lean({ virtuals: true })
       .select("-__v");
   } catch (e) {
     throw new Error(e);
@@ -31,9 +33,16 @@ export const getFuelBalanceCount = async () => {
 };
 
 export const addFuelBalance = async (body: fuelBalanceDocument) => {
+  const url = config.get<string>("fuelBalanceCloud");
   try {
+    let response = await axios.post(url, {
+      ...body,
+      stationDetailId: body.stationId,
+    });
+    console.log(response.data, "response from cloud");
     return await new fuelBalanceModel(body).save();
   } catch (e) {
+    console.log(e, "error in fuelBalance add");
     throw new Error(e);
   }
 };
@@ -60,13 +69,19 @@ export const updateTodayTankBalance = async (body: fuelBalanceDocument) => {
 };
 
 export const updateFuelBalance = async (
+  stationId: string,
+  tankNo: string,
   query: FilterQuery<fuelBalanceDocument>,
   body: UpdateQuery<fuelBalanceDocument>
 ) => {
   try {
+    const url = config.get<string>("updateFuelBalanceCloud");
+    const data = await axios.patch(url, { ...body, stationDetailId:stationId, tankNo });
+    console.log(data.data, "response from cloud update");
     await fuelBalanceModel.updateOne(query, body);
     return await fuelBalanceModel.find(query).lean();
   } catch (e) {
+    console.log(e, "error in fuelBalance update");
     throw new Error(e);
   }
 };
@@ -116,7 +131,7 @@ export const deleteFuelBalance = async (
 
 export const calcFuelBalance = async (query, body, payload: string) => {
   try {
-    let result = await fuelBalanceModel.find(query).lean({ virtuals: true});
+    let result = await fuelBalanceModel.find(query).lean({ virtuals: true });
     if (result.length === 0) {
       throw new Error("No fuel balance data found for the given query.");
     }
@@ -141,7 +156,9 @@ export const calcFuelBalance = async (query, body, payload: string) => {
     };
 
     await fuelBalanceModel.updateMany({ _id: gg?._id }, obj);
-    return await fuelBalanceModel.find({ _id: gg?._id }).lean({ virtuals: true });
+    return await fuelBalanceModel
+      .find({ _id: gg?._id })
+      .lean({ virtuals: true });
   } catch (e) {
     return e; // Rethrow the error with the actual error message
   }
@@ -160,7 +177,7 @@ export const fuelBalancePaginate = async (
     .sort({ realTime: -1 })
     .skip(skipCount)
     .limit(limitNo)
-    .lean({ virtuals: true})
+    .lean({ virtuals: true })
     // .populate("stationId")
     .select("-__v");
 
@@ -186,7 +203,7 @@ export const fuelBalanceByDate = async (
     .find(filter)
     .sort({ realTime: -1 })
     .populate("stationId")
-    .lean({ virtuals: true})
+    .lean({ virtuals: true })
     .select("-__v");
 
   return result;
@@ -204,7 +221,7 @@ export const fuelBalanceByOneDate = async (
   let result = await fuelBalanceModel
     .find(filter)
     .sort({ realTime: -1 })
-    .lean({ virtuals: true})
+    .lean({ virtuals: true })
     .select("-__v");
 
   return result;

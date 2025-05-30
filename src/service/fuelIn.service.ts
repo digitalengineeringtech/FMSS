@@ -66,6 +66,8 @@ export const addFuelIn = async (body: any) => {
     let result = await new fuelInModel(updatedBody).save();
 
     await updateFuelBalance(
+      body.user.stationId,
+      body.tankNo,
       { _id: tankCondition[0]?._id },
       { 
           fuelIn: Number(body.receive_balance ?? 0),
@@ -93,7 +95,7 @@ export const addFuelIn = async (body: any) => {
          terminal: result?.terminal,
          current_balance: result?.current_balance,
          send_balance: result?.send_balance,
-         receive_balance: result?.receive_balance,
+         receive_balance: result?.receive_balance.toString(),
          receive_date: result?.receive_date,
          createAt: result?.receive_date
       }
@@ -353,6 +355,8 @@ export const calculateFuelBalance = async (
           })
       );
 
+      
+      
       return await getFuelBalance({
         stationId: body.stationId,
         createAt: body.createAt
