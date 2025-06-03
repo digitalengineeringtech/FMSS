@@ -70,7 +70,7 @@ export const addFuelIn = async (body: any) => {
       body.tankNo,
       { _id: tankCondition[0]?._id },
       { 
-          fuelIn: Number(body.receive_balance ?? 0),
+          fuelIn: Number(tankCondition[0]?.fuelIn != undefined ? tankCondition[0]?.fuelIn : 0)  + Number(body.receive_balance ?? 0),
           terminal: Number(body.send_balance ?? 0),
           balance: Number(tankCondition[0]?.balance != undefined ? tankCondition[0]?.balance : 0)  + Number(body.receive_balance ?? 0)
       }
@@ -219,7 +219,6 @@ export const addAtgFuelIn = async (body: any) => {
     };
 
     let result = await new fuelInModel(fuelInObject).save();
-
     return result;
   } catch (e) {
     console.log(e);
@@ -267,7 +266,7 @@ export const updateAtgFuelIn = async (body: any) => {
       const url = config.get<string>("atgFuelInCloud");
 
       const cloudObject = {
-        stationId: result?.stationDetailId,
+        stationDetailId: result?.stationDetailId,
         driver: result?.driver,
         bowser: result?.bowser,
         tankNo: result?.tankNo,
@@ -286,7 +285,7 @@ export const updateAtgFuelIn = async (body: any) => {
       const response = await axios.post(url, cloudObject);
 
       if (response.status === 200) {
-        await fuelInModel.findOneAndUpdate(body.id, {
+        await fuelInModel.findOneAndUpdate({_id:body.id}, {
           asyncAlready: 2,
         });
       } else {
@@ -350,7 +349,7 @@ export const calculateFuelBalance = async (
                 balance: ea.todayTank != 0 ? ea.todayTank : ea.balance,
               } as fuelBalanceDocument;
             }
-
+            
             await addFuelBalance(obj);
           })
       );
