@@ -17,40 +17,40 @@ const roleRoute = require("express").Router();
 
 roleRoute.get(
   "/",
-  validateToken2,
-  roleValidator(["admin", "installer"]),
+  // validateToken2,
+  // roleValidator(["admin", "installer"]),
   getRoleHandler
 );
 
 roleRoute.post(
   "/",
-  validateToken,
-  validateAll(roleSchema),
-  roleValidator(["admin"]),
+  // validateToken,
+  // validateAll(roleSchema),
+  // roleValidator(["admin"]),
   addRoleHandler
 );
 
 roleRoute.delete(
   "/",
-  validateToken,
-  validateAll(allSchemaId),
-  roleValidator(["admin"]),
+  // validateToken,
+  // validateAll(allSchemaId),
+  // roleValidator(["admin"]),
   deletRoleHandler
 );
 
 roleRoute.patch(
   "/add/permit",
-  validateToken,
-  validateAll(rolePermitSchema),
-  roleValidator(["admin"]),
+  // validateToken,
+  // validateAll(rolePermitSchema),
+  // roleValidator(["admin"]),
   roleAddPermitHandler
 );
 
 roleRoute.patch(
   "/remove/permit",
-  validateToken,
-  validateAll(rolePermitSchema),
-  roleValidator(["admin"]),
+  // validateToken,
+  // validateAll(rolePermitSchema),
+  // roleValidator(["admin"]),
   roleRemovePermitHandler
 );
 

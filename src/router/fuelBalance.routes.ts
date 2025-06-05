@@ -20,61 +20,61 @@ const fuelBalanceRoute = require("express").Router();
 
 fuelBalanceRoute.get(
   "/all",
-  validateToken2,
-  roleValidator(["admin", "installer", "manager"]),
+  // validateToken2,
+  // roleValidator(["admin", "installer", "manager"]),
   getAllFuelBalanceHandler
 );
 
 fuelBalanceRoute.get(
   "/pagi/:page",
-  validateToken,
-  hasAnyPermit(["view"]),
+  // validateToken,
+  // hasAnyPermit(["view"]),
   getFuelBalanceHandler
 );
 
 fuelBalanceRoute.get(
   "/by-date",
-  validateToken,
-  hasAnyPermit(["view"]),
+  // validateToken,
+  // hasAnyPermit(["view"]),
   getFuelBalanceByDateHandler
 );
 
 fuelBalanceRoute.get(
   "/by-one-date",
-  validateToken,
-  hasAnyPermit(["view"]),
+  // validateToken,
+  // hasAnyPermit(["view"]),
   getFuelBalanceByOneDateHandler
 );
 
 fuelBalanceRoute.post(
   "/",
-  validateToken2,
-  // validateAll(fuelBalanceSchema),
-  roleValidator(["admin", "installer"]),
-  hasAnyPermit(["add"]),
+  // validateToken2,
+  // // validateAll(fuelBalanceSchema),
+  // roleValidator(["admin", "installer"]),
+  // hasAnyPermit(["add"]),
   addFuelBalanceHandler
 );
 
 fuelBalanceRoute.post(
   "/add-today-tank",
-  validateToken2,
-  roleValidator(['manager']),
-  hasAnyPermit(['add']),
+  // validateToken2,
+  // roleValidator(['manager']),
+  // hasAnyPermit(['add']),
   updateTodayTankHandler
 );
 
 fuelBalanceRoute.patch(
   "/",
-  validateToken,
-  roleValidator(["admin"]),
-  hasAnyPermit(["edit"]),
+  // validateToken,
+  // roleValidator(["admin"]),
+  // hasAnyPermit(["edit"]),
   updateFuelBalanceHandler
 );
 
 fuelBalanceRoute.delete(
   "/",
-  validateToken2,
-  roleValidator(["admin", "installer"]),
+  // validateToken2,
+  // roleValidator(["admin", "installer"]),
   // hasAnyPermit(["delete"]),
   deleteFuelBalanceHandler
 );

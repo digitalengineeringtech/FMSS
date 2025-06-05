@@ -34,8 +34,8 @@ const detailSaleRoute = require("express").Router();
 
 detailSaleRoute.get(
   "/pagi/:page",
-  validateToken2,
-  hasAnyPermit(["view"]),
+  // validateToken2,
+  // hasAnyPermit(["view"]),
   getDetailSaleHandler
 );
 
@@ -109,9 +109,9 @@ detailSaleRoute.delete(
 
 detailSaleRoute.post(
   "/initial",
-  validateToken2,
-  roleValidator(["admin", "installer"]),
-  hasAnyPermit(["add"]),
+  // validateToken2,
+  // roleValidator(["admin", "installer"]),
+  // hasAnyPermit(["add"]),
   initialDetailHandler
 );
 
