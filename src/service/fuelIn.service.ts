@@ -1,6 +1,10 @@
 import { FilterQuery, UpdateQuery } from "mongoose";
 import fuelInModel, { fuelInDocument } from "../model/fuelIn.model";
-import { addFuelBalance, getFuelBalance, updateFuelBalance } from "./fuelBalance.service";
+import {
+  addFuelBalance,
+  getFuelBalance,
+  updateFuelBalance,
+} from "./fuelBalance.service";
 import config, { get } from "config";
 import axios from "axios";
 import { log } from "console";
@@ -62,10 +66,21 @@ export const addFuelIn = async (body: any) => {
     let result = await new fuelInModel(updatedBody).save();
 
     await updateFuelBalance(
+      body.user.stationId,
+      body.tankNo,
       { _id: tankCondition[0]._id },
-      { 
-          fuelIn: body.receive_balance, 
-          balance: tankCondition[0].balance + Number(body.receive_balance)
+      {
+        fuelIn:
+          Number(
+            tankCondition[0]?.fuelIn != undefined ? tankCondition[0]?.fuelIn : 0
+          ) + Number(body.receive_balance ?? 0),
+        terminal: Number(body.send_balance ?? 0),
+        balance:
+          Number(
+            tankCondition[0]?.balance != undefined
+              ? tankCondition[0]?.balance
+              : 0
+          ) + Number(body.receive_balance ?? 0),
       }
     );
 
@@ -77,21 +92,21 @@ export const addFuelIn = async (body: any) => {
 
     try {
       const cloudObject = {
-         stationId: result?.stationDetailId,
-         driver: result?.driver,
-         bowser: result?.bowser,
-         tankNo: result?.tankNo,
-         fuel_type: result?.fuel_type,
-         fuel_in_code: result?.fuel_in_code,
-         tank_balance: result?.tank_balance,
-         opening: result?.opening,
-         terminal: result?.terminal,
-         current_balance: result?.current_balance,
-         send_balance: result?.send_balance,
-         receive_balance: result?.receive_balance,
-         receive_date: result?.receive_date,
-         createAt: result?.receive_date
-      }
+        stationDetailId: result?.stationDetailId,
+        driver: result?.driver,
+        bowser: result?.bowser,
+        tankNo: result?.tankNo,
+        fuel_type: result?.fuel_type,
+        fuel_in_code: result?.fuel_in_code,
+        tank_balance: result?.tank_balance,
+        opening: result?.opening,
+        terminal: result?.terminal,
+        current_balance: result?.current_balance,
+        send_balance: result?.send_balance,
+        receive_balance: result?.receive_balance.toString(),
+        receive_date: result?.receive_date,
+        createAt: result?.receive_date,
+      };
 
       let response = await axios.post(url, cloudObject);
 
@@ -187,9 +202,9 @@ export const addAtgFuelIn = async (body: any) => {
       fuel_type = "001-Octane Ron(92)";
     } else if (oilType == "95 Octane") {
       fuel_type = "002-Octane Ron(95)";
-    } else if (oilType == "HSD" || oilType == 'Diesel') {
+    } else if (oilType == "HSD" || oilType == "Diesel") {
       fuel_type = "004-Diesel";
-    } else if (oilType == "PHSD" || oilType == 'Super Diesel') {
+    } else if (oilType == "PHSD" || oilType == "Super Diesel") {
       fuel_type = "005-Premium Diesel";
     }
 
@@ -219,7 +234,6 @@ export const addAtgFuelIn = async (body: any) => {
 };
 
 export const updateAtgFuelIn = async (body: any) => {
-  
   try {
     let tankUrl = config.get<string>("tankDataUrl");
 
@@ -249,7 +263,7 @@ export const updateAtgFuelIn = async (body: any) => {
       const url = config.get<string>("atgFuelInCloud");
 
       const cloudObject = {
-        stationId: result?.stationDetailId,
+        stationDetailId: result?.stationDetailId,
         driver: result?.driver,
         bowser: result?.bowser,
         tankNo: result?.tankNo,
@@ -262,15 +276,18 @@ export const updateAtgFuelIn = async (body: any) => {
         send_balance: result?.send_balance,
         receive_balance: result?.receive_balance,
         receive_date: result?.receive_date,
-        createAt: result?.receive_date
-     }
+        createAt: result?.receive_date,
+      };
 
       const response = await axios.post(url, cloudObject);
 
       if (response.status === 200) {
-        await fuelInModel.findOneAndUpdate(body.id, {
-          asyncAlready: 2,
-        });
+        await fuelInModel.findOneAndUpdate(
+          { _id: body.id },
+          {
+            asyncAlready: 2,
+          }
+        );
       } else {
         throw new Error("Cloud not connected");
       }
@@ -285,16 +302,14 @@ export const updateAtgFuelIn = async (body: any) => {
   }
 };
 
-export const calculateFuelBalance = async (
-  body: any,
-) => {
+export const calculateFuelBalance = async (body: any) => {
   try {
     const checkDate = await getFuelBalance({
       stationId: body.stationId,
-      createAt: body.createAt
+      createAt: body.createAt,
     });
 
-    if(checkDate.length == 0) {
+    if (checkDate.length == 0) {
       let prevResult = await getFuelBalance(
         {
           stationId: body.stationId,
@@ -339,12 +354,12 @@ export const calculateFuelBalance = async (
 
       return await getFuelBalance({
         stationId: body.stationId,
-        createAt: body.createAt
+        createAt: body.createAt,
       });
     } else {
-      return 'Today fuel balance already calculated'
+      return "Today fuel balance already calculated";
     }
   } catch (error) {
     return error;
   }
-}
+};
