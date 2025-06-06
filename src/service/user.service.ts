@@ -3,6 +3,7 @@ import userModel, { UserInput, UserDocument } from "../model/user.model";
 import { compass, createToken, set } from "../utils/helper";
 import { permitDocument } from "../model/permit.model";
 import config from "config";
+import InstallerUserModel, { InstallerUserDocument } from "../model/installerUser.model";
 
 export const registerUser = async (payload: UserInput) => {
   try {
@@ -51,6 +52,37 @@ export const loginUser = async ({
   set("stationId", userObj.stationId);
   set('tankCount', userObj.tankCount);
   return userObj;
+};
+
+export const loginInstallerUser = async ({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) => {
+  try {
+    let user = await InstallerUserModel
+      .findOne({ email })
+      .populate("roles permits collectionId")
+      .exec();
+    // .select("-__v");
+
+    console.log(user);
+
+    if (!user || !compass(password, user.password)) {
+      throw new Error("Creditial Error");
+    }
+
+    let userObj: Partial<InstallerUserDocument> | any = user.toObject();
+    userObj["token"] = createToken(userObj);
+
+    delete userObj.password;
+
+    return userObj;
+  } catch (e: any) {
+    throw new Error(e);
+  }
 };
 
 export const cardAuth = async (cardId: string): Promise<{ token: string }> => {
