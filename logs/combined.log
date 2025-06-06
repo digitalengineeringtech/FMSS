@@ -157,3 +157,29 @@
           Response: {"con":true,"msg":"New DetailSale data was added","result":{"stationDetailId":"64ce8b0c26c645b891eed1e8","accessDb":"kyaw_san","device":"website","preset":"0004000 P","asyncAlready":"1","vocono":"31/asdfasdf/05062025/2","carNo":"5E-4578","vehicleType":"Bus ( City )","depNo":"7","nozzleNo":"13","fuelType":"004-Diesel","cashType":"Cash","casherCode":"asdfasdf","couObjId":null,"isError":"A","salePrice":10000,"saleLiter":3.012,"totalPrice":664,"totalizer_liter":4559.023999999999,"devTotalizar_liter":1234.567,"totalizer_amount":5480226,"tankBalance":11000,"tankNo":7,"isSent":0,"dailyReportDate":"2025-06-05","createAt":"2025-06-05T11:00:03.000Z","_id":"68411d51090629657ee41c36","__v":0,"formatted":{"saleLiter":"3.012","totalizer_liter":"4559.024","devTotalizar_liter":"1234.567","tankBalance":"11000.000"},"id":"68411d51090629657ee41c36"}}
           ========== ended ==========
         
+2025-06-06T06:59:08.129Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"684291aa21f848a9b1090bb3","stationDetailId":"64ce8b0c26c645b891eed1e8","vocono":"31/asdfasdf/06062025/1","carNo":"4E-3457","vehicleType":"Car","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"asdfasdf","couObjId":null,"asyncAlready":"1","salePrice":1097,"saleLiter":18.232,"totalPrice":4000,"totalizer_liter":241305.027999999,"totalizer_amount":23538514.624000005,"devTotalizar_liter":1234.567,"devTotalizar_amount":2342999946,"tankBalance":4009.1960000000004,"tankNo":1,"dailyReportDate":"2025-06-06","isError":"A","isReload":0,"preset":"0005000 P","device":"website","createAt":"2025-06-06T13:28:50.000Z","customer":null,"__v":0,"discount":"20%"}
+      ========== ended ==========
+     
+2025-06-06T06:59:08.300Z [info]: 
+          ========== start ==========
+          function: Response Logger
+          Response: {"con":true,"msg":"New DetailSale data was added","result":{"stationDetailId":"64ce8b0c26c645b891eed1e8","accessDb":"kyaw_san","device":"website","preset":"0005000 P","asyncAlready":"1","vocono":"31/asdfasdf/06062025/1","carNo":"4E-3457","vehicleType":"Car","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"asdfasdf","couObjId":null,"isError":"A","salePrice":1097,"saleLiter":18.232,"totalPrice":4000,"totalizer_liter":241305.027999999,"devTotalizar_liter":1234.567,"totalizer_amount":23538514.624000005,"tankBalance":4009.1960000000004,"tankNo":1,"isSent":0,"dailyReportDate":"2025-06-06","createAt":"2025-06-06T13:28:50.000Z","_id":"684291bc980397308b7282aa","__v":0,"formatted":{"saleLiter":"18.232","totalizer_liter":"241305.028","devTotalizar_liter":"1234.567","tankBalance":"4009.196"},"id":"684291bc980397308b7282aa"}}
+          ========== ended ==========
+        
+2025-06-06T07:18:09.413Z [info]: 
+      ========== start ==========
+      function: detailSaleUpdateByDevice ( Final )
+      description: Final data update in detailSale
+      Result: {"_id":"6842962c79c6d9ef9f262b24","stationDetailId":"64ce8b0c26c645b891eed1e8","vocono":"31/asdfasdf/06062025/2","carNo":"4U-4673","vehicleType":"Car","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"asdfasdf","couObjId":null,"asyncAlready":"1","salePrice":1097,"saleLiter":18.232,"totalPrice":4000,"totalizer_liter":241323.259999999,"totalizer_amount":23542514.624000005,"devTotalizar_liter":1234.567,"devTotalizar_amount":2342999946,"tankBalance":3990.9640000000004,"tankNo":1,"dailyReportDate":"2025-06-06","isError":"A","isReload":0,"preset":"0005000 P","device":"website","createAt":"2025-06-06T13:48:04.000Z","customer":null,"__v":0,"discount":"20%"}
+      ========== ended ==========
+     
+2025-06-06T07:18:09.816Z [info]: 
+          ========== start ==========
+          function: Response Logger
+          Response: {"con":true,"msg":"New DetailSale data was added","result":{"stationDetailId":"64ce8b0c26c645b891eed1e8","accessDb":"kyaw_san","device":"website","preset":"0005000 P","asyncAlready":"1","vocono":"31/asdfasdf/06062025/2","carNo":"4U-4673","vehicleType":"Car","depNo":"1","nozzleNo":"01","fuelType":"001-Octane Ron(92)","cashType":"Cash","casherCode":"asdfasdf","couObjId":null,"isError":"A","salePrice":1097,"saleLiter":18.232,"totalPrice":4000,"totalizer_liter":241323.259999999,"devTotalizar_liter":1234.567,"totalizer_amount":23542514.624000005,"tankBalance":3990.9640000000004,"tankNo":1,"isSent":0,"dailyReportDate":"2025-06-06","createAt":"2025-06-06T13:48:04.000Z","_id":"68429631980397308b72847c","__v":0,"formatted":{"saleLiter":"18.232","totalizer_liter":"241323.260","devTotalizar_liter":"1234.567","tankBalance":"3990.964"},"id":"68429631980397308b72847c"}}
+          ========== ended ==========
+        
