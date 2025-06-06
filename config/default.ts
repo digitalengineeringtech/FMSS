@@ -1,10 +1,10 @@
 export default {
   port: 9000,
   host: "localhost",
-  // dbUrl:
-  //   "mongodb://detpos:asdffdsa@192.168.0.100:27017/local-pos?authSource=admin",
   dbUrl:
-    "mongodb://detpos:asdffdsa@127.0.0.1:27017/local-pos?authSource=admin",
+    "mongodb://detpos:asdffdsa@192.168.0.100:27017/local-pos?authSource=admin",
+  // dbUrl:
+  //   "mongodb://detpos:asdffdsa@127.0.0.1:27017/local-pos?authSource=admin",
   saltWorkFactor: 10,
   secretKey: "suuhh",
   page_limit: 50,
@@ -20,31 +20,31 @@ export default {
   //--- tank data ( local atg ) -------------------------------------------------------
   //if atg => " tankDataUrl actual link " : " "
   // tankDataUrl: "",
-  tankDataUrl: "https://fake-tank-data.onrender.com/api/data",
+  // tankDataUrl: "https://fake-tank-data.onrender.com/api/data",
   // tankDataUrl: "https://e688ad90-86cd-43c9-a524-2aaccb212b97.mock.pstmn.io/data",
-  // tankDataUrl: "http://192.168.0.105:8080/baseOilcan",
+  tankDataUrl: "http://192.168.0.105:8080/baseOilcan",
 
   //--- tank data ( tank data cloud ) -------------------------------------------------------
-  // tankDataCloudUrl: "https://detfsmm.com/api/tank-data",
-  tankDataCloudUrl: "http://127.0.01:8000/api/tank-data",
+  tankDataCloudUrl: "https://detfsmm.com/api/tank-data",
+  // tankDataCloudUrl: "http://127.0.01:8000/api/tank-data",
 
   //--- tank data ( fuel in data cloud ) -------------------------------------------------------
-  // fuelInCloud: "https://detfsmm.com/api/fuelIn",
-  fuelInCloud: "http://127.0.01:8000/api/fuelIn",
+  fuelInCloud: "https://detfsmm.com/api/fuelIn",
+  // fuelInCloud: "http://127.0.01:8000/api/fuelIn",
 
 
-  // fuelBalanceCloud: "https://detfsmm.com/api/fuel-balance/check-balance",
-  fuelBalanceCloud: "http://127.0.01:8000/api/fuel-balance/check-balance",
+  fuelBalanceCloud: "https://detfsmm.com/api/fuel-balance/check-balance",
+  // fuelBalanceCloud: "http://127.0.01:8000/api/fuel-balance/check-balance",
 
-  // updateFuelBalanceCloud: "https://detfsmm.com/api/fuel-balance/local-sev",
-  updateFuelBalanceCloud: "http://127.0.01:8000/api/fuel-balance/local-sev",
+  updateFuelBalanceCloud: "https://detfsmm.com/api/fuel-balance/local-sev",
+  // updateFuelBalanceCloud: "http://127.0.01:8000/api/fuel-balance/local-sev",
 
-  // atgFuelInCloud: 'https://detfsmm.com/api/fuelIn/cloud/atg',
-    atgFuelInCloud: 'http://127.0.01:8000/api/fuelIn/cloud/atg',
+  atgFuelInCloud: 'https://detfsmm.com/api/fuelIn/cloud/atg',
+    // atgFuelInCloud: 'http://127.0.01:8000/api/fuelIn/cloud/atg',
 
   //--- tank data ( voucher data cloud ) -------------------------------------------------------
-  // detailsaleCloudUrl: "https://detfsmm.com/api/detail-sale",
-  detailsaleCloudUrl: "http://127.0.01:8000/api/detail-sale",
+  detailsaleCloudUrl: "https://detfsmm.com/api/detail-sale",
+  // detailsaleCloudUrl: "http://127.0.01:8000/api/detail-sale",
 
   //coustomerCloudUrl: "http://detfsmm.com:9000/api/customer",
   // coustomerCloudUrl: "https://detfsmm.com/api/customer/local-create",
