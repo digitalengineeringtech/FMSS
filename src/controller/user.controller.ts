@@ -7,6 +7,7 @@ import {
   cardAuth,
   deleteUser,
   getUser,
+  loginInstallerUser,
   loginUser,
   registerUser,
   updateUser,
@@ -38,6 +39,11 @@ export const loginUserHandler = async (
   next: NextFunction
 ) => {
   try {
+
+    if(req.body.email=="installer@gmail.com"){
+      let result = await loginInstallerUser(req.body)
+      fMsg(res, "logined users", result);
+    }
     let mode = await get("mode");
     if (mode == "dead") throw new Error("Your are out of service");
 

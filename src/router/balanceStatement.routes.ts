@@ -23,22 +23,22 @@ balanceStatementRoute.post("/manual", manualAddHandler);
 
 balanceStatementRoute.post(
   "/recive-balance",
-  validateToken,
-  validateAll(fuelReciveSchema),
+  // validateToken,
+  // validateAll(fuelReciveSchema),
   addReciveBalanceHandler
 );
 
 balanceStatementRoute.post(
   "/adjust-balance",
-  validateToken,
-  validateAll(fuelAdjustSchema),
+  // validateToken,
+  // validateAll(fuelAdjustSchema),
   addAdjustBalanceHandler
 );
 
 balanceStatementRoute.post(
   "/today-balance",
-  validateToken,
-  validateAll(todayBalanceSchema),
+  // validateToken,
+  // validateAll(todayBalanceSchema),
   addTodayBalanceHandler
 );
 

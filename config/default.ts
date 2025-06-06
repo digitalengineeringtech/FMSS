@@ -1,10 +1,20 @@
 export default {
   port: 9000,
   host: "localhost",
-  dbUrl:
-    "mongodb://detpos:asdffdsa@192.168.0.100:27017/local-pos?authSource=admin",
   // dbUrl:
-  //   "mongodb://detpos:asdffdsa@127.0.0.1:27017/local-pos?authSource=admin",
+  //   "mongodb://detpos:asdffdsa@192.168.0.100:27017/local-pos?authSource=admin",
+  dbUrl:
+    "mongodb://detpos:asdffdsa@127.0.0.1:27017/local-pos?authSource=admin",
+    controlDbUrl:
+    "mongodb+srv://ksdbfms:Tpd7iFyquVJrh4u8@controller.zabfxgj.mongodb.net/?retryWrites=true&w=majority",
+      // kyawsan_DbUrl:
+  //   "mongodb://detpos:asdffdsa@127.0.0.1:27017/HKTest?authSource=admin",
+  kyawsan_DbUrl:
+    "mongodb+srv://ksdbfms:Asdffdsa-4580@ksfms.tfk72hu.mongodb.net/?retryWrites=true&w=majority",
+  // common_DbUrl:
+  //   "mongodb://detpos:asdffdsa@127.0.0.1:27017/common?authSource=admin",
+  common_DbUrl:
+    "mongodb+srv://ksdbfms:C9GADG2k0tLRl95C@common.advclns.mongodb.net/?retryWrites=true&w=majority",
   saltWorkFactor: 10,
   secretKey: "suuhh",
   page_limit: 50,
@@ -22,15 +32,15 @@ export default {
   // tankDataUrl: "",
   // tankDataUrl: "https://fake-tank-data.onrender.com/api/data",
   // tankDataUrl: "https://e688ad90-86cd-43c9-a524-2aaccb212b97.mock.pstmn.io/data",
-  tankDataUrl: "http://192.168.0.105:8080/baseOilcan",
+  // tankDataUrl: "http://192.168.0.105:8080/baseOilcan",
 
   //--- tank data ( tank data cloud ) -------------------------------------------------------
-  tankDataCloudUrl: "https://detfsmm.com/api/tank-data",
-  // tankDataCloudUrl: "http://127.0.01:8000/api/tank-data",
+  // tankDataCloudUrl: "https://detfsmm.com/api/tank-data",
+  tankDataCloudUrl: "http://127.0.01:8000/api/tank-data",
 
   //--- tank data ( fuel in data cloud ) -------------------------------------------------------
-  fuelInCloud: "https://detfsmm.com/api/fuelIn",
-  // fuelInCloud: "http://127.0.01:8000/api/fuelIn",
+  // fuelInCloud: "https://detfsmm.com/api/fuelIn",
+  fuelInCloud: "http://127.0.01:8000/api/fuelIn",
 
 
   fuelBalanceCloud: "https://detfsmm.com/api/fuel-balance/check-balance",

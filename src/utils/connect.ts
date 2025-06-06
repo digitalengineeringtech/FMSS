@@ -1,8 +1,21 @@
 import mongoose from "mongoose";
 import config from "config";
 import mqtt from "mqtt";
+const connectionOptions: any = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+};
 
+export function externalDbConnect(extDbUrl: string){
+    const dbLink = config.get<string>(extDbUrl); //get db url from config default
+  let cachedDb = mongoose.createConnection(dbLink, connectionOptions);
+  cachedDb.once("open", () => {
+    console.log(`Connected to ${extDbUrl} database`);
+  });
+  return cachedDb;
+}
 const dbConnect = async () => {
+
   const dbUrl = config.get<string>("dbUrl");
 
   try {

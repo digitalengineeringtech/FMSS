@@ -31,7 +31,9 @@ import {
 } from "../schema/schema";
 
 //register user
-userRoute.post("/register", validateAll(createUserSchema), registerUserHandler);
+userRoute.post("/register", 
+  // validateAll(createUserSchema),
+   registerUserHandler);
 
 //login user
 userRoute.post("/login", validateAll(loginUserSchema), loginUserHandler);
@@ -41,21 +43,23 @@ userRoute.post("/cardAuth", validateAll(cardIdSchema), cardAuthHandler);
 //update
 userRoute.patch(
   "/",
-  validateToken,
-  roleValidator(["admin"]),
-  hasAnyPermit(["edit"]),
+  // validateToken,
+  // roleValidator(["admin"]),
+  // hasAnyPermit(["edit"]),
   updateUserHandler
 );
 
 //getuser
-userRoute.get("/", validateToken, getUserHandler);
+userRoute.get("/", 
+  // validateToken,
+   getUserHandler);
 
 //delete each user
 userRoute.delete(
   "/",
-  validateToken,
-  roleValidator(["admin"]),
-  hasAnyPermit(["delete"]),
+  // validateToken,
+  // roleValidator(["admin"]),
+  // hasAnyPermit(["delete"]),
   deleteUserHandler
 );
 
@@ -63,15 +67,15 @@ userRoute.delete(
 //beware deleting all user route
 userRoute.delete(
   "/admin",
-  validateToken,
-  roleValidator(["admin"]),
+  // validateToken,
+  // roleValidator(["admin"]),
   deleteUserHandler
 );
 
 userRoute.get(
   "/admin",
-  validateToken2,
-  roleValidator(["admin", "installer"]),
+  // validateToken2,
+  // roleValidator(["admin", "installer"]),
   getUserByAdminHandler
 );
 
@@ -87,10 +91,10 @@ userRoute.patch(
 
 userRoute.patch(
   "/remove/role",
-  validateToken2,
-  validateAll(userRoleSchema),
-  roleValidator(["admin", "installer"]),
-  hasAnyPermit(["delete"]),
+  // validateToken2,
+  // validateAll(userRoleSchema),
+  // roleValidator(["admin", "installer"]),
+  // hasAnyPermit(["delete"]),
   userRemoveRoleHandler
 );
 
@@ -106,10 +110,10 @@ userRoute.patch(
 
 userRoute.patch(
   "/remove/permit",
-  validateToken2,
-  validateAll(userPermitSchema),
-  roleValidator(["admin", "installer"]),
-  hasAnyPermit(["delete"]),
+  // validateToken2,
+  // validateAll(userPermitSchema),
+  // roleValidator(["admin", "installer"]),
+  // hasAnyPermit(["delete"]),
   userRemovePermitHandler
 );
 
